@@ -1,0 +1,13 @@
+{
+  "editor.renderWhitespace": "boundary",
+  "editor.formatOnSave": false,
+  "files.encoding": "utf8",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.eol": "\n",
+
+  "rust-client.engine": "rust-analyzer",
+
+  "search.exclude": {
+  },
+}

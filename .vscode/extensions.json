@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
+    "oderwat.indent-rainbow",
+    "aaron-bond.better-comments",
+    "coenraads.bracket-pair-colorizer",
+    "rust-lang.rust",
+    "matklad.rust-analyzer"
+  ]
+}

@@ -1,0 +1,120 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install musl tools
+        uses: sudo apt-get install musl-tools
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          target: x86_64-unknown-linux-musl
+
+      - name: Run cargo check
+        uses: actions-rs/cargo@v1
+        continue-on-error: false
+        with:
+          command: build
+          args: --release --target x86_64-unknown-linux-musl
+
+      - name: Azure Login
+        if: github.event_name != 'pull_request'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_KSAPPLICATIONS_STORAGE }}
+
+      - name: Deploy
+        if: github.event_name != 'pull_request'
+        run: |
+              az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/edpdgen' --file ./target/release/edpdgen --content-cache-control 'no-store max-age=0' --content-type "application/x-executable"
+        shell: pwsh
+
+      - name: Azure Logout
+        if: github.event_name != 'pull_request'
+        run: |
+              az logout
+
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        continue-on-error: false
+        with:
+          command: test
+
+  lints:
+    name: Lints
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustf
+          target: mt, clippy
+
+      - name: Run cargo fmt
+        uses: actions-rs/cargo@v1
+        continue-on-error: false
+        with:
+          command: fmt
+          args: --all -- --che
+          target: ck
+
+      - name: Run cargo clippy
+        uses: actions-rs/cargo@v1
+        continue-on-error: false
+        with:
+          command: clippy
+          args: --all-targets --all-features -- -D warnings
+
+  finish:
+    name: Finish
+    needs: [build, test, lints]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify DPT on Discord
+        if: github.event_name != 'pull_request'
+        env:
+          JOB_STATUS: ${{ job.status }}
+          WEBHOOK_URL: ${{ secrets.DISCORD_DPT_DEPLOYMENT_NOTIFICATIONS_WEBHOOK_URL }}
+          HOOK_OS_NAME: ${{ runner.os }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+        run: |
+          git clone https://github.com/DiscordHooks/github-actions-discord-webhook webhook
+          bash webhook/send.sh $JOB_STATUS $WEBHOOK_URL
+        shell: bash

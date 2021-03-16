@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "f5build",
+      "type": "yarn",
+      "script": "f5build",
+      "problemMatcher": []
+    },
+  ]
+}
