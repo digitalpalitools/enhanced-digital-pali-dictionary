@@ -10,7 +10,7 @@
     "start": "nodemon",
     "run": "cross-env TS_NODE_PROJECT=tsconfig.json node --max-old-space-size=8192 -r ts-node/register ./src/index.ts ods2csv",
     "build": "rimraf ./build && cross-env TS_NODE_PROJECT=tsconfig.json webpack --config webpack.config.ts",
-    "lint": "eslint src/*.ts",
+    "lint": "eslint src",
     "test": "jest --colors --coverage",
     "test:watch": "jest --colors --coverage --watchAll"
   },

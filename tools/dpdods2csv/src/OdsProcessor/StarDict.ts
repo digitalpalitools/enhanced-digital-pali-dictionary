@@ -41,9 +41,9 @@ ${contents}
 const createHtmlForWordGroup = (ws: PaliWordBase[], odsType: OdsType): string => {
   const sws = ws.sort((w1, w2) => w1.sortKey().localeCompare(w2.sortKey()))
 
-  const toc = ws.length < 2 ? '' : `${sws.map((w) => w.createTocSummary()).join('\n')}<br/>`
+  const toc = ws.length < 2 ? '' : `${sws.map(w => w.createTocSummary()).join('\n')}<br/>`
 
-  const html = sws.map((w) => w.createWordData()).join('')
+  const html = sws.map(w => w.createWordData()).join('')
 
   return createHtml(`${toc}${html}`, odsType)
 }
@@ -106,7 +106,7 @@ const createIdx = (idxWords: IdxWord[], reporter: Reporter): [IdxInfo, Buffer] =
 
   const sortedIdxWords = idxWords.sort((w1, w2) => g_ascii_strcasecmp(w1.str, w2.str))
 
-  const buffers = sortedIdxWords.flatMap((w) => {
+  const buffers = sortedIdxWords.flatMap(w => {
     const strB = Buffer.from(w.str, 'utf-8')
 
     const metaB = Buffer.alloc(1 + 4 + 4, 0, 'binary')

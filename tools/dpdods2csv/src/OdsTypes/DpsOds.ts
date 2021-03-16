@@ -189,7 +189,7 @@ class PaliWord implements Ods.PaliWordBase {
   sortKey = () => Ods.padTrailingNumbers(this.pali)
 }
 
-const createPaliWord: Ods.PaliWordFactory = (x) => new PaliWord(x)
+const createPaliWord: Ods.PaliWordFactory = x => new PaliWord(x)
 
 export const dpsOds: Ods.OdsType = {
   name: 'Devamitta Pāli Study',

@@ -24,14 +24,14 @@ export const getBoldStyles = (contentsXml: Document): string[] => {
 
   const allAutomaticStyles = contentsXml.getElementsByTagName('office:automatic-styles')
   Array.from(allAutomaticStyles)
-    .map((e) => e as Element)
-    .forEach((automaticStyles) => {
+    .map(e => e as Element)
+    .forEach(automaticStyles => {
       Array.from(automaticStyles?.childNodes)
-        .map((e) => e as Element)
-        .forEach((automaticStyle) => {
+        .map(e => e as Element)
+        .forEach(automaticStyle => {
           Array.from(automaticStyle?.childNodes)
-            .map((e) => e as Element)
-            .forEach((style) => {
+            .map(e => e as Element)
+            .forEach(style => {
               if (style?.tagName === 'style:text-properties' && style?.getAttribute('fo:font-weight') === 'bold') {
                 const s = automaticStyle.getAttribute('style:name')
                 if (s) {
@@ -50,7 +50,7 @@ export const getRowsInSheet = (contentsXml: Document, sheetName: string, reporte
 
   const firstSpreadsheet = allSpreadsheets[0]
   const table = Array.from(firstSpreadsheet.getElementsByTagName('table:table')).find(
-    (t) => t.getAttribute('table:name') === sheetName,
+    t => t.getAttribute('table:name') === sheetName,
   )
 
   if (!table) {
@@ -64,7 +64,7 @@ export const getRowsInSheet = (contentsXml: Document, sheetName: string, reporte
 }
 
 const processText = (nodes: NodeListOf<ChildNode>, boldStyles: string[]): string => {
-  const nodeTexts = Array.from(nodes).map((n) => {
+  const nodeTexts = Array.from(nodes).map(n => {
     if (n.nodeType === n.TEXT_NODE) {
       return n.nodeValue
     }
@@ -83,7 +83,7 @@ export const getCellText = (cell: Element, boldStyles: string[]): string => {
   const cellContents = cell.getElementsByTagName('text:p')
   if (cellContents.length > 0) {
     return Array.from(cellContents)
-      .map((x) => processText(x.childNodes, boldStyles))
+      .map(x => processText(x.childNodes, boldStyles))
       .join('<br/>')
   }
 
@@ -103,7 +103,7 @@ export const createInMemoryCSV = (rows: Element[], boldStyles: string[], columnC
       return [...accFlatCell, cell]
     }, [] as Element[])
 
-    const cells = flatCells.splice(0, columnCount).map((c) => getCellText(c, boldStyles))
+    const cells = flatCells.splice(0, columnCount).map(c => getCellText(c, boldStyles))
 
     return [...rowAcc, cells]
   }
@@ -151,5 +151,5 @@ export const readAllPaliWords = async (
     `OdsProcessor: processODS: Created in memory csv with ${inMemCsv.length} rows. (${(end - start) / 1000.0} s)`,
   )
 
-  return inMemCsv.map(pwFactory).filter((w) => w.includeInDictionary())
+  return inMemCsv.map(pwFactory).filter(w => w.includeInDictionary())
 }

@@ -269,7 +269,7 @@ class PaliWord implements Ods.PaliWordBase {
   sortKey = () => Ods.padTrailingNumbers(this.pali1)
 }
 
-const createPaliWord: Ods.PaliWordFactory = (x) => new PaliWord(x)
+const createPaliWord: Ods.PaliWordFactory = x => new PaliWord(x)
 
 export const dpdOds: Ods.OdsType = {
   name: 'Digital Pāli Dictionary (DPD)',
