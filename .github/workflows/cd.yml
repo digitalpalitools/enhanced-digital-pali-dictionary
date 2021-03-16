@@ -85,16 +85,14 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-          components: rustf
-          target: mt, clippy
+          components: rustfmt, clippy
 
       - name: Run cargo fmt
         uses: actions-rs/cargo@v1
         continue-on-error: false
         with:
           command: fmt
-          args: --all -- --che
-          target: ck
+          args: --all -- --check
 
       - name: Run cargo clippy
         uses: actions-rs/cargo@v1
@@ -108,12 +106,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install
-        run: yarn --no-progress --non-interactive --no-lockfile
-        working-directory: ./tools/dpdods2csv
+        run: |
+              cd ./tools/dpdods2csv
+              yarn --no-progress --non-interactive --no-lockfile
 
       - name: Lint code
-        run: yarn lint
-        working-directory: ./tools/dpdods2csv
+        run: |
+              cd ./tools/dpdods2csv
+              yarn lint
 
       - name: Test
         run: yarn test --colors --coverage
@@ -121,6 +121,7 @@ jobs:
 
       - name: Build CLI
         run: |
+              cd ./tools/dpdods2csv
               yarn build
               cp ./build/index.js ./build/dpdods2csv.js
         working-directory: ./tools/dpdods2csv
