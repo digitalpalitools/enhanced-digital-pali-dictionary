@@ -11,11 +11,12 @@
     "run": "cross-env TS_NODE_PROJECT=tsconfig.json node --max-old-space-size=8192 -r ts-node/register ./src/index.ts ods2csv",
     "build": "rimraf ./build && cross-env TS_NODE_PROJECT=tsconfig.json webpack --config webpack.config.ts",
     "lint": "eslint src/*.ts",
-    "test": "jest --colors --coverage --passWithNoTests",
+    "test": "jest --colors --coverage",
     "test:watch": "jest --colors --coverage --watchAll"
   },
   "dependencies": {
     "buffer": "^6.0.3",
+    "json2csv": "^5.0.6",
     "jszip": "^3.5.0",
     "lodash": "^4.17.21",
     "luxon": "^1.25.0",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
+    "@types/json2csv": "^5.0.1",
     "@types/lodash": "^4.14.168",
     "@types/luxon": "^1.25.0",
     "@types/node": "^13.7.1",
