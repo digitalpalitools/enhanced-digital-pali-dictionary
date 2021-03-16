@@ -47,7 +47,8 @@ jobs:
               ls -la .
               ls -la ./target
               ls -la ./target/x86_64-unknown-linux-musl
-              az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/edpdgen' --file ./target/x86_64-unknown-linux-musl/edpdgen --content-cache-control 'no-store max-age=0' --content-type "application/x-executable"
+              ls -la ./target/x86_64-unknown-linux-musl/release
+              az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/edpdgen' --file ./target/x86_64-unknown-linux-musl/release/edpdgen --content-cache-control 'no-store max-age=0' --content-type "application/x-executable"
         shell: pwsh
 
       - name: Azure Logout
@@ -110,9 +111,9 @@ jobs:
     steps:
       - name: Install
         run: |
-              la -la
-              la -la ./tools
-              la -la ./tools/dpdods2csv
+              ls -la
+              ls -la ./tools
+              ls -la ./tools/dpdods2csv
               cd ./tools/dpdods2csv
               yarn --no-progress --non-interactive --no-lockfile
 
