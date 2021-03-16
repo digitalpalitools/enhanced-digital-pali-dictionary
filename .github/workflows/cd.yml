@@ -17,7 +17,8 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install musl tools
-        uses: sudo apt-get install musl-tools
+        run: |
+              sudo apt-get install musl-tools
 
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
@@ -40,7 +41,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_KSAPPLICATIONS_STORAGE }}
 
-      - name: Deploy
+      - name: Deploy edpdgen
         if: github.event_name != 'pull_request'
         run: |
               az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/edpdgen' --file ./target/release/edpdgen --content-cache-control 'no-store max-age=0' --content-type "application/x-executable"
@@ -102,9 +103,53 @@ jobs:
           command: clippy
           args: --all-targets --all-features -- -D warnings
 
+  build-ods2csv:
+    name: Build ODS2CSV
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install
+        run: yarn --no-progress --non-interactive --no-lockfile
+        working-directory: ./tools/dpdods2csv
+
+      - name: Lint code
+        run: yarn lint
+        working-directory: ./tools/dpdods2csv
+
+      - name: Test
+        run: yarn test --colors --coverage
+        working-directory: ./tools/dpdods2csv
+
+      - name: Build CLI
+        run: |
+              yarn build
+              cp ./build/index.js ./build/dpdods2csv.js
+        working-directory: ./tools/dpdods2csv
+
+      - name: Zip CLI
+        uses: montudor/action-zip@v0.1.1
+        with:
+          args: zip -9 -j ./tools/dpdods2csv/build/dpdods2csv.zip ./tools/dpdods2csv/build/dpdods2csv.js
+
+      - name: Azure Login
+        if: github.event_name != 'pull_request'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_KSAPPLICATIONS_STORAGE }}
+
+      - name: Deploy dpdods2csv.zip
+        if: github.event_name != 'pull_request'
+        run: |
+              az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/dpdods2csv.zip' --file ./tools/dpdods2csv/build/dpdods2csv.zip --content-cache-control 'no-store max-age=0' --content-type "application/gzip"
+        shell: pwsh
+
+      - name: Azure Logout
+        if: github.event_name != 'pull_request'
+        run: |
+              az logout
+
   finish:
     name: Finish
-    needs: [build, test, lints]
+    needs: [build, test, lints, build-ods2csv]
     runs-on: ubuntu-latest
     steps:
       - name: Notify DPT on Discord
