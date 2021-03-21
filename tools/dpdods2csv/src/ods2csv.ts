@@ -44,6 +44,9 @@ export const runCommand = async (args: CommandArgs) => {
     odsType.paliWordFactory,
   )
 
+  const fullCsv = Ods.generateFullCsv(allWords, reporter)
+  fs.writeFile(args.odsFile.replace(/.ods$/i, '-full.csv'), fullCsv)
+
   const vocabCsv = Ods.generateVocabCsv(allWords, reporter)
   fs.writeFile(args.odsFile.replace(/.ods$/i, '-vocab.csv'), vocabCsv)
 

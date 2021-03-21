@@ -151,5 +151,5 @@ export const readAllPaliWords = async (
     `OdsProcessor: processODS: Created in memory csv with ${inMemCsv.length} rows. (${(end - start) / 1000.0} s)`,
   )
 
-  return inMemCsv.map(pwFactory).filter(w => w.includeInDictionary())
+  return inMemCsv.map(pwFactory)
 }
