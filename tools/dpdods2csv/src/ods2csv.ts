@@ -44,6 +44,10 @@ export const runCommand = async (args: CommandArgs) => {
     odsType.paliWordFactory,
   )
 
+  allWords.forEach(w => {
+    logger.info(`>>> ${w.sortKey()} => ${w.tocId()}`)
+  })
+
   const fullCsv = Ods.generateFullCsv(allWords, reporter)
   fs.writeFile(args.odsFile.replace(/.ods$/i, '-full.csv'), fullCsv)
 

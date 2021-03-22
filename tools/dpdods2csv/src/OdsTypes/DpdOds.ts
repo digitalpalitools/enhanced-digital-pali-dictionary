@@ -211,6 +211,10 @@ class PaliWord implements Ods.PaliWordBase {
     return this.record[39]
   }
 
+  isValidWord() {
+    return !!this.pali1
+  }
+
   groupId() {
     return Ods.makeGroupId(this.pali1)
   }

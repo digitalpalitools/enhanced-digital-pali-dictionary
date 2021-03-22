@@ -17,7 +17,7 @@
         "--max-old-space-size=8192",
       ],
       "program": "${workspaceFolder}/src/index.ts",
-      "args": ["generate-files"],
+      "args": ["ods2csv"],
       "console": "integratedTerminal"
     },
   ],

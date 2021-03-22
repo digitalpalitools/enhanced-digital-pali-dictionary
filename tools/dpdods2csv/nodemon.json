@@ -5,5 +5,5 @@
   ],
   "ext": ".ts,.js",
   "ignore": [],
-  "exec": "TS_NODE_PROJECT=tsconfig.json node --max-old-space-size=8192 -r ts-node/register ./src/index.ts generate-files"
+  "exec": "TS_NODE_PROJECT=tsconfig.json node --max-old-space-size=8192 -r ts-node/register ./src/index.ts ods2csv"
 }

@@ -1,4 +1,5 @@
 export interface PaliWordBase {
+  isValidWord(): boolean
   sortKey(): string
   groupId(): string
   tocId(): string

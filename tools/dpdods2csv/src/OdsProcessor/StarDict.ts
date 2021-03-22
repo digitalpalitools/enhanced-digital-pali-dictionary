@@ -39,6 +39,8 @@ ${contents}
 </html>`
 
 const createHtmlForWordGroup = (ws: PaliWordBase[], odsType: OdsType): string => {
+  // eslint-disable-next-line no-debugger
+  debugger
   const sws = ws.sort((w1, w2) => w1.sortKey().localeCompare(w2.sortKey()))
 
   const toc = ws.length < 2 ? '' : `${sws.map(w => w.createTocSummary()).join('\n')}<br/>`
@@ -49,6 +51,7 @@ const createHtmlForWordGroup = (ws: PaliWordBase[], odsType: OdsType): string =>
 }
 
 const createDict = (odsType: OdsType, wordGroups: PaliWordGroup, reporter: Reporter): [IdxWord[], Buffer] => {
+  reporter.Info(`... ... Creating dict: ${Object.keys(wordGroups).length} word groups.`)
   reporter.Info(`... Creating dict: ${Object.keys(wordGroups).length} word groups.`)
 
   type IdBufferMap = { [id: string]: Buffer }
