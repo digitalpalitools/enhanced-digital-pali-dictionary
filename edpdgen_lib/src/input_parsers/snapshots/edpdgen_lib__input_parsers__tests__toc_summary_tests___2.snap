@@ -1,5 +1,5 @@
 ---
-source: edpdgen_lib/src/lib.rs
+source: edpdgen_lib/src/input_parsers/mod.rs
 expression: toc_summary
 
 ---
