@@ -37,85 +37,92 @@ trait PaliWord {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DpdPaliWord {
     #[serde(rename = "Pāli1")]
-    pub pali1: String,
+    pali1: String,
     #[serde(rename = "Pāli2")]
-    pub pali2: String,
+    pali2: String,
     #[serde(rename = "Fin")]
-    pub fin: String,
+    fin: String,
     #[serde(rename = "POS")]
-    pub pos: String,
+    pos: String,
     #[serde(rename = "Grammar")]
-    pub grammar: String,
+    grammar: String,
     #[serde(rename = "Derived from")]
-    pub derived_from: String,
+    derived_from: String,
     #[serde(rename = "Neg")]
-    pub neg: String,
+    neg: String,
     #[serde(rename = "Verb")]
-    pub verb: String,
+    verb: String,
     #[serde(rename = "Trans")]
-    pub trans: String,
+    trans: String,
     #[serde(rename = "Case")]
-    pub case: String,
+    case: String,
     #[serde(rename = "Meaning IN CONTEXT")]
-    pub in_english: String,
+    in_english: String,
     #[serde(rename = "Sanskrit")]
-    pub sanskrit: String,
+    sanskrit: String,
     #[serde(rename = "Sk Root")]
-    pub sanskrit_root: String,
+    sanskrit_root: String,
     #[serde(rename = "Family")]
-    pub family: String,
+    family: String,
     #[serde(rename = "Pāli Root")]
-    pub pali_root: String,
+    pali_root: String,
     #[serde(rename = "V")]
-    pub v: String,
+    v: String,
     #[serde(rename = "Grp")]
-    pub grp: String,
+    grp: String,
     #[serde(rename = "Sgn")]
-    pub sgn: String,
+    sgn: String,
     #[serde(rename = "Root Meaning")]
-    pub root_meaning: String,
+    root_meaning: String,
     #[serde(rename = "Base")]
-    pub base: String,
+    base: String,
     #[serde(rename = "Construction")]
-    pub construction: String,
+    construction: String,
     #[serde(rename = "Derivative")]
-    pub derivative: String,
+    derivative: String,
     #[serde(rename = "Suffix")]
-    pub suffix: String,
+    suffix: String,
     #[serde(rename = "Compound")]
-    pub compound: String,
+    compound: String,
     #[serde(rename = "Compound Construction")]
-    pub compound_construction: String,
+    compound_construction: String,
     #[serde(rename = "Source1")]
-    pub source1: String,
+    source1: String,
     #[serde(rename = "Sutta1")]
-    pub sutta1: String,
+    sutta1: String,
     #[serde(rename = "Example1")]
-    pub example1: String,
+    example1: String,
     #[serde(rename = "Source 2")]
-    pub source2: String,
+    source2: String,
     #[serde(rename = "Sutta2")]
-    pub sutta2: String,
+    sutta2: String,
     #[serde(rename = "Example 2")]
-    pub example2: String,
+    example2: String,
     #[serde(rename = "Antonyms")]
-    pub antonyms: String,
+    antonyms: String,
     #[serde(rename = "Synonyms – different word")]
-    pub synonyms: String,
+    synonyms: String,
     #[serde(rename = "Variant – same constr or diff reading")]
-    pub variant: String,
+    variant: String,
     #[serde(rename = "Commentary")]
-    pub commentary: String,
+    commentary: String,
     #[serde(rename = "Notes")]
-    pub notes: String,
+    notes: String,
     #[serde(rename = "Stem")]
-    pub stem: String,
+    stem: String,
     #[serde(rename = "Pattern")]
-    pub pattern: String,
+    pattern: String,
     #[serde(rename = "Buddhadatta")]
-    pub buddhadatta: String,
+    buddhadatta: String,
     #[serde(rename = "3")]
-    pub two: String,
+    two: String,
+}
+
+#[derive(Serialize)]
+struct WordDataViewModel<'a> {
+    word: &'a DpdPaliWord,
+    toc_id: &'a str,
+    short_name: &'a str,
 }
 
 impl PaliWord for DpdPaliWord {
@@ -145,7 +152,10 @@ impl PaliWord for DpdPaliWord {
 
     fn toc_summary(&self) -> Result<String, String> {
         let mut context = Context::new();
-        context.insert("word", &self);
+        context.insert("toc_id", &self.toc_id());
+        context.insert("pali1", &self.pali1);
+        context.insert("pos", &self.pos);
+        context.insert("in_english", &self.in_english);
 
         TEMPLATES
             .render("toc_summary", &context)
@@ -153,9 +163,13 @@ impl PaliWord for DpdPaliWord {
     }
 
     fn word_data(&self) -> Result<String, String> {
-        let mut context = Context::new();
-        context.insert("word", &self);
+        let vm = WordDataViewModel {
+            word: &self,
+            toc_id: &self.toc_id(),
+            short_name: "dpd",
+        };
 
+        let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
         TEMPLATES
             .render("word_data", &context)
             .map_err(|e| e.to_string())

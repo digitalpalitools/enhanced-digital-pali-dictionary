@@ -44,16 +44,12 @@ export const runCommand = async (args: CommandArgs) => {
     odsType.paliWordFactory,
   )
 
-  allWords.forEach(w => {
-    logger.info(`>>> ${w.sortKey()} => ${w.tocId()}`)
-  })
-
   const fullCsv = Ods.generateFullCsv(allWords, reporter)
-  fs.writeFile(args.odsFile.replace(/.ods$/i, '-full.csv'), fullCsv)
+  await fs.writeFile(args.odsFile.replace(/.ods$/i, '-full.csv'), fullCsv)
 
   const vocabCsv = Ods.generateVocabCsv(allWords, reporter)
-  fs.writeFile(args.odsFile.replace(/.ods$/i, '-vocab.csv'), vocabCsv)
+  await fs.writeFile(args.odsFile.replace(/.ods$/i, '-vocab.csv'), vocabCsv)
 
   const rootCsv = Ods.generateRootCsv(allWords, reporter)
-  fs.writeFile(args.odsFile.replace(/.ods$/i, '-root.csv'), rootCsv)
+  await fs.writeFile(args.odsFile.replace(/.ods$/i, '-root.csv'), rootCsv)
 }
