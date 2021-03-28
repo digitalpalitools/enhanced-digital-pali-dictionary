@@ -1,0 +1,33 @@
+---
+source: edpdgen_lib/src/output_generators/mod.rs
+expression: idx_entries
+
+---
+- word: ābādha
+  data_offset: 0
+  data_size: 313
+- word: ābādhato
+  data_offset: 313
+  data_size: 315
+- word: ābādhika
+  data_offset: 628
+  data_size: 315
+- word: ābādhikinī
+  data_offset: 943
+  data_size: 318
+- word: abahulīkata
+  data_offset: 1261
+  data_size: 317
+- word: abala
+  data_offset: 1578
+  data_size: 376
+- word: abalabala
+  data_offset: 1954
+  data_size: 314
+- word: ābandhaka
+  data_offset: 2268
+  data_size: 315
+- word: adhikāra
+  data_offset: 2583
+  data_size: 492
+

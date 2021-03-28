@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* {
+  font-family: "Verajja Serif", "DejaVu Sans", sans-serif;
+}
+table.word-info-table-{{ ods_type }} tr {
+  vertical-align: top;
+}
+table.word-info-table-{{ ods_type }} tr td:nth-child(1), span.sutta-source-{{ ods_type }} {
+  color: {{ accent_color }};
+}
+</style>
+</head>
+<body>
+{% if 2 <= toc_entries | length -%}
+{% for toc_entry in toc_entries -%}
+{{ toc_entry }}
+{% endfor %}<br/>
+{% else %}
+{% endif -%}
+
+{%- for description in descriptions -%}
+{{ description }}
+{%- endfor -%}
+</body>
+</html>

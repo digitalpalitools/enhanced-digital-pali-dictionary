@@ -9,6 +9,8 @@ description = "Enhanced Digital Pāli Dictionary Generator CLI."
 
 [dependencies]
 edpdgen_lib = { path = '../edpdgen_lib' }
+colored = "2"
+chrono = "0.4"
 
 [dev-dependencies]
 proptest = "0.10.1"
