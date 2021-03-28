@@ -39,7 +39,7 @@ pub fn resolve_file_in_manifest_dir(file_name: &str) -> Result<String, String> {
         p1.join(file_name).to_str().map(|x| x.to_owned())
     };
 
-    Ok(file_path.ok_or_else(|| format!("Unable to resolve {}", file_name))?)
+    file_path.ok_or_else(|| format!("Unable to resolve {}", file_name))
 }
 
 #[cfg(test)]
