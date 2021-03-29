@@ -6,6 +6,8 @@ import { paliComparator } from './PaliCompare'
 
 type OdsParserInput = Blob | Uint8Array
 
+const doubleQuoteFinder = new RegExp('"', 'g')
+
 export const parseContentsXML = async (file: OdsParserInput, reporter: Reporter): Promise<Document | null> => {
   const zip = await JSZip.loadAsync(file)
 
@@ -67,7 +69,7 @@ export const getRowsInSheet = (contentsXml: Document, sheetName: string, reporte
 const processText = (nodes: NodeListOf<ChildNode>, boldStyles: string[]): string => {
   const nodeTexts = Array.from(nodes).map(n => {
     if (n.nodeType === n.TEXT_NODE) {
-      return n.nodeValue
+      return n.nodeValue?.replace(doubleQuoteFinder, '""')
     }
 
     const ne = n as Element

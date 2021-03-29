@@ -1,11 +1,7 @@
 use crate::input_parsers::PaliWord;
 use crate::EdpdLogger;
+use crate::{glib, StarDictFile, StartDictInfo};
 use itertools::Itertools;
-use std::cmp::Ordering;
-
-// use std::fs::File;
-// use std::io::Write;
-
 use tera::{Context, Tera};
 
 lazy_static! {
@@ -16,6 +12,8 @@ lazy_static! {
             include_str!("templates/word_group.html"),
         )])
         .expect("Unexpected failure adding template");
+        tera.add_raw_templates(vec![("ifo_file", include_str!("templates/ifo_file.txt"))])
+            .expect("Unexpected failure adding template");
         tera.autoescape_on(vec!["html"]);
         tera
     };
@@ -28,52 +26,6 @@ struct IdxEntry {
     data_size: i32,
 }
 
-/**
- * From: https://stackoverflow.com/a/13225961/6196679
- *
- * Compares two strings, ignoring the case of ASCII characters. It treats
- * non-ASCII characters taking in account case differences. This is an
- * attempt to mimic glib's string utility function
- * <a href="http://developer.gnome.org/glib/2.28/glib-String-Utility-Functions.html#g-ascii-strcasecmp">g_ascii_strcasecmp ()</a>.
- *
- * This is a slightly modified version of java.lang.String.CASE_INSENSITIVE_ORDER.compare(String s1, String s2) method.
- *
- * @param str1  string to compare with str2
- * @param str2  string to compare with str1
- * @return      0 if the strings match, a negative value if str1 < str2, or a positive value if str1 > str2
- */
-pub fn g_ascii_strcasecmp(str1: &str, str2: &str) -> Ordering {
-    let str_vec1: Vec<char> = str1.chars().collect();
-    let str_vec2: Vec<char> = str2.chars().collect();
-    let n1 = str_vec1.len();
-    let n2 = str_vec2.len();
-    let c127 = 127 as char;
-
-    let min = n1.min(n2);
-    for i in 0..min {
-        let c1 = str_vec1[i];
-        let c2 = str_vec2[i];
-        if c1 != c2 {
-            if c1 > c127 || c2 > c127 {
-                // If non-ASCII char...
-                return c1.cmp(&c2);
-            } else {
-                let c1uc = c1.to_ascii_uppercase();
-                let c2uc = c2.to_ascii_uppercase();
-                if c1uc != c2uc {
-                    let c1lc = c1.to_ascii_lowercase();
-                    let c2lc = c2.to_ascii_lowercase();
-                    if c1lc != c2lc {
-                        return c1lc.cmp(&c2lc);
-                    }
-                }
-            }
-        }
-    }
-
-    n1.cmp(&n2)
-}
-
 #[derive(Serialize)]
 struct WordGroupViewModel<'a> {
     ods_type: &'a str,
@@ -82,17 +34,28 @@ struct WordGroupViewModel<'a> {
     descriptions: &'a [String],
 }
 
+#[derive(Serialize)]
+struct IfoViewModel<'a> {
+    version: &'a str,
+    name: &'a str,
+    word_count: usize,
+    idx_file_size: usize,
+    author: &'a str,
+    description: &'a str,
+    time_stamp: &'a str,
+}
+
 fn create_html_for_word_group(
-    ods_type: &str,
+    dict_info: &StartDictInfo,
     words: impl Iterator<Item = impl PaliWord>,
-    _logger: &impl EdpdLogger,
 ) -> Result<String, String> {
     let mut word_info: Vec<(String, String, String)> = words
         .map(|w| {
             (
                 w.sort_key(),
                 w.toc_entry().unwrap_or_else(|e| e),
-                w.word_data_entry().unwrap_or_else(|e| e),
+                w.word_data_entry(dict_info.short_name)
+                    .unwrap_or_else(|e| e),
             )
         })
         .collect();
@@ -102,8 +65,8 @@ fn create_html_for_word_group(
     let descriptions: Vec<String> = word_info.iter().map(|w| w.2.to_owned()).collect();
 
     let vm = WordGroupViewModel {
-        ods_type,
-        accent_color: "orange",
+        ods_type: dict_info.short_name,
+        accent_color: dict_info.accent_color,
         toc_entries: &toc_entries,
         descriptions: &descriptions,
     };
@@ -115,23 +78,18 @@ fn create_html_for_word_group(
 }
 
 fn create_dict(
-    ods_type: &str,
+    dict_info: &StartDictInfo,
     words: impl Iterator<Item = impl PaliWord>,
     logger: &impl EdpdLogger,
 ) -> Result<(Vec<u8>, Vec<IdxEntry>), String> {
+    logger.info(&"Creating dict entries.".to_string());
     let word_groups = words.group_by(|pw| pw.group_id());
 
     let mut dict_buffer: Vec<u8> = Vec::new();
     let mut idx_words: Vec<IdxEntry> = Vec::new();
     for (n, (key, word_group)) in (&word_groups).into_iter().enumerate() {
-        let html_str = create_html_for_word_group(ods_type, word_group, logger)?;
+        let html_str = create_html_for_word_group(dict_info, word_group)?;
         let mut html_bytes = html_str.into_bytes();
-
-        // //if key.eq("ajapada") {//"abbahe") {
-        // logger.info(&format!("Writing {}...", key));
-        // let mut dict_file = File::create(format!("d:/delme/dicts-rust/words/{}.txt", key)).map_err(|e| e.to_string()).unwrap();
-        // dict_file.write_all(&html_bytes).unwrap();
-        // //}
 
         idx_words.push(IdxEntry {
             word: key,
@@ -143,13 +101,22 @@ fn create_dict(
             data_size: html_bytes.len() as i32,
         });
         dict_buffer.append(&mut html_bytes);
+
+        if n % 10_000 == 0 && n != 0 {
+            logger.info(&format!("... created {} dict entries.", n));
+        }
     }
 
+    logger.info(&format!(
+        "... done creating {} dict entries.",
+        idx_words.len()
+    ));
     Ok((dict_buffer, idx_words))
 }
 
 fn create_idx(idx_entries: &mut Vec<IdxEntry>, logger: &impl EdpdLogger) -> Vec<u8> {
-    idx_entries.sort_by(|w1, w2| g_ascii_strcasecmp(&w1.word, &w2.word));
+    logger.info(&format!("Creating {} idx entries.", &idx_entries.len()));
+    idx_entries.sort_by(|w1, w2| glib::g_ascii_strcasecmp(&w1.word, &w2.word));
 
     let idx: Vec<u8> = idx_entries.iter().fold(Vec::new(), |mut acc, e| {
         acc.append(&mut e.word.to_owned().into_bytes());
@@ -159,20 +126,71 @@ fn create_idx(idx_entries: &mut Vec<IdxEntry>, logger: &impl EdpdLogger) -> Vec<
         acc
     });
 
-    logger.info(&format!("Created {} idx entries.", &idx_entries.len()));
+    logger.info(&format!(
+        "... done creating {} idx entries.",
+        &idx_entries.len()
+    ));
     idx
 }
 
-pub fn write_dictionary(
-    ods_type: &str,
+pub fn create_dictionary(
+    dict_info: &StartDictInfo,
     words: impl Iterator<Item = impl PaliWord>,
     logger: &impl EdpdLogger,
-) -> Result<(Vec<u8>, Vec<u8>), String> {
-    let (dict, mut idx_entries) = create_dict(ods_type, words, logger)?;
-
+) -> Result<Vec<StarDictFile>, String> {
+    let (dict, mut idx_entries) = create_dict(dict_info, words, logger)?;
     let idx = create_idx(&mut idx_entries, logger);
+    let ifo = create_ifo(dict_info, idx_entries.len(), idx.len())?;
+    let png = create_png(dict_info);
 
-    Ok((dict, idx))
+    Ok(vec![
+        StarDictFile {
+            extension: "idx".to_string(),
+            data: idx,
+        },
+        StarDictFile {
+            extension: "dict".to_string(),
+            data: dict,
+        },
+        StarDictFile {
+            extension: "ifo".to_string(),
+            data: ifo,
+        },
+        StarDictFile {
+            extension: "png".to_string(),
+            data: png,
+        },
+    ])
+}
+
+fn create_ifo(
+    dict_info: &StartDictInfo,
+    word_count: usize,
+    idx_file_size: usize,
+) -> Result<Vec<u8>, String> {
+    let vm = IfoViewModel {
+        version: env!("CARGO_PKG_VERSION"),
+        name: dict_info.name,
+        word_count,
+        idx_file_size,
+        author: dict_info.author,
+        description: dict_info.description,
+        time_stamp: dict_info.time_stamp,
+    };
+
+    let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
+    let ifo_str = TEMPLATES
+        .render("ifo_file", &context)
+        .map_err(|e| e.to_string())?;
+
+    Ok(ifo_str.into_bytes())
+}
+
+fn create_png(dict_info: &StartDictInfo) -> Vec<u8> {
+    let mut png = Vec::new();
+    png.extend_from_slice(&dict_info.ico);
+
+    png
 }
 
 #[cfg(test)]
@@ -207,8 +225,8 @@ mod tests {
             Ok(self.toc_entry.clone())
         }
 
-        fn word_data_entry(&self) -> Result<String, String> {
-            Ok(self.word_data_entry.clone())
+        fn word_data_entry(&self, short_name: &str) -> Result<String, String> {
+            Ok(format!("{}-{}", self.word_data_entry, short_name))
         }
     }
 
@@ -222,12 +240,24 @@ mod tests {
         rdr.into_deserialize::<TestPaliWord>().map(|w| w.expect(""))
     }
 
+    fn create_dict_info<'a>() -> StartDictInfo<'a> {
+        StartDictInfo {
+            name: "Digital Pāli Tools Dictionary (DPD)",
+            short_name: "dpd",
+            author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
+            description: "The next generation comprehensive digital Pāli dictionary.",
+            accent_color: "orange",
+            time_stamp: "xxxx",
+            ico: &[],
+        }
+    }
+
     #[test]
     fn create_dict_test() {
         let words = read_pali_words();
 
         let (dict_data, idx_entries) =
-            create_dict("dpd", words, &TestLogger::new()).expect("Unexpected");
+            create_dict(&create_dict_info(), words, &TestLogger::new()).expect("Unexpected");
         let dict_entries: Vec<String> = idx_entries
             .iter()
             .map(|ie| {
@@ -264,5 +294,12 @@ mod tests {
             idx,
             vec![0x61, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0x62, 0x63, 0, 1, 0, 1, 0, 0, 2, 0, 2]
         )
+    }
+
+    #[test]
+    fn create_ifo_test() {
+        let ifo = create_ifo(&create_dict_info(), 100, 1000).expect("Unexpected");
+
+        insta::assert_snapshot!(&String::from_utf8(ifo).expect("Unexpected"));
     }
 }

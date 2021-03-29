@@ -1,5 +1,6 @@
 use crate::EdpdLogger;
 use regex::{Captures, Regex};
+use std::path::Path;
 use tera::{Context, Tera};
 
 lazy_static! {
@@ -26,7 +27,7 @@ pub trait PaliWord {
     fn group_id(&self) -> String;
     fn toc_id(&self) -> String;
     fn toc_entry(&self) -> Result<String, String>;
-    fn word_data_entry(&self) -> Result<String, String>;
+    fn word_data_entry(&self, short_name: &str) -> Result<String, String>;
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -151,11 +152,11 @@ impl PaliWord for DpdPaliWord {
             .map_err(|e| e.to_string())
     }
 
-    fn word_data_entry(&self) -> Result<String, String> {
+    fn word_data_entry(&self, short_name: &str) -> Result<String, String> {
         let vm = WordDataViewModel {
             word: &self,
             toc_id: &self.toc_id(),
-            short_name: "dpd",
+            short_name,
         };
 
         let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
@@ -165,11 +166,11 @@ impl PaliWord for DpdPaliWord {
     }
 }
 
-pub fn read_words<'a>(
-    path: &str,
+pub fn load_words<'a>(
+    path: &Path,
     logger: &'a impl EdpdLogger,
 ) -> Result<impl Iterator<Item = impl PaliWord> + 'a, String> {
-    logger.info(&format!("Reading words from {}", path));
+    logger.info(&format!("Loading words from {:?}.", path));
 
     let file = std::fs::File::open(path).map_err(|e| e.to_string())?;
     let rdr = csv::ReaderBuilder::new()
@@ -191,6 +192,7 @@ pub fn read_words<'a>(
             }
         });
 
+    logger.info(&format!("... done loading words from {:?}.", &path));
     Ok(words)
 }
 
@@ -199,9 +201,10 @@ mod tests {
     use super::*;
     use crate::resolve_file_in_manifest_dir;
     use crate::tests::TestLogger;
+    use std::path::PathBuf;
     use test_case::test_case;
 
-    fn get_csv_path() -> String {
+    fn get_csv_path() -> PathBuf {
         resolve_file_in_manifest_dir("Pali_English_Dictionary_10_rows-full.csv")
             .expect("must exist!")
     }
@@ -211,7 +214,7 @@ mod tests {
     #[test_case(11, "adhikāra 010"; "2 digits")]
     fn test_sort_key(rec_number: usize, expected_sk: &str) {
         let l = TestLogger::new();
-        let mut recs = read_words(&get_csv_path(), &l).expect("failed to load");
+        let mut recs = load_words(&get_csv_path(), &l).expect("failed to load");
 
         let sk = recs
             .nth(rec_number)
@@ -226,7 +229,7 @@ mod tests {
     #[test_case(11, "adhikāra"; "2 digits")]
     fn test_group_id(rec_number: usize, expected_gid: &str) {
         let l = TestLogger::new();
-        let mut recs = read_words(&get_csv_path(), &l).expect("failed to load");
+        let mut recs = load_words(&get_csv_path(), &l).expect("failed to load");
 
         let gid = recs
             .nth(rec_number)
@@ -241,7 +244,7 @@ mod tests {
     #[test_case(11, "adhikāra_10_dpd"; "2 digits")]
     fn test_toc_id(rec_number: usize, expected_toc_id: &str) {
         let l = TestLogger::new();
-        let mut recs = read_words(&get_csv_path(), &l).expect("unexpected");
+        let mut recs = load_words(&get_csv_path(), &l).expect("unexpected");
 
         let toc_id = recs
             .nth(rec_number)
@@ -266,7 +269,7 @@ mod tests {
     #[test_case(12)]
     fn toc_summary_tests(rec_number: usize) {
         let l = TestLogger::new();
-        let mut recs = read_words(&get_csv_path(), &l).expect("unexpected");
+        let mut recs = load_words(&get_csv_path(), &l).expect("unexpected");
 
         let toc_summary = recs
             .nth(rec_number)
@@ -291,11 +294,11 @@ mod tests {
     #[test_case(12)]
     fn word_data_tests(rec_number: usize) {
         let l = TestLogger::new();
-        let mut recs = read_words(&get_csv_path(), &l).expect("unexpected");
+        let mut recs = load_words(&get_csv_path(), &l).expect("unexpected");
 
         let word_data = recs
             .nth(rec_number)
-            .map(|r| r.word_data_entry().expect("unexpected"))
+            .map(|r| r.word_data_entry("dpd").expect("unexpected"))
             .expect("unexpected");
 
         insta::assert_snapshot!(word_data);

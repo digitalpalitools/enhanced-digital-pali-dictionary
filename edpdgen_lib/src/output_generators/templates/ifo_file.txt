@@ -1,0 +1,10 @@
+StarDict's dict ifo file
+version={{ version }}
+bookname={{ name }}
+wordcount={{ word_count }}
+idxfilesize={{ idx_file_size }}
+author={{ author }}
+website=https://github.com/digitalpalitools
+description={{ description }}
+date={{ time_stamp }}
+sametypesequence=h

@@ -1,0 +1,16 @@
+---
+source: edpdgen_lib/src/output_generators/mod.rs
+expression: "&String::from_utf8(ifo).expect(\"Unexpected\")"
+
+---
+StarDict's dict ifo file
+version=0.1.0
+bookname=Digital Pāli Tools Dictionary (DPD)
+wordcount=100
+idxfilesize=1000
+author=Digital Pāli Tools <digitalpalitools@gmail.com>
+website=https://github.com/digitalpalitools
+description=The next generation comprehensive digital Pāli dictionary.
+date=xxxx
+sametypesequence=h
+
