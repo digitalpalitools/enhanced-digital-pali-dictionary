@@ -2,8 +2,11 @@ import JSZip from 'jszip'
 import { DOMParser } from 'xmldom'
 import { PaliWordBase, PaliWordFactory } from './PaliWord'
 import { Reporter } from './Common'
+import { paliComparator } from './PaliCompare'
 
 type OdsParserInput = Blob | Uint8Array
+
+const doubleQuoteFinder = new RegExp('"', 'g')
 
 export const parseContentsXML = async (file: OdsParserInput, reporter: Reporter): Promise<Document | null> => {
   const zip = await JSZip.loadAsync(file)
@@ -66,7 +69,7 @@ export const getRowsInSheet = (contentsXml: Document, sheetName: string, reporte
 const processText = (nodes: NodeListOf<ChildNode>, boldStyles: string[]): string => {
   const nodeTexts = Array.from(nodes).map(n => {
     if (n.nodeType === n.TEXT_NODE) {
-      return n.nodeValue
+      return n.nodeValue?.replace(doubleQuoteFinder, '""')
     }
 
     const ne = n as Element
@@ -151,5 +154,8 @@ export const readAllPaliWords = async (
     `OdsProcessor: processODS: Created in memory csv with ${inMemCsv.length} rows. (${(end - start) / 1000.0} s)`,
   )
 
-  return inMemCsv.map(pwFactory).filter(w => w.isValidWord())
+  const [header, ...data] = inMemCsv.map(pwFactory)
+  const sortedData = data.filter(w => w.isValidWord()).sort((a, b) => paliComparator(a.sortKey(), b.sortKey()))
+
+  return [header, ...sortedData]
 }

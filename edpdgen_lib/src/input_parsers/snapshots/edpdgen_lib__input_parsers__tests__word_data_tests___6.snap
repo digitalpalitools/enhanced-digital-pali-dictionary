@@ -3,7 +3,6 @@ source: edpdgen_lib/src/input_parsers/mod.rs
 expression: word_data
 
 ---
-
   <hr />
   <div>
     <h4 id="abala_2_dpd">abala 2</h4>

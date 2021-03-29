@@ -212,7 +212,7 @@ class PaliWord implements Ods.PaliWordBase {
   }
 
   isValidWord() {
-    return !!this.pali1
+    return !!this.pali1 && !this.pali1.startsWith('?')
   }
 
   groupId() {
