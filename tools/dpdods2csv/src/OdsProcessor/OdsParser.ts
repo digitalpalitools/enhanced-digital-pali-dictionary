@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
 import { DOMParser } from 'xmldom'
-import { PaliWordBase, PaliWordFactory } from './PaliWord'
+import { PaliWordFields, PaliWordBase, PaliWordFactory } from './PaliWord'
 import { Reporter } from './Common'
 import { paliComparator } from './PaliCompare'
 
@@ -154,7 +154,11 @@ export const readAllPaliWords = async (
     `OdsProcessor: processODS: Created in memory csv with ${inMemCsv.length} rows. (${(end - start) / 1000.0} s)`,
   )
 
-  const [header, ...data] = inMemCsv.map(pwFactory)
+  const fields = inMemCsv[0].reduce((acc, e, i) => {
+    acc[e] = i
+    return acc
+  }, {} as PaliWordFields)
+  const [header, ...data] = inMemCsv.map(r => pwFactory(fields, r))
   const sortedData = data.filter(w => w.isValidWord()).sort((a, b) => paliComparator(a.sortKey(), b.sortKey()))
 
   return [header, ...sortedData]

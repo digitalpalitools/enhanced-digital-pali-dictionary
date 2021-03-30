@@ -30,10 +30,10 @@ fn main() -> Result<(), String> {
 
     let csv_path = matches
         .value_of("CSV_FILE")
-        .expect("This is a required argument");
+        .ok_or_else(|| "This is a required argument")?;
     l.info(&format!("Using csv file: {}", csv_path));
 
-    edpdgen_lib::run(Path::new(csv_path), &ColoredConsoleLogger {})
+    edpdgen_lib::run(Path::new(csv_path), &l)
 }
 
 fn get_time_stamp() -> String {

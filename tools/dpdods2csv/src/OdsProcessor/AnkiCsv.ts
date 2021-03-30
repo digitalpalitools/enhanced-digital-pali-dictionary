@@ -4,8 +4,7 @@ import { PaliWordBase } from './PaliWord'
 
 //
 // NOTE: There are bunch of issues with this implementation, fix as required.
-// 1. This will break if there is a quote inside any word.
-// 2. Not a streaming API, duplicates the entire dataset in memory.
+// 1. Not a streaming API, duplicates the entire dataset in memory.
 //
 
 const generateCsv = (allWords: PaliWordBase[], filter: (w: PaliWordBase) => boolean): [Buffer, number] => {

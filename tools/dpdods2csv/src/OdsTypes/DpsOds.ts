@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/dot-notation */
 import * as Ods from '../OdsProcessor'
 
 /*
@@ -31,110 +32,113 @@ Test
 const shortName = 'dps'
 
 class PaliWord implements Ods.PaliWordBase {
+  readonly fields: Ods.PaliWordFields
+
   readonly record: string[]
 
-  constructor(record: string[]) {
+  constructor(header: Ods.PaliWordFields, record: string[]) {
+    this.fields = header
     this.record = record
   }
 
   get pali() {
-    return this.record[0]
+    return this.record[this.fields['pāli:']]
   }
 
   get bang() {
-    return this.record[1]
+    return this.record[this.fields['(!)']]
   }
 
   get pos() {
-    return this.record[2]
+    return this.record[this.fields['POS']]
   }
 
   get grammar() {
-    return this.record[3]
+    return this.record[this.fields['Grammar']]
   }
 
   get derivedFrom() {
-    return this.record[4]
+    return this.record[this.fields['Derived from']]
   }
 
   get neg() {
-    return this.record[5]
+    return this.record[this.fields['Neg']]
   }
 
   get verb() {
-    return this.record[6]
+    return this.record[this.fields['Verb']]
   }
 
   get trans() {
-    return this.record[7]
+    return this.record[this.fields['Trans']]
   }
 
   get case() {
-    return this.record[8]
+    return this.record[this.fields['Case']]
   }
 
   get inEnglish() {
-    return this.record[9]
+    return this.record[this.fields['Meaning in english']]
   }
 
   get inRussian() {
-    return this.record[10]
+    return this.record[this.fields['in native language']]
   }
 
   get paliRoot() {
-    return this.record[11]
+    return this.record[this.fields['pali root']]
   }
 
   get base() {
-    return this.record[12]
+    return this.record[this.fields['base']]
   }
 
   get construction() {
-    return this.record[13]
+    return this.record[this.fields['constraction']]
   }
 
   get sanskrit() {
-    return this.record[14]
+    return this.record[this.fields['sanskrit']]
   }
 
   get sanskritRoot() {
-    return this.record[15]
+    return this.record[this.fields['sk root']]
   }
 
   get comments() {
-    return this.record[16]
+    return this.record[this.fields['Comments']]
   }
 
   get source1() {
-    return this.record[17]
+    return this.record[this.fields['sourse 1']]
   }
 
   get sentence1() {
-    return this.record[18]
+    return this.record[this.fields['sentence from the pāli cannon 1']]
   }
 
   get sutta1() {
-    return this.record[19]
+    return this.record[this.fields['sutta name pali 1']]
   }
 
   get source2() {
-    return this.record[20]
+    return this.record[this.fields['source 2']]
   }
 
   get sentence2() {
-    return this.record[21]
+    return this.record[this.fields['sentence 2']]
   }
 
   get sutta2() {
-    return this.record[22]
+    return this.record[this.fields['chant name 2']]
   }
 
   get chapter() {
-    return this.record[23]
+    return this.record[this.fields['Chapter']]
   }
 
   get test() {
-    return this.record[24]
+    return this.record[this.fields['Test']]
   }
 
   isValidWord() {
@@ -193,7 +197,7 @@ class PaliWord implements Ods.PaliWordBase {
   sortKey = () => Ods.padTrailingNumbers(this.pali)
 }
 
-const createPaliWord: Ods.PaliWordFactory = x => new PaliWord(x)
+const createPaliWord: Ods.PaliWordFactory = (h, r) => new PaliWord(h, r)
 
 export const dpsOds: Ods.OdsType = {
   name: 'Devamitta Pāli Study',

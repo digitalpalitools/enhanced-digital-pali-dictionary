@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/dot-notation */
 import * as Ods from '../OdsProcessor'
 
 /*
@@ -45,174 +46,173 @@ import * as Ods from '../OdsProcessor'
 const shortName = 'dpd'
 
 class PaliWord implements Ods.PaliWordBase {
+  readonly fields: Ods.PaliWordFields
+
   readonly record: string[]
 
-  constructor(record: string[]) {
+  constructor(header: Ods.PaliWordFields, record: string[]) {
+    this.fields = header
     this.record = record
   }
 
   get pali1() {
-    return this.record[0]
+    return this.record[this.fields['Pāli1']]
   }
 
   get pali2() {
-    return this.record[1]
+    return this.record[this.fields['Pāli2']]
   }
 
   get fin() {
-    return this.record[2]
+    return this.record[this.fields['Fin']]
   }
 
   get pos() {
-    return this.record[3]
+    return this.record[this.fields['POS']]
   }
 
   get grammar() {
-    return this.record[4]
+    return this.record[this.fields['Grammar']]
   }
 
   get derivedFrom() {
-    return this.record[5]
+    return this.record[this.fields['Derived from']]
   }
 
   get neg() {
-    return this.record[6]
+    return this.record[this.fields['Neg']]
   }
 
   get verb() {
-    return this.record[7]
+    return this.record[this.fields['Verb']]
   }
 
   get trans() {
-    return this.record[8]
+    return this.record[this.fields['Trans']]
   }
 
   get case() {
-    return this.record[9]
+    return this.record[this.fields['Case']]
   }
 
   get inEnglish() {
-    return this.record[10]
+    return this.record[this.fields['Meaning IN CONTEXT']]
   }
 
   get sanskrit() {
-    return this.record[11]
+    return this.record[this.fields['Sanskrit']]
   }
 
   get sanskritRoot() {
-    return this.record[12]
+    return this.record[this.fields['Sk Root']]
   }
 
   get family() {
-    return this.record[13]
+    return this.record[this.fields['Family']]
   }
 
   get paliRoot() {
-    return this.record[14]
+    return this.record[this.fields['Pāli Root']]
   }
 
   get v() {
-    return this.record[15]
+    return this.record[this.fields['V']]
   }
 
   get grp() {
-    return this.record[16]
+    return this.record[this.fields['Grp']]
   }
 
   get sgn() {
-    return this.record[17]
+    return this.record[this.fields['Sgn']]
   }
 
   get rootMeaning() {
-    return this.record[18]
+    return this.record[this.fields['Root Meaning']]
   }
 
   get base() {
-    return this.record[19]
+    return this.record[this.fields['Base']]
   }
 
   get construction() {
-    return this.record[20]
+    return this.record[this.fields['Construction']]
   }
 
   get derivative() {
-    return this.record[21]
+    return this.record[this.fields['Derivative']]
   }
 
   get suffix() {
-    return this.record[22]
+    return this.record[this.fields['Suffix']]
   }
 
   get compound() {
-    return this.record[23]
+    return this.record[this.fields['Compound']]
   }
 
   get compoundConstruction() {
-    return this.record[24]
+    return this.record[this.fields['Compound Construction']]
   }
 
   get source1() {
-    return this.record[25]
+    return this.record[this.fields['Source1']]
   }
 
   get sutta1() {
-    return this.record[26]
+    return this.record[this.fields['Sutta1']]
   }
 
   get example1() {
-    return this.record[27]
+    return this.record[this.fields['Example1']]
   }
 
   get source2() {
-    return this.record[28]
+    return this.record[this.fields['Source 2']]
   }
 
   get sutta2() {
-    return this.record[29]
+    return this.record[this.fields['Sutta2']]
   }
 
   get example2() {
-    return this.record[30]
+    return this.record[this.fields['Example 2']]
   }
 
   get antonyms() {
-    return this.record[31]
+    return this.record[this.fields['Antonyms']]
   }
 
   get synonyms() {
-    return this.record[32]
+    return this.record[this.fields['Synonyms – different word']]
   }
 
   get variant() {
-    return this.record[33]
+    return this.record[this.fields['Variant – same constr or diff reading']]
   }
 
   get commentary() {
-    return this.record[34]
+    return this.record[this.fields['Commentary']]
   }
 
   get notes() {
-    return this.record[35]
+    return this.record[this.fields['Notes']]
   }
 
   get stem() {
-    return this.record[36]
+    return this.record[this.fields['Stem']]
   }
 
   get pattern() {
-    return this.record[37]
+    return this.record[this.fields['Pattern']]
   }
 
   get buddhadatta() {
-    return this.record[38]
-  }
-
-  get two() {
-    return this.record[39]
+    return this.record[this.fields['Buddhadatta']]
   }
 
   isValidWord() {
-    return !!this.pali1 && !this.pali1.startsWith('?')
+    return !!this.pali1
   }
 
   groupId() {
@@ -273,7 +273,7 @@ class PaliWord implements Ods.PaliWordBase {
   sortKey = () => Ods.padTrailingNumbers(this.pali1)
 }
 
-const createPaliWord: Ods.PaliWordFactory = x => new PaliWord(x)
+const createPaliWord: Ods.PaliWordFactory = (h, r) => new PaliWord(h, r)
 
 export const dpdOds: Ods.OdsType = {
   name: 'Digital Pāli Dictionary (DPD)',
