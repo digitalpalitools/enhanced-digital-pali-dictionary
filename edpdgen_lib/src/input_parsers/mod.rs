@@ -30,6 +30,7 @@ pub trait PaliWord {
     fn word_data_entry(&self, short_name: &str) -> Result<String, String>;
 }
 
+// NOTE: Keep the order deliberately randomized as we support column reordering.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DpdPaliWord {
     #[serde(rename = "Pāli1")]
@@ -102,6 +103,10 @@ pub struct DpdPaliWord {
     variant: String,
     #[serde(rename = "Commentary")]
     commentary: String,
+    #[serde(rename = "Literal Meaning")]
+    literal_meaning: String,
+    #[serde(rename = "Root In Comps")]
+    root_in_compound: String,
     #[serde(rename = "Notes")]
     notes: String,
     #[serde(rename = "Stem")]

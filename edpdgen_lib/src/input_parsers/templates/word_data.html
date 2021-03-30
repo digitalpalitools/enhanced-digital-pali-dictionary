@@ -21,6 +21,12 @@
 {%- if word['Meaning IN CONTEXT'] -%}
 <tr><td>English</td><td><span><strong>{{ word['Meaning IN CONTEXT'] }}</strong></span></td></tr>
 {%- endif -%}
+{%- if word['Literal Meaning'] -%}
+<tr><td>Literal Meaning</td><td><span>{{ word['Literal Meaning'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Root In Comps'] -%}
+<tr><td>Root In Compounds</td><td><span>{{ word['Root In Comps'] }}</span></td></tr>
+{%- endif -%}
 {%- if word['Family'] -%}
 <tr><td>Family</td><td><span>{{ word['Family'] }}</span></td></tr>
 {%- endif -%}
