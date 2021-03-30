@@ -30,7 +30,7 @@ fn main() -> Result<(), String> {
 
     let csv_path = matches
         .value_of("CSV_FILE")
-        .ok_or(|| "This is a required argument")?;
+        .ok_or_else(|| "This is a required argument".to_string())?;
     l.info(&format!("Using csv file: {}", csv_path));
 
     edpdgen_lib::run(Path::new(csv_path), &l)
