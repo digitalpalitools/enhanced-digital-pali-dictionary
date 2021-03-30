@@ -15,12 +15,9 @@ table.word-info-table-{{ ods_type }} tr td:nth-child(1), span.sutta-source-{{ od
 </style>
 </head>
 <body>
-{% if 2 <= toc_entries | length -%}
 {% for toc_entry in toc_entries -%}
 {{ toc_entry }}
 {% endfor %}<br/>
-{% else %}
-{% endif -%}
 
 {%- for description in descriptions -%}
 {{ description }}
