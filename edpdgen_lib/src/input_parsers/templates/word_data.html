@@ -43,7 +43,7 @@
 <tr><td>Derivative</td><td><span>{{ word['Derivative'] }} ({{ word['Suffix'] }})</span></td></tr>
 {%- endif -%}
 {%- if word['Compound'] -%}
-<tr><td>Compound</td><td><span>{{ word['Compound'] }} ({{ word['Compound Construction'] }})</span></td></tr>
+<tr><td>Compound</td><td><span>{{ word['Compound'] }} {% if word['Compound Construction'] -%}({{ word['Compound Construction'] }}){%- endif -%}</span></td></tr>
 {%- endif -%}
 {%- if word['Antonyms'] -%}
 <tr><td>Antonym</td><td><span>{{ word['Antonyms'] }}</span></td></tr>
