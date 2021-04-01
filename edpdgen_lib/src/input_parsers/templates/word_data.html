@@ -22,16 +22,13 @@
 <tr><td>English</td><td><span><strong>{{ word['Meaning IN CONTEXT'] }}</strong></span></td></tr>
 {%- endif -%}
 {%- if word['Literal Meaning'] -%}
-<tr><td>Literal Meaning</td><td><span>{{ word['Literal Meaning'] }}</span></td></tr>
-{%- endif -%}
-{%- if word['Root In Comps'] -%}
-<tr><td>Root In Compounds</td><td><span>{{ word['Root In Comps'] }}</span></td></tr>
+<tr><td></td><td><span>lit. {{ word['Literal Meaning'] }}</span></td></tr>
 {%- endif -%}
 {%- if word['Family'] -%}
 <tr><td>Family</td><td><span>{{ word['Family'] }}</span></td></tr>
 {%- endif -%}
 {%- if word['Pāli Root'] -%}
-<tr><td>Root</td><td><span>{{ word['Pāli Root'] }}<sup>{{ word['V'] }}</sup>{{ word['Grp'] }} {{ word['Sgn'] }} ({{ word['Root Meaning'] }})</span></td></tr>
+<tr><td>Root</td><td><span>{{ word['Pāli Root'] }}<sup>{{ word['V'] }}</sup>{{ word['Grp'] }} {{ word['Sgn'] }} ({{ word['Root Meaning'] }}){%- if word['Root In Comps'] -%}&nbsp;{{ word['Root In Comps'] }}&nbsp;in comps{%- endif -%}</span></td></tr>
 {%- endif -%}
 {%- if word['Base'] -%}
 <tr><td>Base</td><td><span>{{ word['Base'] }}</span></td></tr>

@@ -55,7 +55,7 @@ fn create_base_path(csv_path: &Path, ods_type: &str) -> Result<PathBuf, String> 
     let base_path = csv_path
         .parent()
         .ok_or_else(|| format!("Unable to get parent folder for {:?}.", &csv_path))?
-        .join("dict")
+        .join("dicts")
         .join(ods_type);
 
     let parent_dir = base_path
