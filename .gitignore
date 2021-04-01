@@ -4,3 +4,4 @@ Cargo.lock
 proptest-regressions/
 pkg/
 *.snap.new
+.~*#

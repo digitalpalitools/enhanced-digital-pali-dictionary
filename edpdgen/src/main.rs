@@ -33,7 +33,17 @@ fn main() -> Result<(), String> {
         .ok_or_else(|| "This is a required argument".to_string())?;
     l.info(&format!("Using csv file: {}", csv_path));
 
-    edpdgen_lib::run(Path::new(csv_path), &l)
+    let feedback_form_url =
+        "https://docs.google.com/forms/d/1hMra0aMz65sYnRlPjGlTYQIHz-3_tKlywu3enqXlpSc/viewform";
+    let host_url = env!("CARGO_PKG_NAME");
+    let host_version = env!("CARGO_PKG_VERSION");
+    edpdgen_lib::run(
+        Path::new(csv_path),
+        feedback_form_url,
+        host_url,
+        host_version,
+        &l,
+    )
 }
 
 fn get_time_stamp() -> String {

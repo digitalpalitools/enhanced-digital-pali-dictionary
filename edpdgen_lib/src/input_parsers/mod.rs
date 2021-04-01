@@ -27,7 +27,13 @@ pub trait PaliWord {
     fn group_id(&self) -> String;
     fn toc_id(&self) -> String;
     fn toc_entry(&self) -> Result<String, String>;
-    fn word_data_entry(&self, short_name: &str) -> Result<String, String>;
+    fn word_data_entry(
+        &self,
+        short_name: &str,
+        feedback_form_url: &str,
+        host_url: &str,
+        host_version: &str,
+    ) -> Result<String, String>;
 }
 
 // NOTE: Keep the order deliberately randomized as we support column reordering.
@@ -122,6 +128,9 @@ struct WordDataViewModel<'a> {
     word: &'a DpdPaliWord,
     toc_id: &'a str,
     short_name: &'a str,
+    feedback_form_url: &'a str,
+    host_url: &'a str,
+    host_version: &'a str,
 }
 
 impl PaliWord for DpdPaliWord {
@@ -157,11 +166,20 @@ impl PaliWord for DpdPaliWord {
             .map_err(|e| e.to_string())
     }
 
-    fn word_data_entry(&self, short_name: &str) -> Result<String, String> {
+    fn word_data_entry(
+        &self,
+        short_name: &str,
+        feedback_form_url: &str,
+        host_url: &str,
+        host_version: &str,
+    ) -> Result<String, String> {
         let vm = WordDataViewModel {
             word: &self,
             toc_id: &self.toc_id(),
             short_name,
+            feedback_form_url,
+            host_url,
+            host_version,
         };
 
         let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
@@ -303,7 +321,10 @@ mod tests {
 
         let word_data = recs
             .nth(rec_number)
-            .map(|r| r.word_data_entry("dpd").expect("unexpected"))
+            .map(|r| {
+                r.word_data_entry("dpd", "fb_url", "host url", "host version")
+                    .expect("unexpected")
+            })
             .expect("unexpected");
 
         insta::assert_snapshot!(word_data);

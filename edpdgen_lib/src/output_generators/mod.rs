@@ -54,8 +54,13 @@ fn create_html_for_word_group(
             (
                 w.sort_key(),
                 w.toc_entry().unwrap_or_else(|e| e),
-                w.word_data_entry(dict_info.short_name)
-                    .unwrap_or_else(|e| e),
+                w.word_data_entry(
+                    dict_info.short_name,
+                    dict_info.feedback_form_url,
+                    dict_info.host_url,
+                    dict_info.host_version,
+                )
+                .unwrap_or_else(|e| e),
             )
         })
         .collect();
@@ -225,8 +230,17 @@ mod tests {
             Ok(self.toc_entry.clone())
         }
 
-        fn word_data_entry(&self, short_name: &str) -> Result<String, String> {
-            Ok(format!("{}-{}", self.word_data_entry, short_name))
+        fn word_data_entry(
+            &self,
+            short_name: &str,
+            feedback_form_url: &str,
+            host_url: &str,
+            host_version: &str,
+        ) -> Result<String, String> {
+            Ok(format!(
+                "{}-{}-{}-{}-{}",
+                self.word_data_entry, short_name, feedback_form_url, host_url, host_version
+            ))
         }
     }
 
@@ -249,6 +263,9 @@ mod tests {
             accent_color: "orange",
             time_stamp: "xxxx",
             ico: &[],
+            feedback_form_url: "http://feedback.form/???",
+            host_url: "this is the host",
+            host_version: "host version",
         }
     }
 

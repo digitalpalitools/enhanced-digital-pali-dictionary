@@ -31,9 +31,18 @@ pub struct StartDictInfo<'a> {
     accent_color: &'a str,
     time_stamp: &'a str,
     ico: &'a [u8],
+    feedback_form_url: &'a str,
+    host_url: &'a str,
+    host_version: &'a str,
 }
 
-pub fn run(csv_path: &Path, logger: &impl EdpdLogger) -> Result<(), String> {
+pub fn run(
+    csv_path: &Path,
+    feedback_form_url: &str,
+    host_url: &str,
+    host_version: &str,
+    logger: &impl EdpdLogger,
+) -> Result<(), String> {
     let dict_info = StartDictInfo {
         name: "Digital Pāli Tools Dictionary (DPD)",
         short_name: "dpd",
@@ -42,6 +51,9 @@ pub fn run(csv_path: &Path, logger: &impl EdpdLogger) -> Result<(), String> {
         accent_color: "orange",
         time_stamp: &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
         ico: include_bytes!("dpd.png"),
+        feedback_form_url,
+        host_url,
+        host_version,
     };
 
     let words = input_parsers::load_words(csv_path, logger)?;
