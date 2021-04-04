@@ -3,7 +3,9 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 
-use chrono::{SecondsFormat, Utc};
+use crate::input_parsers::dpd::DpdPaliWord;
+use crate::input_parsers::dps::DpsPaliWord;
+use crate::input_parsers::PaliWord;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
@@ -24,42 +26,39 @@ pub struct StarDictFile {
 }
 
 pub struct StartDictInfo<'a> {
-    name: &'a str,
-    short_name: &'a str,
-    author: &'a str,
-    description: &'a str,
-    accent_color: &'a str,
-    time_stamp: &'a str,
-    ico: &'a [u8],
-    feedback_form_url: &'a str,
-    host_url: &'a str,
-    host_version: &'a str,
+    pub name: &'a str,
+    pub short_name: &'a str,
+    pub author: &'a str,
+    pub description: &'a str,
+    pub accent_color: &'a str,
+    pub time_stamp: &'a str,
+    pub ico: &'a [u8],
+    pub feedback_form_url: &'a str,
+    pub host_url: &'a str,
+    pub host_version: &'a str,
 }
 
 pub fn run(
+    dict_info: &StartDictInfo,
     csv_path: &Path,
-    feedback_form_url: &str,
-    host_url: &str,
-    host_version: &str,
-    logger: &impl EdpdLogger,
+    logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
-    let dict_info = StartDictInfo {
-        name: "Digital Pāli Tools Dictionary (DPD)",
-        short_name: "dpd",
-        author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
-        description: "The next generation comprehensive digital Pāli dictionary.",
-        accent_color: "orange",
-        time_stamp: &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true),
-        ico: include_bytes!("dpd.png"),
-        feedback_form_url,
-        host_url,
-        host_version,
-    };
+    match dict_info.short_name {
+        "dpd" => run_for_ods_type::<DpdPaliWord>(dict_info, csv_path, logger),
+        "dps" => run_for_ods_type::<DpsPaliWord>(dict_info, csv_path, logger),
+        _ => unreachable!(),
+    }
+}
 
-    let words = input_parsers::load_words(csv_path, logger)?;
+fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + PaliWord>(
+    dict_info: &StartDictInfo,
+    csv_path: &Path,
+    logger: &dyn EdpdLogger,
+) -> Result<(), String> {
+    let words = input_parsers::load_words::<T>(csv_path, logger)?;
     let sd_files = output_generators::create_dictionary(&dict_info, words, logger)?;
 
-    let base_path = create_base_path(csv_path, "dpd")?;
+    let base_path = create_base_path(csv_path, dict_info.short_name)?;
     write_dictionary(&base_path, sd_files, logger)
 }
 
@@ -94,7 +93,7 @@ pub fn resolve_file_in_manifest_dir(file_name: &str) -> Result<PathBuf, String> 
 fn write_dictionary(
     base_path: &Path,
     sd_files: Vec<StarDictFile>,
-    logger: &impl EdpdLogger,
+    logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
     for sd_file in sd_files {
         let f_name = base_path.with_extension(&sd_file.extension);

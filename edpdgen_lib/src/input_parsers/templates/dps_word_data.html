@@ -1,0 +1,83 @@
+  <hr />
+  <div>
+    <h4 id="{{ toc_id }}">{{ word['Pāli1'] }}</h4>
+    <table class="word-info-table-{{ short_name }}">
+      <tbody><tr><td>Pāli</td><td><span>{{ word['Pāli2'] }}</span></td></tr>
+{%- if word['Grammar'] -%}
+<tr><td>Grammar</td><td><span>{{ word['Grammar'] }}
+{%- if word['Verb'] -%}
+, {{ word['Verb'] }}
+{%- endif -%}
+{%- if word['Neg'] -%}
+, {{ word['Neg'] }}
+{%- endif -%}
+{%- if word['Trans'] -%}
+, {{ word['Trans'] }}
+{%- endif -%}
+{%- if word['Case'] %} ({{ word['Case'] }})
+{%- endif -%}
+</span></td></tr>
+{%- endif -%}
+{%- if word['Meaning IN CONTEXT'] -%}
+<tr><td>English</td><td><span><strong>{{ word['Meaning IN CONTEXT'] }}</strong></span></td></tr>
+{%- endif -%}
+{%- if word['Literal Meaning'] -%}
+<tr><td></td><td><span>lit. {{ word['Literal Meaning'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Family'] -%}
+<tr><td>Family</td><td><span>{{ word['Family'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Pāli Root'] -%}
+<tr><td>Root</td><td><span>{{ word['Pāli Root'] }}<sup>{{ word['V'] }}</sup>{{ word['Grp'] }} {{ word['Sgn'] }} ({{ word['Root Meaning'] }}){%- if word['Root In Comps'] -%}&nbsp;{{ word['Root In Comps'] }}&nbsp;in comps{%- endif -%}</span></td></tr>
+{%- endif -%}
+{%- if word['Base'] -%}
+<tr><td>Base</td><td><span>{{ word['Base'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Construction'] -%}
+<tr><td>Construction</td><td><span>{{ word['Construction'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Derivative'] -%}
+<tr><td>Derivative</td><td><span>{{ word['Derivative'] }} ({{ word['Suffix'] }})</span></td></tr>
+{%- endif -%}
+{%- if word['Compound'] -%}
+<tr><td>Compound</td><td><span>{{ word['Compound'] }} {% if word['Compound Construction'] -%}({{ word['Compound Construction'] }}){%- endif -%}</span></td></tr>
+{%- endif -%}
+{%- if word['Antonyms'] -%}
+<tr><td>Antonym</td><td><span>{{ word['Antonyms'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Synonyms – different word'] -%}
+<tr><td>Synonym</td><td><span>{{ word['Synonyms – different word'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Variant – same constr or diff reading'] -%}
+<tr><td>Variant</td><td><span>{{ word['Variant – same constr or diff reading'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Sanskrit'] -%}
+<tr><td>Sanskrit</td><td><span>{{ word['Sanskrit'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Sk Root'] -%}
+<tr><td>Sanskrit Root</td><td><span>{{ word['Sk Root'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Commentary'] -%}
+<tr><td>Commentary</td><td><span>{{ word['Commentary'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Notes'] -%}
+<tr><td>Notes</td><td><span>{{ word['Notes'] }}</span></td></tr>
+{%- endif -%}
+</tbody>
+    </table>
+    <br />
+{%- if word['Example1'] -%}
+<span>{{ word['Example1'] }}</span><br />
+{%- endif -%}
+{%- if word['Source1'] -%}
+<span class="sutta-source-{{ short_name }}"><i>{{ word['Source1'] }} {{ word['Sutta1'] }}</i></span><br /><br />
+{%- endif -%}
+{%- if word['Example 2'] -%}
+<span>{{ word['Example 2'] }}</span><br />
+{%- endif -%}
+{%- if word['Source 2'] -%}
+<span class="sutta-source-{{ short_name }}"><i>{{ word['Source 2'] }} {{ word['Sutta2'] }}</i></span><br /><br />
+{%- endif -%}
+</div>
+<br/>
+<a class="dictionary-feedback-link-{{ short_name }}" href="{{ feedback_form_url }}?entry.267696921={{ host_url }}&entry.1433863141={{ host_version }}" target="_blank">spot a mistake in the dictionary? fix it here!</a>

@@ -1,5 +1,5 @@
 ---
-source: edpdgen_lib/src/input_parsers/mod.rs
+source: edpdgen_lib/src/input_parsers/dpd.rs
 expression: word_data
 
 ---

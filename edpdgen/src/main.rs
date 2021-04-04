@@ -1,47 +1,29 @@
-use chrono::Local;
-use clap::{App, Arg};
+use chrono::{Local, SecondsFormat, Utc};
+use clap::{App, Arg, ArgMatches};
 use colored::*;
-use edpdgen_lib::EdpdLogger;
+use edpdgen_lib::{EdpdLogger, StartDictInfo};
 use std::path::Path;
 
 fn main() -> Result<(), String> {
     let l = ColoredConsoleLogger {};
-    let matches = App::new(env!("CARGO_PKG_NAME"))
-        .version(env!("CARGO_PKG_VERSION"))
-        .author(env!("CARGO_PKG_AUTHORS"))
-        .about(env!("CARGO_PKG_DESCRIPTION"))
-        .arg(
-            Arg::with_name("CSV_FILE")
-                .short("c")
-                .long("csv")
-                .value_name("CSV_FILE")
-                .help("CSV with all words.")
-                .required(true)
-                .validator(|x| {
-                    if Path::new(&x).is_file() {
-                        Ok(())
-                    } else {
-                        Err(format!("{} does not exist.", x))
-                    }
-                })
-                .takes_value(true),
-        )
-        .get_matches();
+    let matches = get_args();
 
     let csv_path = matches
         .value_of("CSV_FILE")
         .ok_or_else(|| "This is a required argument".to_string())?;
-    l.info(&format!("Using csv file: {}", csv_path));
+    let ods_type = matches
+        .value_of("ODS_TYPE")
+        .ok_or_else(|| "This is a required argument".to_string())?;
 
-    let feedback_form_url =
-        "https://docs.google.com/forms/d/1hMra0aMz65sYnRlPjGlTYQIHz-3_tKlywu3enqXlpSc/viewform";
-    let host_url = env!("CARGO_PKG_NAME");
-    let host_version = env!("CARGO_PKG_VERSION");
+    l.info(&format!(
+        "Using csv file: {} for ods type {}.",
+        csv_path, ods_type
+    ));
+    let time_stamp = &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true);
+
     edpdgen_lib::run(
+        &get_stardict_info_from_ods_type(ods_type, time_stamp),
         Path::new(csv_path),
-        feedback_form_url,
-        host_url,
-        host_version,
         &l,
     )
 }
@@ -67,5 +49,81 @@ impl EdpdLogger for ColoredConsoleLogger {
             get_time_stamp().white(),
             format!("error: {}", msg).red(),
         );
+    }
+}
+
+fn get_args<'a>() -> ArgMatches<'a> {
+    App::new(env!("CARGO_PKG_NAME"))
+        .version(env!("CARGO_PKG_VERSION"))
+        .author(env!("CARGO_PKG_AUTHORS"))
+        .about(env!("CARGO_PKG_DESCRIPTION"))
+        .arg(
+            Arg::with_name("CSV_FILE")
+                .short("c")
+                .long("csv")
+                .value_name("CSV_FILE")
+                .help("CSV with all words.")
+                .required(true)
+                .validator(|x| {
+                    if Path::new(&x).is_file() {
+                        Ok(())
+                    } else {
+                        Err(format!("{} does not exist.", x))
+                    }
+                })
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("ODS_TYPE")
+                .short("t")
+                .long("type")
+                .value_name("ODS_TYPE")
+                .help("Type of ODS.")
+                .required(true)
+                .possible_values(&["dpd", "dps"])
+                .takes_value(true),
+        )
+        .get_matches()
+}
+
+fn get_stardict_info_from_ods_type<'a>(
+    ods_type: &'a str,
+    time_stamp: &'a str,
+) -> StartDictInfo<'a> {
+    let host_url = env!("CARGO_PKG_NAME");
+    let host_version = env!("CARGO_PKG_VERSION");
+    let short_name = ods_type;
+
+    match short_name {
+        "dpd" => {
+            StartDictInfo {
+                name: "Digital Pāli Tools Dictionary (DPD)",
+                short_name,
+                author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
+                description: "The next generation comprehensive digital Pāli dictionary.",
+                accent_color: "orange",
+                time_stamp,
+                ico: include_bytes!("dpd.png"),
+                feedback_form_url:
+                    "https://docs.google.com/forms/d/1hMra0aMz65sYnRlPjGlTYQIHz-3_tKlywu3enqXlpSc/viewform",
+                host_url,
+                host_version,
+            }
+        }
+        "dps" => {
+            StartDictInfo {
+                name: "Devamitta Pāli Study (DPS)",
+                short_name,
+                author: "Devamitta Bhikkhu",
+                description: "A detailed Pāli language word lookup.",
+                accent_color: "green",
+                time_stamp,
+                ico: include_bytes!("dps.png"),
+                feedback_form_url: "https://docs.google.com/forms",
+                host_url,
+                host_version,
+            }
+        }
+        _ => unreachable!()
     }
 }

@@ -53,7 +53,7 @@ fn create_html_for_word_group(
         .map(|w| {
             (
                 w.sort_key(),
-                w.toc_entry().unwrap_or_else(|e| e),
+                w.toc_entry(dict_info.short_name).unwrap_or_else(|e| e),
                 w.word_data_entry(
                     dict_info.short_name,
                     dict_info.feedback_form_url,
@@ -85,7 +85,7 @@ fn create_html_for_word_group(
 fn create_dict(
     dict_info: &StartDictInfo,
     words: impl Iterator<Item = impl PaliWord>,
-    logger: &impl EdpdLogger,
+    logger: &dyn EdpdLogger,
 ) -> Result<(Vec<u8>, Vec<IdxEntry>), String> {
     logger.info(&"Creating dict entries.".to_string());
     let word_groups = words.group_by(|pw| pw.group_id());
@@ -119,7 +119,7 @@ fn create_dict(
     Ok((dict_buffer, idx_words))
 }
 
-fn create_idx(idx_entries: &mut Vec<IdxEntry>, logger: &impl EdpdLogger) -> Vec<u8> {
+fn create_idx(idx_entries: &mut Vec<IdxEntry>, logger: &dyn EdpdLogger) -> Vec<u8> {
     logger.info(&format!("Creating {} idx entries.", &idx_entries.len()));
     idx_entries.sort_by(|w1, w2| glib::g_ascii_strcasecmp(&w1.word, &w2.word));
 
@@ -141,7 +141,7 @@ fn create_idx(idx_entries: &mut Vec<IdxEntry>, logger: &impl EdpdLogger) -> Vec<
 pub fn create_dictionary(
     dict_info: &StartDictInfo,
     words: impl Iterator<Item = impl PaliWord>,
-    logger: &impl EdpdLogger,
+    logger: &dyn EdpdLogger,
 ) -> Result<Vec<StarDictFile>, String> {
     let (dict, mut idx_entries) = create_dict(dict_info, words, logger)?;
     let idx = create_idx(&mut idx_entries, logger);
@@ -206,6 +206,7 @@ mod tests {
 
     #[derive(Debug, Deserialize)]
     struct TestPaliWord {
+        id: String,
         sort_key: String,
         group_id: String,
         toc_id: String,
@@ -214,6 +215,10 @@ mod tests {
     }
 
     impl PaliWord for TestPaliWord {
+        fn id(&self) -> &str {
+            &self.id
+        }
+
         fn sort_key(&self) -> String {
             self.sort_key.clone()
         }
@@ -222,11 +227,11 @@ mod tests {
             self.group_id.clone()
         }
 
-        fn toc_id(&self) -> String {
+        fn toc_id(&self, _short_name: &str) -> String {
             self.toc_id.clone()
         }
 
-        fn toc_entry(&self) -> Result<String, String> {
+        fn toc_entry(&self, _short_name: &str) -> Result<String, String> {
             Ok(self.toc_entry.clone())
         }
 
@@ -257,7 +262,7 @@ mod tests {
     fn create_dict_info<'a>() -> StartDictInfo<'a> {
         StartDictInfo {
             name: "Digital Pāli Tools Dictionary (DPD)",
-            short_name: "dpd",
+            short_name: "dpz",
             author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
             description: "The next generation comprehensive digital Pāli dictionary.",
             accent_color: "orange",

@@ -2,8 +2,8 @@
 import * as Ods from '../OdsProcessor'
 
 /*
-pāli:
-(!)
+Pāli1
+Fin
 POS
 Grammar
 Derived from
@@ -11,20 +11,21 @@ Neg
 Verb
 Trans
 Case
-Meaning in english
-in native language
-pali root
-base
-constraction
-sanskrit
-sk root
-Comments
-sourse 1
-sentence from the pāli cannon 1
-sutta name pali 1
-source 2
-sentence 2
-chant name 2
+Meaning IN CONTEXT
+Meaning in native language
+Pāli Root
+Base
+Construction
+Sanskrit
+Sk Root
+Commentary
+Notes
+Source1
+Example1
+Sutta1
+Source 2
+Example 2
+Sutta2
 Chapter
 Test
 */
@@ -42,11 +43,11 @@ class PaliWord implements Ods.PaliWordBase {
   }
 
   get pali() {
-    return this.record[this.fields['pāli:']]
+    return this.record[this.fields['Pāli1']]
   }
 
-  get bang() {
-    return this.record[this.fields['(!)']]
+  get fin() {
+    return this.record[this.fields['Fin']]
   }
 
   get pos() {
@@ -78,59 +79,63 @@ class PaliWord implements Ods.PaliWordBase {
   }
 
   get inEnglish() {
-    return this.record[this.fields['Meaning in english']]
+    return this.record[this.fields['Meaning IN CONTEXT']]
   }
 
   get inRussian() {
-    return this.record[this.fields['in native language']]
+    return this.record[this.fields['Meaning in native language']]
   }
 
   get paliRoot() {
-    return this.record[this.fields['pali root']]
+    return this.record[this.fields['Pāli Root']]
   }
 
   get base() {
-    return this.record[this.fields['base']]
+    return this.record[this.fields['Base']]
   }
 
   get construction() {
-    return this.record[this.fields['constraction']]
+    return this.record[this.fields['Construction']]
   }
 
   get sanskrit() {
-    return this.record[this.fields['sanskrit']]
+    return this.record[this.fields['Sanskrit']]
   }
 
   get sanskritRoot() {
-    return this.record[this.fields['sk root']]
+    return this.record[this.fields['Sk Root']]
   }
 
-  get comments() {
-    return this.record[this.fields['Comments']]
+  get commentary() {
+    return this.record[this.fields['Commentary']]
+  }
+
+  get notes() {
+    return this.record[this.fields['Notes']]
   }
 
   get source1() {
-    return this.record[this.fields['sourse 1']]
+    return this.record[this.fields['Source1']]
   }
 
-  get sentence1() {
-    return this.record[this.fields['sentence from the pāli cannon 1']]
+  get example1() {
+    return this.record[this.fields['Example1']]
   }
 
   get sutta1() {
-    return this.record[this.fields['sutta name pali 1']]
+    return this.record[this.fields['Sutta1']]
   }
 
   get source2() {
-    return this.record[this.fields['source 2']]
+    return this.record[this.fields['Source 2']]
   }
 
-  get sentence2() {
-    return this.record[this.fields['sentence 2']]
+  get example2() {
+    return this.record[this.fields['Example 2']]
   }
 
   get sutta2() {
-    return this.record[this.fields['chant name 2']]
+    return this.record[this.fields['Sutta2']]
   }
 
   get chapter() {
@@ -141,8 +146,9 @@ class PaliWord implements Ods.PaliWordBase {
     return this.record[this.fields['Test']]
   }
 
+  // eslint-disable-next-line class-methods-use-this
   isValidWord() {
-    return !!this.pali
+    return true
   }
 
   groupId() {
@@ -173,13 +179,13 @@ class PaliWord implements Ods.PaliWordBase {
       (this.construction && `<tr><td>Construction</td><td><span>${this.construction}</span></td></tr>`) +
       (this.sanskrit && `<tr><td>Sanskrit</td><td><span>${this.sanskrit}</span></td></tr>`) +
       (this.sanskritRoot && `<tr><td>Sanskrit Root</td><td><span>${this.sanskritRoot}</span></td></tr>`) +
-      (this.comments && `<tr><td>Commentary</td><td><span>${this.comments}</span></td></tr>`) +
+      (this.commentary && `<tr><td>Commentary</td><td><span>${this.commentary}</span></td></tr>`) +
       `</tbody>
     </table>`
     +
-    (this.sentence1 && `<br /><span>${this.sentence1}</span><br />`) +
+    (this.example1 && `<br /><span>${this.example1}</span><br />`) +
     (this.source1 && `<span class="sutta-source-${shortName}"><i>${this.source1} ${this.sutta1}</i></span><br />`) +
-    (this.sentence2 && `<br /><span>${this.sentence2}</span><br />`) +
+    (this.example2 && `<br /><span>${this.example2}</span><br />`) +
     (this.source2 && `<span class="sutta-source-${shortName}"><i>${this.source2} ${this.sutta2}</i></span><br />`) +
     (this.chapter && `<span class="sutta-source-${shortName}"><i>${this.chapter}</i></span><br /><br />`) +
   `</div>`
