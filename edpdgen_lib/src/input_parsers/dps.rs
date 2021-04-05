@@ -23,9 +23,7 @@ lazy_static! {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DpsPaliWord {
     #[serde(rename = "Pāli1")]
-    pali1: String,
-    #[serde(rename = "Pāli2")]
-    pali2: String,
+    pali: String,
     #[serde(rename = "Fin")]
     fin: String,
     #[serde(rename = "POS")]
@@ -44,66 +42,38 @@ pub struct DpsPaliWord {
     case: String,
     #[serde(rename = "Meaning IN CONTEXT")]
     in_english: String,
-    #[serde(rename = "Sanskrit")]
-    sanskrit: String,
-    #[serde(rename = "Sk Root")]
-    sanskrit_root: String,
-    #[serde(rename = "Family")]
-    family: String,
+    #[serde(rename = "Meaning in native language")]
+    in_russian: String,
     #[serde(rename = "Pāli Root")]
     pali_root: String,
-    #[serde(rename = "V")]
-    v: String,
-    #[serde(rename = "Grp")]
-    grp: String,
-    #[serde(rename = "Sgn")]
-    sgn: String,
-    #[serde(rename = "Root Meaning")]
-    root_meaning: String,
     #[serde(rename = "Base")]
     base: String,
     #[serde(rename = "Construction")]
     construction: String,
-    #[serde(rename = "Derivative")]
-    derivative: String,
-    #[serde(rename = "Suffix")]
-    suffix: String,
-    #[serde(rename = "Compound")]
-    compound: String,
-    #[serde(rename = "Compound Construction")]
-    compound_construction: String,
-    #[serde(rename = "Source1")]
-    source1: String,
-    #[serde(rename = "Sutta1")]
-    sutta1: String,
-    #[serde(rename = "Example1")]
-    example1: String,
-    #[serde(rename = "Source 2")]
-    source2: String,
-    #[serde(rename = "Sutta2")]
-    sutta2: String,
-    #[serde(rename = "Example 2")]
-    example2: String,
-    #[serde(rename = "Antonyms")]
-    antonyms: String,
-    #[serde(rename = "Synonyms – different word")]
-    synonyms: String,
-    #[serde(rename = "Variant – same constr or diff reading")]
-    variant: String,
+    #[serde(rename = "Sanskrit")]
+    sanskrit: String,
+    #[serde(rename = "Sk Root")]
+    sanskrit_root: String,
     #[serde(rename = "Commentary")]
     commentary: String,
-    #[serde(rename = "Literal Meaning")]
-    literal_meaning: String,
-    #[serde(rename = "Root In Comps")]
-    root_in_compound: String,
     #[serde(rename = "Notes")]
     notes: String,
-    #[serde(rename = "Stem")]
-    stem: String,
-    #[serde(rename = "Pattern")]
-    pattern: String,
-    #[serde(rename = "Buddhadatta")]
-    buddhadatta: String,
+    #[serde(rename = "Source1")]
+    source1: String,
+    #[serde(rename = "Example1")]
+    example1: String,
+    #[serde(rename = "Sutta1")]
+    sutta1: String,
+    #[serde(rename = "Source 2")]
+    source2: String,
+    #[serde(rename = "Example 2")]
+    example2: String,
+    #[serde(rename = "Sutta2")]
+    sutta2: String,
+    #[serde(rename = "Chapter")]
+    chapter: String,
+    #[serde(rename = "Test")]
+    test: String,
 }
 
 #[derive(Serialize)]
@@ -118,7 +88,7 @@ struct WordDataViewModel<'a> {
 
 impl PaliWord for DpsPaliWord {
     fn id(&self) -> &str {
-        &self.pali1
+        &self.pali
     }
 
     fn sort_key(&self) -> String {
@@ -136,7 +106,7 @@ impl PaliWord for DpsPaliWord {
     fn toc_entry(&self, short_name: &str) -> Result<String, String> {
         let mut context = Context::new();
         context.insert("toc_id", &self.toc_id(short_name));
-        context.insert("pali1", &self.pali1);
+        context.insert("pali", &self.pali);
         context.insert("pos", &self.pos);
         context.insert("in_english", &self.in_english);
 
@@ -165,5 +135,58 @@ impl PaliWord for DpsPaliWord {
         TEMPLATES
             .render("dps_word_data", &context)
             .map_err(|e| e.to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::input_parsers::load_words;
+    use crate::tests::TestLogger;
+    use std::path::PathBuf;
+    use test_case::test_case;
+
+    pub fn get_csv_path() -> PathBuf {
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("src")
+            .join("input_parsers")
+            .join("dps_sample.csv")
+    }
+
+    #[test_case(0)]
+    #[test_case(1)]
+    #[test_case(2)]
+    #[test_case(3)]
+    #[test_case(4)]
+    fn toc_summary_tests(rec_number: usize) {
+        let l = TestLogger::new();
+        let mut recs = load_words::<DpsPaliWord>(&get_csv_path(), &l).expect("unexpected");
+
+        let toc_summary = recs
+            .nth(rec_number)
+            .map(|r| r.toc_entry("dpy").expect("unexpected"))
+            .expect("unexpected");
+
+        insta::assert_snapshot!(toc_summary);
+    }
+
+    #[test_case(0)]
+    #[test_case(1)]
+    #[test_case(2)]
+    #[test_case(3)]
+    #[test_case(4)]
+    fn word_data_tests(rec_number: usize) {
+        let l = TestLogger::new();
+        let mut recs = load_words::<DpsPaliWord>(&get_csv_path(), &l).expect("unexpected");
+
+        let word_data = recs
+            .nth(rec_number)
+            .map(|r| {
+                r.word_data_entry("dpy", "fb_url", "host url", "host version")
+                    .expect("unexpected")
+            })
+            .expect("unexpected");
+
+        insta::assert_snapshot!(word_data);
     }
 }
