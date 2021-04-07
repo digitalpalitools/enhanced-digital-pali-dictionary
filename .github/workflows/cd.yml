@@ -186,7 +186,7 @@ jobs:
 
   finish:
     name: Finish
-    needs: [build-linux, test-linux, build-windows, test-windows, lints, build-dpdods2csv]
+    needs: [build-test-deploy-linux, build-test-deploy-windows, lints, build-dpdods2csv]
     runs-on: ubuntu-latest
     steps:
       - name: Notify DPT on Discord
