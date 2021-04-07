@@ -18,6 +18,7 @@ serde = "1"
 serde_derive = "1"
 itertools = "0.10.0"
 chrono = "0.4"
+pls_core = { git = "https://github.com/digitalpalitools/pali-language-services" }
 
 [dependencies.tera]
 version = "1.6.1"

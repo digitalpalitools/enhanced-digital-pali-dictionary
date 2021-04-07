@@ -9,8 +9,8 @@ on:
       - master
 
 jobs:
-  build:
-    name: Build
+  build-linux:
+    name: Build - linux
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
@@ -52,8 +52,47 @@ jobs:
         run: |
               az logout
 
-  test:
-    name: Tests
+  build-windows:
+    name: Build - windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          target: x86_64-pc-windows-msvc
+
+      - name: Run cargo build
+        uses: actions-rs/cargo@v1
+        continue-on-error: false
+        with:
+          command: build
+          args: --release --target x86_64-pc-windows-msvc
+
+      - name: Azure Login
+        if: github.event_name != 'pull_request'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_KSAPPLICATIONS_STORAGE }}
+
+      - name: Deploy edpdgen
+        if: github.event_name != 'pull_request'
+        run: |
+              az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/edpdgen.exe' --file ./target/x86_64-pc-windows-msvc/release/edpdgen.exe --content-cache-control 'no-store max-age=0' --content-type "application/x-executable"
+        shell: pwsh
+
+      - name: Azure Logout
+        if: github.event_name != 'pull_request'
+        run: |
+              az logout
+
+  test-linux:
+    name: Tests - linux
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
@@ -77,6 +116,28 @@ jobs:
         with:
           command: test
           args: --release --target x86_64-unknown-linux-musl
+
+  test-windows:
+    name: Tests - windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          target: x86_64-pc-windows-msvc
+
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        continue-on-error: false
+        with:
+          command: test
+          args: --release --target x86_64-pc-windows-msvc
 
   lints:
     name: Lints
