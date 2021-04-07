@@ -291,8 +291,8 @@ mod tests {
             })
             .collect();
 
-        insta::assert_yaml_snapshot!(idx_entries);
         insta::assert_debug_snapshot!(dict_entries);
+        insta::assert_yaml_snapshot!(idx_entries);
     }
 
     #[test]

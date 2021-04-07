@@ -1,33 +1,16 @@
 ---
 source: edpdgen_lib/src/output_generators/mod.rs
-expression: idx_entries
+expression: dict_entries
 
 ---
-- word: ābādha
-  data_offset: 0
-  data_size: 395
-- word: ābādhato
-  data_offset: 395
-  data_size: 399
-- word: ābādhika
-  data_offset: 794
-  data_size: 399
-- word: ābādhikinī
-  data_offset: 1193
-  data_size: 405
-- word: abahulīkata
-  data_offset: 1598
-  data_size: 403
-- word: abala
-  data_offset: 2001
-  data_size: 493
-- word: abalabala
-  data_offset: 2494
-  data_size: 397
-- word: ābandhaka
-  data_offset: 2891
-  data_size: 399
-- word: adhikāra
-  data_offset: 3290
-  data_size: 727
-
+[
+    "\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n* {\n  font-family: \"Verajja Serif\", \"DejaVu Sans\", sans-serif;\n}\ntable.word-info-table-dpz tr {\n  vertical-align: top;\n}\ntable.word-info-table-dpz tr td:nth-child(1), span.sutta-source-dpz {\n  color: orange;\n}\n</style>\n</head>\n<body>\nābādha_dpz - toc\n<br/>ābādha_dpz - word data-dpz-http://feedback.form/???-this is the host-host version</body>\n</html>",
+    "\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n* {\n  font-family: \"Verajja Serif\", \"DejaVu Sans\", sans-serif;\n}\ntable.word-info-table-dpz tr {\n  vertical-align: top;\n}\ntable.word-info-table-dpz tr td:nth-child(1), span.sutta-source-dpz {\n  color: orange;\n}\n</style>\n</head>\n<body>\nābādhato_dpz - toc\n<br/>ābādhato_dpz - word data-dpz-http://feedback.form/???-this is the host-host version</body>\n</html>",
+    "\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n* {\n  font-family: \"Verajja Serif\", \"DejaVu Sans\", sans-serif;\n}\ntable.word-info-table-dpz tr {\n  vertical-align: top;\n}\ntable.word-info-table-dpz tr td:nth-child(1), span.sutta-source-dpz {\n  color: orange;\n}\n</style>\n</head>\n<body>\nābādhika_dpz - toc\n<br/>ābādhika_dpz - word data-dpz-http://feedback.form/???-this is the host-host version</body>\n</html>",
+    "\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n* {\n  font-family: \"Verajja Serif\", \"DejaVu Sans\", sans-serif;\n}\ntable.word-info-table-dpz tr {\n  vertical-align: top;\n}\ntable.word-info-table-dpz tr td:nth-child(1), span.sutta-source-dpz {\n  color: orange;\n}\n</style>\n</head>\n<body>\nābādhikinī_dpz - toc\n<br/>ābādhikinī_dpz - word data-dpz-http://feedback.form/???-this is the host-host version</body>\n</html>",
+    "\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n* {\n  font-family: \"Verajja Serif\", \"DejaVu Sans\", sans-serif;\n}\ntable.word-info-table-dpz tr {\n  vertical-align: top;\n}\ntable.word-info-table-dpz tr td:nth-child(1), span.sutta-source-dpz {\n  color: orange;\n}\n</style>\n</head>\n<body>\nabahulīkata_dpz - toc\n<br/>abahulīkata_dpz - word data-dpz-http://feedback.form/???-this is the host-host version</body>\n</html>",
+    "\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n* {\n  font-family: \"Verajja Serif\", \"DejaVu Sans\", sans-serif;\n}\ntable.word-info-table-dpz tr {\n  vertical-align: top;\n}\ntable.word-info-table-dpz tr td:nth-child(1), span.sutta-source-dpz {\n  color: orange;\n}\n</style>\n</head>\n<body>\nabala_1_dpz - toc\nabala_2_dpz - toc\n<br/>abala_1_dpz - word data-dpz-http://feedback.form/???-this is the host-host versionabala_2_dpz - word data-dpz-http://feedback.form/???-this is the host-host version</body>\n</html>",
+    "\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n* {\n  font-family: \"Verajja Serif\", \"DejaVu Sans\", sans-serif;\n}\ntable.word-info-table-dpz tr {\n  vertical-align: top;\n}\ntable.word-info-table-dpz tr td:nth-child(1), span.sutta-source-dpz {\n  color: orange;\n}\n</style>\n</head>\n<body>\nabalabala_dpz - toc\n<br/>abalabala_dpz - word data-dpz-http://feedback.form/???-this is the host-host version</body>\n</html>",
+    "\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n* {\n  font-family: \"Verajja Serif\", \"DejaVu Sans\", sans-serif;\n}\ntable.word-info-table-dpz tr {\n  vertical-align: top;\n}\ntable.word-info-table-dpz tr td:nth-child(1), span.sutta-source-dpz {\n  color: orange;\n}\n</style>\n</head>\n<body>\nābandhaka_dpz - toc\n<br/>ābandhaka_dpz - word data-dpz-http://feedback.form/???-this is the host-host version</body>\n</html>",
+    "\n<!DOCTYPE html>\n<html>\n<head>\n<style>\n* {\n  font-family: \"Verajja Serif\", \"DejaVu Sans\", sans-serif;\n}\ntable.word-info-table-dpz tr {\n  vertical-align: top;\n}\ntable.word-info-table-dpz tr td:nth-child(1), span.sutta-source-dpz {\n  color: orange;\n}\n</style>\n</head>\n<body>\nadhikāra_1_dpz - toc\nadhikāra_2_dpz - toc\nadhikāra_4_dpz - toc\nadhikāra_10_dpz - toc\n<br/>adhikāra_1_dpz - word data-dpz-http://feedback.form/???-this is the host-host versionadhikāra_2_dpz - word data-dpz-http://feedback.form/???-this is the host-host versionadhikāra_4_dpz - word data-dpz-http://feedback.form/???-this is the host-host versionadhikāra_10_dpz - word data-dpz-http://feedback.form/???-this is the host-host version</body>\n</html>",
+]
