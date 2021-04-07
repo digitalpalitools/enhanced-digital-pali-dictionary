@@ -220,7 +220,7 @@ jobs:
 
   finish:
     name: Finish
-    needs: [build, test, lints, build-dpdods2csv]
+    needs: [build-linux, test-linux, build-windows, test-windows, lints, build-dpdods2csv]
     runs-on: ubuntu-latest
     steps:
       - name: Notify DPT on Discord
