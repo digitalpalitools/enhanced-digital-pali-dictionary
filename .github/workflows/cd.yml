@@ -72,21 +72,21 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-          target: x86_64-pc-windows-msvc
+          target: i686-pc-windows-msvc
 
       - name: Run cargo build
         uses: actions-rs/cargo@v1
         continue-on-error: false
         with:
           command: build
-          args: --release --target x86_64-pc-windows-msvc
+          args: --release --target i686-pc-windows-msvc
 
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         continue-on-error: false
         with:
           command: test
-          args: --release --target x86_64-pc-windows-msvc
+          args: --release --target i686-pc-windows-msvc
 
       - name: Azure Login
         if: github.event_name != 'pull_request'
@@ -97,7 +97,7 @@ jobs:
       - name: Deploy edpdgen
         if: github.event_name != 'pull_request'
         run: |
-              az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/edpdgen.exe' --file ./target/x86_64-pc-windows-msvc/release/edpdgen.exe --content-cache-control 'no-store max-age=0' --content-type "application/x-executable"
+              az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/edpdgen.exe' --file ./target/i686-pc-windows-msvc/release/edpdgen.exe --content-cache-control 'no-store max-age=0' --content-type "application/x-executable"
         shell: pwsh
 
       - name: Azure Logout
