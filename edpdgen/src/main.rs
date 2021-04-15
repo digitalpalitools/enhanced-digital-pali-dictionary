@@ -130,7 +130,8 @@ fn get_stardict_info_from_ods_type<'a>(
                 accent_color: "green",
                 time_stamp,
                 ico: include_bytes!("dps.png"),
-                feedback_form_url: "https://docs.google.com/forms",
+                feedback_form_url:
+                    "https://docs.google.com/forms/d/e/1FAIpQLSc87oKqninpyg01YWdsjdYK6wSeIMoAZpy2jNM7Wu0KYygnHw/viewform",
                 host_url,
                 host_version,
                 generate_inflections: gen_inflections,
