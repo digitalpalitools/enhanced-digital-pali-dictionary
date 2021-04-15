@@ -14,15 +14,18 @@ fn main() -> Result<(), String> {
     let ods_type = matches
         .value_of("ODS_TYPE")
         .ok_or_else(|| "This is a required argument".to_string())?;
+    let gen_inflections = matches.is_present("GENERATE_INFLECTION");
 
     l.info(&format!(
-        "Using csv file: {} for ods type {}.",
-        csv_path, ods_type
+        "Using csv file: {} for ods type {}. Will {}generate inflections.",
+        csv_path,
+        ods_type,
+        if gen_inflections { "" } else { "NOT " }
     ));
     let time_stamp = &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true);
 
     edpdgen_lib::run(
-        &get_stardict_info_from_ods_type(ods_type, time_stamp),
+        &get_stardict_info_from_ods_type(ods_type, time_stamp, gen_inflections),
         Path::new(csv_path),
         &l,
     )
@@ -83,12 +86,19 @@ fn get_args<'a>() -> ArgMatches<'a> {
                 .possible_values(&["dpd", "dps"])
                 .takes_value(true),
         )
+        .arg(
+            Arg::with_name("GENERATE_INFLECTION")
+                .short("i")
+                .long("inflection")
+                .help("Generate inflection tables and syn file."),
+        )
         .get_matches()
 }
 
 fn get_stardict_info_from_ods_type<'a>(
     ods_type: &'a str,
     time_stamp: &'a str,
+    gen_inflections: bool,
 ) -> StartDictInfo<'a> {
     let host_url = env!("CARGO_PKG_NAME");
     let host_version = env!("CARGO_PKG_VERSION");
@@ -108,6 +118,7 @@ fn get_stardict_info_from_ods_type<'a>(
                     "https://docs.google.com/forms/d/1hMra0aMz65sYnRlPjGlTYQIHz-3_tKlywu3enqXlpSc/viewform",
                 host_url,
                 host_version,
+                generate_inflections: gen_inflections,
             }
         }
         "dps" => {
@@ -122,6 +133,7 @@ fn get_stardict_info_from_ods_type<'a>(
                 feedback_form_url: "https://docs.google.com/forms",
                 host_url,
                 host_version,
+                generate_inflections: gen_inflections,
             }
         }
         _ => unreachable!()

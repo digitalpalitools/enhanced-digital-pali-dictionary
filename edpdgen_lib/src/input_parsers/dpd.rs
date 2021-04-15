@@ -1,3 +1,4 @@
+use crate::inflection_generator::InflectionGenerator;
 use crate::input_parsers::{make_group_id, make_sort_key, make_toc_id, PaliWord};
 use tera::{Context, Tera};
 
@@ -114,6 +115,7 @@ struct WordDataViewModel<'a> {
     feedback_form_url: &'a str,
     host_url: &'a str,
     host_version: &'a str,
+    inflection_table: &'a str,
 }
 
 impl PaliWord for DpdPaliWord {
@@ -151,6 +153,7 @@ impl PaliWord for DpdPaliWord {
         feedback_form_url: &str,
         host_url: &str,
         host_version: &str,
+        igen: &dyn InflectionGenerator,
     ) -> Result<String, String> {
         let vm = WordDataViewModel {
             word: &self,
@@ -159,6 +162,7 @@ impl PaliWord for DpdPaliWord {
             feedback_form_url,
             host_url,
             host_version,
+            inflection_table: &igen.generate_inflection_table_html(&self.pali1),
         };
 
         let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
@@ -173,7 +177,7 @@ mod tests {
     use super::*;
     use crate::input_parsers::load_words;
     use crate::input_parsers::tests::get_csv_path;
-    use crate::tests::TestLogger;
+    use crate::tests::{TestInflectionGenerator, TestLogger};
     use test_case::test_case;
 
     #[test_case(0)]
@@ -217,11 +221,12 @@ mod tests {
     fn word_data_tests(rec_number: usize) {
         let l = TestLogger::new();
         let mut recs = load_words::<DpdPaliWord>(&get_csv_path(), &l).expect("unexpected");
+        let igen = TestInflectionGenerator::new();
 
         let word_data = recs
             .nth(rec_number)
             .map(|r| {
-                r.word_data_entry("dpd", "fb_url", "host url", "host version")
+                r.word_data_entry("dpd", "fb_url", "host url", "host version", &igen)
                     .expect("unexpected")
             })
             .expect("unexpected");

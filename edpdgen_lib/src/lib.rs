@@ -3,6 +3,9 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 
+use crate::inflection_generator::{
+    InflectionGenerator, NullInflectionGenerator, PlsInflectionGenerator,
+};
 use crate::input_parsers::dpd::DpdPaliWord;
 use crate::input_parsers::dps::DpsPaliWord;
 use crate::input_parsers::PaliWord;
@@ -12,6 +15,7 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 
 mod glib;
+mod inflection_generator;
 mod input_parsers;
 mod output_generators;
 
@@ -36,6 +40,7 @@ pub struct StartDictInfo<'a> {
     pub feedback_form_url: &'a str,
     pub host_url: &'a str,
     pub host_version: &'a str,
+    pub generate_inflections: bool,
 }
 
 pub fn run(
@@ -43,9 +48,15 @@ pub fn run(
     csv_path: &Path,
     logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
+    let igen: Box<dyn InflectionGenerator> = if dict_info.generate_inflections {
+        Box::new(PlsInflectionGenerator::new())
+    } else {
+        Box::new(NullInflectionGenerator::new())
+    };
+
     match dict_info.short_name {
-        "dpd" => run_for_ods_type::<DpdPaliWord>(dict_info, csv_path, logger),
-        "dps" => run_for_ods_type::<DpsPaliWord>(dict_info, csv_path, logger),
+        "dpd" => run_for_ods_type::<DpdPaliWord>(dict_info, csv_path, igen.as_ref(), logger),
+        "dps" => run_for_ods_type::<DpsPaliWord>(dict_info, csv_path, igen.as_ref(), logger),
         _ => unreachable!(),
     }
 }
@@ -53,10 +64,11 @@ pub fn run(
 fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + PaliWord>(
     dict_info: &StartDictInfo,
     csv_path: &Path,
+    igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
     let words = input_parsers::load_words::<T>(csv_path, logger)?;
-    let sd_files = output_generators::create_dictionary(&dict_info, words, logger)?;
+    let sd_files = output_generators::create_dictionary(&dict_info, words, igen, logger)?;
 
     let base_path = create_base_path(csv_path, dict_info.short_name)?;
     write_dictionary(&base_path, sd_files, logger)
@@ -124,5 +136,19 @@ mod tests {
     impl EdpdLogger for TestLogger {
         fn info(&self, _msg: &str) {}
         fn error(&self, _msg: &str) {}
+    }
+
+    pub struct TestInflectionGenerator {}
+
+    impl TestInflectionGenerator {
+        pub fn new() -> TestInflectionGenerator {
+            TestInflectionGenerator {}
+        }
+    }
+
+    impl InflectionGenerator for TestInflectionGenerator {
+        fn generate_inflection_table_html(&self, pali1: &str) -> String {
+            format!("[ITABLE: {}]", pali1)
+        }
     }
 }

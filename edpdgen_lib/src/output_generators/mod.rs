@@ -1,3 +1,4 @@
+use crate::inflection_generator::InflectionGenerator;
 use crate::input_parsers::PaliWord;
 use crate::EdpdLogger;
 use crate::{glib, StarDictFile, StartDictInfo};
@@ -48,6 +49,7 @@ struct IfoViewModel<'a> {
 fn create_html_for_word_group(
     dict_info: &StartDictInfo,
     words: impl Iterator<Item = impl PaliWord>,
+    igen: &dyn InflectionGenerator,
 ) -> Result<String, String> {
     let mut word_info: Vec<(String, String, String)> = words
         .map(|w| {
@@ -59,6 +61,7 @@ fn create_html_for_word_group(
                     dict_info.feedback_form_url,
                     dict_info.host_url,
                     dict_info.host_version,
+                    igen,
                 )
                 .unwrap_or_else(|e| e),
             )
@@ -85,6 +88,7 @@ fn create_html_for_word_group(
 fn create_dict(
     dict_info: &StartDictInfo,
     words: impl Iterator<Item = impl PaliWord>,
+    igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
 ) -> Result<(Vec<u8>, Vec<IdxEntry>), String> {
     logger.info(&"Creating dict entries.".to_string());
@@ -93,7 +97,7 @@ fn create_dict(
     let mut dict_buffer: Vec<u8> = Vec::new();
     let mut idx_words: Vec<IdxEntry> = Vec::new();
     for (n, (key, word_group)) in (&word_groups).into_iter().enumerate() {
-        let html_str = create_html_for_word_group(dict_info, word_group)?;
+        let html_str = create_html_for_word_group(dict_info, word_group, igen)?;
         let mut html_bytes = html_str.into_bytes();
 
         idx_words.push(IdxEntry {
@@ -141,9 +145,10 @@ fn create_idx(idx_entries: &mut Vec<IdxEntry>, logger: &dyn EdpdLogger) -> Vec<u
 pub fn create_dictionary(
     dict_info: &StartDictInfo,
     words: impl Iterator<Item = impl PaliWord>,
+    igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
 ) -> Result<Vec<StarDictFile>, String> {
-    let (dict, mut idx_entries) = create_dict(dict_info, words, logger)?;
+    let (dict, mut idx_entries) = create_dict(dict_info, words, igen, logger)?;
     let idx = create_idx(&mut idx_entries, logger);
     let ifo = create_ifo(dict_info, idx_entries.len(), idx.len())?;
     let png = create_png(dict_info);
@@ -202,7 +207,7 @@ fn create_png(dict_info: &StartDictInfo) -> Vec<u8> {
 mod tests {
     use super::*;
     use crate::resolve_file_in_manifest_dir;
-    use crate::tests::TestLogger;
+    use crate::tests::{TestInflectionGenerator, TestLogger};
 
     #[derive(Debug, Deserialize)]
     struct TestPaliWord {
@@ -241,10 +246,16 @@ mod tests {
             feedback_form_url: &str,
             host_url: &str,
             host_version: &str,
+            igen: &dyn InflectionGenerator,
         ) -> Result<String, String> {
             Ok(format!(
-                "{}-{}-{}-{}-{}",
-                self.word_data_entry, short_name, feedback_form_url, host_url, host_version
+                "{}-{}-{}-{}-{}-{}",
+                self.word_data_entry,
+                short_name,
+                feedback_form_url,
+                host_url,
+                host_version,
+                igen.generate_inflection_table_html(self.id())
             ))
         }
     }
@@ -271,15 +282,17 @@ mod tests {
             feedback_form_url: "http://feedback.form/???",
             host_url: "this is the host",
             host_version: "host version",
+            generate_inflections: false,
         }
     }
 
     #[test]
     fn create_dict_test() {
         let words = read_pali_words();
+        let igen = TestInflectionGenerator::new();
 
         let (dict_data, idx_entries) =
-            create_dict(&create_dict_info(), words, &TestLogger::new()).expect("Unexpected");
+            create_dict(&create_dict_info(), words, &igen, &TestLogger::new()).expect("Unexpected");
         let dict_entries: Vec<String> = idx_entries
             .iter()
             .map(|ie| {

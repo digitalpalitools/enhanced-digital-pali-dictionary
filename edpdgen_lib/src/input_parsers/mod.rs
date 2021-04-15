@@ -1,3 +1,4 @@
+use crate::inflection_generator::InflectionGenerator;
 use crate::EdpdLogger;
 use regex::{Captures, Regex};
 use std::path::Path;
@@ -21,6 +22,7 @@ pub trait PaliWord {
         feedback_form_url: &str,
         host_url: &str,
         host_version: &str,
+        igen: &dyn InflectionGenerator,
     ) -> Result<String, String>;
 }
 
