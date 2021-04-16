@@ -111,7 +111,7 @@ fn create_dict(
         });
         dict_buffer.append(&mut html_bytes);
 
-        if n % 10_000 == 0 && n != 0 {
+        if n % 1_000 == 0 && n != 0 {
             logger.info(&format!("... created {} dict entries.", n));
         }
     }
@@ -282,7 +282,7 @@ mod tests {
             feedback_form_url: "http://feedback.form/???",
             host_url: "this is the host",
             host_version: "host version",
-            generate_inflections: false,
+            inflections_db_path: None,
         }
     }
 

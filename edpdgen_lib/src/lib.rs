@@ -21,7 +21,8 @@ mod output_generators;
 
 pub trait EdpdLogger {
     fn info(&self, msg: &str);
-    fn error(&self, error: &str);
+    fn error(&self, msg: &str);
+    fn warning(&self, msg: &str);
 }
 
 pub struct StarDictFile {
@@ -40,7 +41,7 @@ pub struct StartDictInfo<'a> {
     pub feedback_form_url: &'a str,
     pub host_url: &'a str,
     pub host_version: &'a str,
-    pub generate_inflections: bool,
+    pub inflections_db_path: Option<&'a str>,
 }
 
 pub fn run(
@@ -48,11 +49,12 @@ pub fn run(
     csv_path: &Path,
     logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
-    let igen: Box<dyn InflectionGenerator> = if dict_info.generate_inflections {
-        Box::new(PlsInflectionGenerator::new())
-    } else {
-        Box::new(NullInflectionGenerator::new())
-    };
+    let igen: Box<dyn InflectionGenerator> =
+        if let Some(inflections_db_path) = dict_info.inflections_db_path {
+            Box::new(PlsInflectionGenerator::new(inflections_db_path, logger))
+        } else {
+            Box::new(NullInflectionGenerator::new())
+        };
 
     match dict_info.short_name {
         "dpd" => run_for_ods_type::<DpdPaliWord>(dict_info, csv_path, igen.as_ref(), logger),
@@ -136,6 +138,7 @@ mod tests {
     impl EdpdLogger for TestLogger {
         fn info(&self, _msg: &str) {}
         fn error(&self, _msg: &str) {}
+        fn warning(&self, _msg: &str) {}
     }
 
     pub struct TestInflectionGenerator {}

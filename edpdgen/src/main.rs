@@ -10,22 +10,26 @@ fn main() -> Result<(), String> {
 
     let csv_path = matches
         .value_of("CSV_FILE")
-        .ok_or_else(|| "This is a required argument".to_string())?;
+        .expect("This is a required argument");
     let ods_type = matches
         .value_of("ODS_TYPE")
-        .ok_or_else(|| "This is a required argument".to_string())?;
-    let gen_inflections = matches.is_present("GENERATE_INFLECTION");
+        .expect("This is a required argument");
+    let inflections_db_path = matches.value_of("INFLECTION_DB_PATH");
 
     l.info(&format!(
-        "Using csv file: {} for ods type {}. Will {}generate inflections.",
+        "Using csv file: {} for ods type {}. {}.",
         csv_path,
         ods_type,
-        if gen_inflections { "" } else { "NOT " }
+        if let Some(idb) = inflections_db_path {
+            format!("Will generated inflections. Using db: {}", idb)
+        } else {
+            "Will NOT generate inflections".to_string()
+        }
     ));
     let time_stamp = &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true);
 
     edpdgen_lib::run(
-        &get_stardict_info_from_ods_type(ods_type, time_stamp, gen_inflections),
+        &get_stardict_info_from_ods_type(ods_type, time_stamp, inflections_db_path),
         Path::new(csv_path),
         &l,
     )
@@ -51,6 +55,14 @@ impl EdpdLogger for ColoredConsoleLogger {
             "{} {}",
             get_time_stamp().white(),
             format!("error: {}", msg).red(),
+        );
+    }
+
+    fn warning(&self, msg: &str) {
+        println!(
+            "{} {}",
+            get_time_stamp().white(),
+            format!("warning: {}", msg).yellow(),
         );
     }
 }
@@ -87,10 +99,20 @@ fn get_args<'a>() -> ArgMatches<'a> {
                 .takes_value(true),
         )
         .arg(
-            Arg::with_name("GENERATE_INFLECTION")
+            Arg::with_name("INFLECTION_DB_PATH")
                 .short("i")
-                .long("inflection")
-                .help("Generate inflection tables and syn file."),
+                .long("inflection-db")
+                .value_name("INFLECTION_DB_PATH")
+                .help("The path to inflections.db.")
+                .required(false)
+                .validator(|x| {
+                    if Path::new(&x).is_file() {
+                        Ok(())
+                    } else {
+                        Err(format!("{} does not exist.", x))
+                    }
+                })
+                .takes_value(true),
         )
         .get_matches()
 }
@@ -98,7 +120,7 @@ fn get_args<'a>() -> ArgMatches<'a> {
 fn get_stardict_info_from_ods_type<'a>(
     ods_type: &'a str,
     time_stamp: &'a str,
-    gen_inflections: bool,
+    inflections_db_path: Option<&'a str>,
 ) -> StartDictInfo<'a> {
     let host_url = env!("CARGO_PKG_NAME");
     let host_version = env!("CARGO_PKG_VERSION");
@@ -118,7 +140,7 @@ fn get_stardict_info_from_ods_type<'a>(
                     "https://docs.google.com/forms/d/1hMra0aMz65sYnRlPjGlTYQIHz-3_tKlywu3enqXlpSc/viewform",
                 host_url,
                 host_version,
-                generate_inflections: gen_inflections,
+                inflections_db_path,
             }
         }
         "dps" => {
@@ -134,7 +156,7 @@ fn get_stardict_info_from_ods_type<'a>(
                     "https://docs.google.com/forms/d/e/1FAIpQLSc87oKqninpyg01YWdsjdYK6wSeIMoAZpy2jNM7Wu0KYygnHw/viewform",
                 host_url,
                 host_version,
-                generate_inflections: gen_inflections,
+                inflections_db_path,
             }
         }
         _ => unreachable!()
