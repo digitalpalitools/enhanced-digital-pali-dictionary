@@ -4,9 +4,12 @@
   <table class="word-info-table-{{ short_name }}">
     <tbody>
     {%- if word['POS'] -%}
-    <tr><td>Grammar</td><td><span>{{ word['POS'] }}, {{ word['Grammar'] }}
+    <tr><td>Grammar</td><td><span>{{ word['POS'] }}
+{%- if word['Grammar'] -%}
+, {{ word['Grammar'] }}
+{%- endif -%}
 {%- if word['Derived from'] -%}
-, {{ word['Derived from'] }}
+, from {{ word['Derived from'] }}
 {%- endif -%}
 {%- if word['Verb'] -%}
 , {{ word['Verb'] }}
