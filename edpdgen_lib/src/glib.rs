@@ -52,7 +52,7 @@ fn g_ascii_strcasecmp(str1: &str, str2: &str) -> Ordering {
 ///
 pub fn stardict_strcmp(s1: &str, s2: &str) -> Ordering {
     let a = g_ascii_strcasecmp(s1, s2);
-    return if a == Equal {
+    if a == Equal {
         s1.cmp(s2)
     } else {
         a
