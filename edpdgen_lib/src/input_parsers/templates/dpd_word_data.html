@@ -1,4 +1,5 @@
   <hr />
+{% if word['Meaning IN CONTEXT'] %}
   <div>
     <h4 id="{{ toc_id }}">{{ word['Pāli1'] }}</h4>
     <table class="word-info-table-{{ short_name }}">
@@ -79,6 +80,11 @@
 <span class="sutta-source-{{ short_name }}"><i>{{ word['Source 2'] }} {{ word['Sutta2'] }}</i></span><br /><br />
 {%- endif -%}
 </div>
+{% else %}
+  <div>
+    Dictionary information for &quot;<strong>{{ word['Pāli1'] }}</strong>&quot; is still being compiled. Please contact <a href="mailto:digitalpalitools@gmail.com">Digital Pāli Tools Team</a> for updates.
+  </div>
+{% endif %}
 <div>
 {{ inflection_table }}
 </div>
