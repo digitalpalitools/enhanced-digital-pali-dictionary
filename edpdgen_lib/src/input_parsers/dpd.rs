@@ -105,6 +105,8 @@ pub struct DpdPaliWord {
     pattern: String,
     #[serde(rename = "Buddhadatta")]
     buddhadatta: String,
+    #[serde(rename = "Cl")]
+    cl: String,
 }
 
 #[derive(Serialize)]
