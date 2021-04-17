@@ -141,6 +141,7 @@ impl PaliWord for DpdPaliWord {
         context.insert("pali1", &self.pali1);
         context.insert("pos", &self.pos);
         context.insert("in_english", &self.in_english);
+        context.insert("buddhadatta", &self.buddhadatta);
 
         TEMPLATES
             .render("dpd_toc_summary", &context)
