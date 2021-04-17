@@ -45,6 +45,12 @@
     {%- if word['Commentary'] -%}
     <tr><td>Commentary</td><td><span>{{ word['Commentary'] }}</span></td></tr>
     {%- endif -%}
+    {%- if word['Notes'] -%}
+    <tr><td>Notes</td><td><span>{{ word['Notes'] }}</span></td></tr>
+    {%- endif -%}
+    {%- if word['Variant'] -%}
+    <tr><td>Variant</td><td><span>{{ word['Variant'] }}</span></td></tr>
+    {%- endif -%}
     </tbody>
   </table>
   <br />
