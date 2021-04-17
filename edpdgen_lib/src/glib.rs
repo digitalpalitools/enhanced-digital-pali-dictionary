@@ -1,20 +1,21 @@
 use std::cmp::Ordering;
+use std::cmp::Ordering::Equal;
 
-/**
- * From: https://stackoverflow.com/a/13225961/6196679
- *
- * Compares two strings, ignoring the case of ASCII characters. It treats
- * non-ASCII characters taking in account case differences. This is an
- * attempt to mimic glib's string utility function
- * <a href="http://developer.gnome.org/glib/2.28/glib-String-Utility-Functions.html#g-ascii-strcasecmp">g_ascii_strcasecmp ()</a>.
- *
- * This is a slightly modified version of java.lang.String.CASE_INSENSITIVE_ORDER.compare(String s1, String s2) method.
- *
- * @param str1  string to compare with str2
- * @param str2  string to compare with str1
- * @return      0 if the strings match, a negative value if str1 < str2, or a positive value if str1 > str2
- */
-pub fn g_ascii_strcasecmp(str1: &str, str2: &str) -> Ordering {
+///
+/// From: https://stackoverflow.com/a/13225961/6196679
+///
+/// Compares two strings, ignoring the case of ASCII characters. It treats
+/// non-ASCII characters taking in account case differences. This is an
+/// attempt to mimic glib's string utility function
+/// <a href="http://developer.gnome.org/glib/2.28/glib-String-Utility-Functions.html#g-ascii-strcasecmp">g_ascii_strcasecmp ()</a>.
+///
+/// This is a slightly modified version of java.lang.String.CASE_INSENSITIVE_ORDER.compare(String s1, String s2) method.
+///
+/// @param str1  string to compare with str2
+/// @param str2  string to compare with str1
+/// @return      0 if the strings match, a negative value if str1 < str2, or a positive value if str1 > str2
+///
+fn g_ascii_strcasecmp(str1: &str, str2: &str) -> Ordering {
     let str_vec1: Vec<char> = str1.chars().collect();
     let str_vec2: Vec<char> = str2.chars().collect();
     let n1 = str_vec1.len();
@@ -44,4 +45,16 @@ pub fn g_ascii_strcasecmp(str1: &str, str2: &str) -> Ordering {
     }
 
     n1.cmp(&n2)
+}
+
+///
+/// NOTE: See https://github.com/huzheng001/stardict-3/blob/master/dict/doc/StarDictFileFormat
+///
+pub fn stardict_strcmp(s1: &str, s2: &str) -> Ordering {
+    let a = g_ascii_strcasecmp(s1, s2);
+    return if a == Equal {
+        s1.cmp(s2)
+    } else {
+        a
+    }
 }

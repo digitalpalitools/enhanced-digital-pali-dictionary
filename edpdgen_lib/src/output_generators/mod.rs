@@ -96,6 +96,7 @@ fn create_dict(
 
     let mut dict_buffer: Vec<u8> = Vec::new();
     let mut idx_words: Vec<IdxEntry> = Vec::new();
+    // syn file stuff
     for (n, (key, word_group)) in (&word_groups).into_iter().enumerate() {
         let html_str = create_html_for_word_group(dict_info, word_group, igen)?;
         let mut html_bytes = html_str.into_bytes();
@@ -129,7 +130,7 @@ fn create_dict(
 
 fn create_idx(idx_entries: &mut Vec<IdxEntry>, logger: &dyn EdpdLogger) -> Vec<u8> {
     logger.info(&format!("Creating {} idx entries.", &idx_entries.len()));
-    idx_entries.sort_by(|w1, w2| glib::g_ascii_strcasecmp(&w1.word, &w2.word));
+    idx_entries.sort_by(|w1, w2| glib::stardict_strcmp(&w1.word, &w2.word));
 
     let idx: Vec<u8> = idx_entries.iter().fold(Vec::new(), |mut acc, e| {
         acc.append(&mut e.word.to_owned().into_bytes());
