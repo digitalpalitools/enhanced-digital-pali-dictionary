@@ -1,6 +1,13 @@
 use crate::EdpdLogger;
 use pls_core::inflections::{generate_inflection_table, PlsInflectionsHost};
 use rusqlite::{Connection, Row, NO_PARAMS};
+use std::env;
+
+lazy_static! {
+    static ref EXAMPLE: u8 = 42;
+    static ref PLS_INFLECTION_GENERATOR_PREFIX: String =
+        env::var("__PLS_INFLECTION_GENERATOR_PREFIX__").unwrap_or_else(|_e| "".to_string());
+}
 
 struct PlsHost<'a> {
     inflections_db_path: &'a str,
@@ -108,6 +115,11 @@ impl<'a> PlsInflectionGenerator<'a> {
 
 impl<'a> InflectionGenerator for PlsInflectionGenerator<'a> {
     fn generate_inflection_table_html(&self, pali1: &str) -> String {
+        let prefix: &str = &PLS_INFLECTION_GENERATOR_PREFIX;
+        if !prefix.is_empty() && !pali1.starts_with(prefix) {
+            return "".to_string();
+        }
+
         generate_inflection_table(pali1, &self.inflection_host).unwrap_or_else(|e| {
             format!(
                 "<div>Unable to generate inflection tables. Error: <strong>{}</strong></div>",

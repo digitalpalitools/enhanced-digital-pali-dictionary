@@ -112,7 +112,11 @@ fn create_dict(
         dict_buffer.append(&mut html_bytes);
 
         if n % 1_000 == 0 && n != 0 {
-            logger.info(&format!("... created {} dict entries.", n));
+            logger.info(&format!(
+                "... created {:05} dict entries, ending with '{}'.",
+                n,
+                idx_words[idx_words.len() - 1].word
+            ));
         }
     }
 
