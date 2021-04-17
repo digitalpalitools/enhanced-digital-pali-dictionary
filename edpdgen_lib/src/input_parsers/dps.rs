@@ -75,6 +75,8 @@ pub struct DpsPaliWord {
     chapter: String,
     #[serde(rename = "Test")]
     test: String,
+    #[serde(rename = "Variant")]
+    variant: String,
 }
 
 #[derive(Serialize)]
