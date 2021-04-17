@@ -5,29 +5,29 @@ expression: idx_entries
 ---
 - word: ābādha
   data_offset: 0
-  data_size: 1292
+  data_size: 1256
 - word: ābādhato
-  data_offset: 1292
-  data_size: 1298
+  data_offset: 1256
+  data_size: 1262
 - word: ābādhika
-  data_offset: 2590
-  data_size: 1298
+  data_offset: 2518
+  data_size: 1262
 - word: ābādhikinī
-  data_offset: 3888
-  data_size: 1307
+  data_offset: 3780
+  data_size: 1271
 - word: abahulīkata
-  data_offset: 5195
-  data_size: 1304
+  data_offset: 5051
+  data_size: 1268
 - word: abala
-  data_offset: 6499
-  data_size: 1407
+  data_offset: 6319
+  data_size: 1372
 - word: abalabala
-  data_offset: 7906
-  data_size: 1295
+  data_offset: 7691
+  data_size: 1259
 - word: ābandhaka
-  data_offset: 9201
-  data_size: 1298
+  data_offset: 8950
+  data_size: 1262
 - word: adhikāra
-  data_offset: 10499
-  data_size: 1694
+  data_offset: 10212
+  data_size: 1661
 
