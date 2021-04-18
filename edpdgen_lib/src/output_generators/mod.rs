@@ -27,6 +27,12 @@ struct IdxEntry {
     data_size: i32,
 }
 
+/// See https://github.com/huzheng001/stardict-3/blob/master/dict/doc/StarDictFileFormat
+struct SynEntry {
+    synonym_word: String,
+    original_word_index: i32,
+}
+
 #[derive(Serialize)]
 struct WordGroupViewModel<'a> {
     ods_type: &'a str,
@@ -96,10 +102,12 @@ fn create_dict(
 
     let mut dict_buffer: Vec<u8> = Vec::new();
     let mut idx_words: Vec<IdxEntry> = Vec::new();
-    // syn file stuff
+    let mut syn_entries: Vec<SynEntry> = Vec::new();
     for (n, (key, word_group)) in (&word_groups).into_iter().enumerate() {
         let html_str = create_html_for_word_group(dict_info, word_group, igen)?;
         let mut html_bytes = html_str.into_bytes();
+
+        let syn_entries =
 
         idx_words.push(IdxEntry {
             word: key,

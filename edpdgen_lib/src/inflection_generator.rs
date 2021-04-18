@@ -1,5 +1,5 @@
 use crate::EdpdLogger;
-use pls_core::inflections::{generate_inflection_table, PlsInflectionsHost};
+use pls_core::inflections::{generate_inflection_table, PlsInflectionsHost, generate_all_inflections};
 use rusqlite::{Connection, Row, NO_PARAMS};
 use std::env;
 
@@ -79,6 +79,7 @@ fn exec_sql_core(
 
 pub trait InflectionGenerator {
     fn generate_inflection_table_html(&self, pali1: &str) -> String;
+    fn generate_all_inflections(&self, pali1: &str) -> String;
 }
 
 pub(crate) struct NullInflectionGenerator {}
@@ -92,6 +93,10 @@ impl NullInflectionGenerator {
 impl InflectionGenerator for NullInflectionGenerator {
     fn generate_inflection_table_html(&self, _pali1: &str) -> String {
         "".to_string()
+    }
+
+    fn generate_all_inflections(&self, pali1: &str) -> String {
+        todo!()
     }
 }
 
@@ -126,5 +131,9 @@ impl<'a> InflectionGenerator for PlsInflectionGenerator<'a> {
                 e
             )
         })
+    }
+
+    fn generate_all_inflections(&self, pali1: &str, stem: &str, pattern: &str) -> String {
+        generate_all_inflections(pali1, stem, pattern)
     }
 }
