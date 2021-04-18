@@ -133,7 +133,7 @@ fn get_stardict_info_from_ods_type<'a>(
                 short_name,
                 author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
                 description: "The next generation comprehensive digital Pāli dictionary.",
-                accent_color: "orange",
+                accent_color: "#7986CB",
                 time_stamp,
                 ico: include_bytes!("dpd.png"),
                 feedback_form_url:

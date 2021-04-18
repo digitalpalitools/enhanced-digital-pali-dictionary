@@ -139,6 +139,7 @@ impl PaliWord for DpdPaliWord {
 
     fn toc_entry(&self, short_name: &str) -> Result<String, String> {
         let mut context = Context::new();
+        context.insert("short_name", short_name);
         context.insert("toc_id", &self.toc_id(short_name));
         context.insert("pali1", &self.pali1);
         context.insert("pos", &self.pos);

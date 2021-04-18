@@ -25,14 +25,11 @@
 {%- if word['Literal Meaning'] -%}
 <tr><td></td><td><span>lit. {{ word['Literal Meaning'] }}</span></td></tr>
 {%- endif -%}
-{%- if word['Family'] -%}
-<tr><td>Family</td><td><span>{{ word['Family'] }}</span></td></tr>
-{%- endif -%}
 {%- if word['Pāli Root'] -%}
-<tr><td>Root</td><td><span>{{ word['Pāli Root'] }}<sup>{{ word['V'] }}</sup>{{ word['Grp'] }} {{ word['Sgn'] }} ({{ word['Root Meaning'] }}){%- if word['Root In Comps'] -%}&nbsp;{{ word['Root In Comps'] }}&nbsp;in comps{%- endif -%}</span></td></tr>
+<tr><td>Root</td><td><span>{{ word['Pāli Root'] }}<sup>{{ word['V'] }}</sup>{{ word['Grp'] }} {{ word['Sgn'] }} ({{ word['Root Meaning'] }})</span></td></tr>
 {%- endif -%}
-{%- if word['Base'] -%}
-<tr><td>Base</td><td><span>{{ word['Base'] }}</span></td></tr>
+{%- if word['Root In Comps'] -%}
+<tr><td></td><td><span>{{ word['Root In Comps'] }} in comps</span></td></tr>
 {%- endif -%}
 {%- if word['Construction'] -%}
 <tr><td>Construction</td><td><span>{{ word['Construction'] }}</span></td></tr>
@@ -84,11 +81,16 @@
   <div>
     Dictionary information for &quot;<strong>{{ word['Pāli1'] }}</strong>&quot; is still being compiled. Please contact <a href="mailto:digitalpalitools@gmail.com">Digital Pāli Tools Team</a> for updates.
   </div>
+  <br />
 {% endif %}
+<div>
+<a class="dictionary-feedback-link-{{ short_name }}" href="{{ feedback_form_url }}?entry.267696921={{ host_url }}&entry.1433863141={{ host_version }}" target="_blank">spot a mistake in the dictionary? fix it here!</a>
+</div>
+<br />
 <div>
 {{ inflection_table }}
 </div>
-<br/>
-<a class="dictionary-feedback-link-{{ short_name }}" href="{{ feedback_form_url }}?entry.267696921={{ host_url }}&entry.1433863141={{ host_version }}" target="_blank">spot a mistake in the dictionary? fix it here!</a>
 <br />
-<a href="#{{ toc_id }}">&#x25B2; back to top</a>
+<div>
+<a class="dictionary-word-back-to-top-link-{{ short_name }}" href="#{{ toc_id }}">&#x25B2; back to top</a>
+</div>
