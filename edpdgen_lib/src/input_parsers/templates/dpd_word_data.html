@@ -1,7 +1,7 @@
   <hr />
-{% if word['Meaning IN CONTEXT'] %}
   <div>
     <h4 id="{{ toc_id }}">{{ word['Pāli1'] }}</h4>
+{% if word['Meaning IN CONTEXT'] %}
     <table class="word-info-table-{{ short_name }}">
       <tbody><tr><td>Pāli</td><td><span>{{ word['Pāli2'] }}</span></td></tr>
 {%- if word['Grammar'] -%}
@@ -28,7 +28,7 @@
 {%- if word['Pāli Root'] -%}
 <tr><td>Root</td><td><span>{{ word['Pāli Root'] }}<sup>{{ word['V'] }}</sup>{{ word['Grp'] }} {{ word['Sgn'] }} ({{ word['Root Meaning'] }})</span></td></tr>
 {%- endif -%}
-{%- if word['Root In Comps'] -%}
+{%- if word['Root In Comps'] and word['Root In Comps'] != '0' -%}
 <tr><td></td><td><span>{{ word['Root In Comps'] }} in comps</span></td></tr>
 {%- endif -%}
 {%- if word['Construction'] -%}
@@ -53,7 +53,7 @@
 <tr><td>Sanskrit</td><td><span><i>{{ word['Sanskrit'] }}</i></span></td></tr>
 {%- endif -%}
 {%- if word['Sk Root'] -%}
-<tr><td>Sanskrit Root</td><td><span><i>{{ word['Sk Root'] }}</i>cl. {{ word['Cl'] }}</span></td></tr>
+<tr><td>Sanskrit Root</td><td><span><i>{{ word['Sk Root'] }}</i>{%- if word['Cl'] and word['Cl'] != '0' -%}&nbsp;cl. {{ word['Cl'] }}{%- endif -%}</span></td></tr>
 {%- endif -%}
 {%- if word['Commentary'] -%}
 <tr><td>Commentary</td><td><span>{{ word['Commentary'] }}</span></td></tr>
@@ -76,21 +76,22 @@
 {%- if word['Source 2'] -%}
 <span class="sutta-source-{{ short_name }}"><i>{{ word['Source 2'] }} {{ word['Sutta2'] }}</i></span><br /><br />
 {%- endif -%}
-</div>
-{% else %}
-  <div>
-    Dictionary information for &quot;<strong>{{ word['Pāli1'] }}</strong>&quot; is still being compiled. Please contact <a href="mailto:digitalpalitools@gmail.com">Digital Pāli Tools Team</a> for updates.
-  </div>
-  <br />
-{% endif %}
 <div>
-<a class="dictionary-feedback-link-{{ short_name }}" href="{{ feedback_form_url }}?entry.267696921={{ host_url }}&entry.1433863141={{ host_version }}" target="_blank">spot a mistake in the dictionary? fix it here!</a>
+  <a class="dictionary-feedback-link-{{ short_name }}" href="{{ feedback_form_url }}?entry.267696921={{ host_url }}&entry.1433863141={{ host_version }}" target="_blank">spot a mistake in the dictionary? fix it here!</a>
 </div>
 <br />
+{% else %}
+<i>NOTE: Dictionary information for &quot;<strong>{{ word['Pāli1'] }}</strong>&quot; is still being compiled. Please check back with the author for updates.</i>
+<br />
+<br />
+{% endif %}
+</div>
+{% if inflection_table %}
 <div>
 {{ inflection_table }}
 </div>
 <br />
+{% endif %}
 <div>
-<a class="dictionary-word-back-to-top-link-{{ short_name }}" href="#{{ toc_id }}">&#x25B2; back to top</a>
+<a class="dictionary-word-back-to-top-link-{{ short_name }}" href="#" onclick="document.getElementById('top-{{ short_name }}').parentElement.previousElementSibling.scrollIntoView();return false;">&#x25B2; back to top</a>
 </div>

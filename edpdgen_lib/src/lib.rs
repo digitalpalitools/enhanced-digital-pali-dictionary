@@ -153,5 +153,14 @@ mod tests {
         fn generate_inflection_table_html(&self, pali1: &str) -> String {
             format!("[ITABLE: {}]", pali1)
         }
+
+        fn generate_all_inflections(
+            &self,
+            pali1: &str,
+            _stem: &str,
+            _pattern: &str,
+        ) -> Vec<String> {
+            vec![format!("[???{}???]", pali1)]
+        }
     }
 }

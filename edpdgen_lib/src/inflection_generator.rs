@@ -1,5 +1,7 @@
 use crate::EdpdLogger;
-use pls_core::inflections::{generate_inflection_table, PlsInflectionsHost, generate_all_inflections};
+use pls_core::inflections::{
+    generate_all_inflections, generate_inflection_table, PlsInflectionsHost,
+};
 use rusqlite::{Connection, Row, NO_PARAMS};
 use std::env;
 
@@ -79,7 +81,7 @@ fn exec_sql_core(
 
 pub trait InflectionGenerator {
     fn generate_inflection_table_html(&self, pali1: &str) -> String;
-    fn generate_all_inflections(&self, pali1: &str) -> String;
+    fn generate_all_inflections(&self, pali1: &str, stem: &str, pattern: &str) -> Vec<String>;
 }
 
 pub(crate) struct NullInflectionGenerator {}
@@ -95,8 +97,8 @@ impl InflectionGenerator for NullInflectionGenerator {
         "".to_string()
     }
 
-    fn generate_all_inflections(&self, pali1: &str) -> String {
-        todo!()
+    fn generate_all_inflections(&self, _pali1: &str, _stem: &str, _pattern: &str) -> Vec<String> {
+        Vec::new()
     }
 }
 
@@ -125,15 +127,28 @@ impl<'a> InflectionGenerator for PlsInflectionGenerator<'a> {
             return "".to_string();
         }
 
-        generate_inflection_table(pali1, &self.inflection_host).unwrap_or_else(|e| {
-            format!(
-                "<div>Unable to generate inflection tables. Error: <strong>{}</strong></div>",
-                e
-            )
-        })
+        match generate_inflection_table(pali1, &self.inflection_host) {
+            Ok(t) => t,
+            Err(e) => {
+                self.inflection_host.logger.error(&format!(
+                    "Unable to generate inflection tables '{}'. Error: {}.",
+                    pali1, e
+                ));
+                "".to_string()
+            }
+        }
     }
 
-    fn generate_all_inflections(&self, pali1: &str, stem: &str, pattern: &str) -> String {
-        generate_all_inflections(pali1, stem, pattern)
+    fn generate_all_inflections(&self, pali1: &str, stem: &str, pattern: &str) -> Vec<String> {
+        match generate_all_inflections(pali1, stem, pattern, &self.inflection_host) {
+            Ok(inflections) => inflections,
+            Err(e) => {
+                self.inflection_host.logger.error(&format!(
+                    "Unable to generate inflections for '{}', '{}', '{}'. Error: {}.",
+                    pali1, stem, pattern, e
+                ));
+                Vec::new()
+            }
+        }
     }
 }
