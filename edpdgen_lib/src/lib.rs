@@ -51,10 +51,12 @@ pub fn run(
 ) -> Result<(), String> {
     let igen: Box<dyn InflectionGenerator> =
         if let Some(inflections_db_path) = dict_info.inflections_db_path {
-            Box::new(PlsInflectionGenerator::new(inflections_db_path, logger))
+            Box::new(PlsInflectionGenerator::new(inflections_db_path, logger)?)
         } else {
             Box::new(NullInflectionGenerator::new())
         };
+
+    igen.check_inflection_db(logger)?;
 
     match dict_info.short_name {
         "dpd" => run_for_ods_type::<DpdPaliWord>(dict_info, csv_path, igen.as_ref(), logger),
@@ -150,6 +152,10 @@ mod tests {
     }
 
     impl InflectionGenerator for TestInflectionGenerator {
+        fn check_inflection_db(&self, _logger: &dyn EdpdLogger) -> Result<(), String> {
+            Ok(())
+        }
+
         fn generate_inflection_table_html(&self, pali1: &str) -> String {
             format!("[ITABLE: {}]", pali1)
         }
