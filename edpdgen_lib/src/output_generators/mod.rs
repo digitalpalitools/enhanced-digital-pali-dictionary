@@ -214,10 +214,7 @@ fn create_syn(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> (Vec<u8>, us
         acc
     });
 
-    logger.info(&format!(
-        "... done creating {} syn entries.",
-        syn_count
-    ));
+    logger.info(&format!("... done creating {} syn entries.", syn_count));
 
     (syn, syn_count)
 }
@@ -235,12 +232,7 @@ pub fn create_dictionary(
     idx_entries.sort_by(|w1, w2| glib::stardict_strcmp(&w1.word, &w2.word));
     let idx = create_idx(&idx_entries, logger);
     let (syn, syn_count) = create_syn(&idx_entries, logger);
-    let ifo = create_ifo(
-        dict_info,
-        idx_entries.len(),
-        syn_count,
-        idx.len(),
-    )?;
+    let ifo = create_ifo(dict_info, idx_entries.len(), syn_count, idx.len())?;
     let png = create_png(dict_info);
 
     Ok(vec![
