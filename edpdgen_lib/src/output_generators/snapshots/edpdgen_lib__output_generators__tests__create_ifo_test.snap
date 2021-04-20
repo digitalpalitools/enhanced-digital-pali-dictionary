@@ -4,10 +4,12 @@ expression: "&String::from_utf8(ifo).expect(\"Unexpected\")"
 
 ---
 StarDict's dict ifo file
-version=0.1.0
+version=3.0.0
 bookname=Digital Pāli Tools Dictionary (DPD)
 wordcount=100
+synwordcount=500
 idxfilesize=1000
+idxoffsetbits=32
 author=Digital Pāli Tools <digitalpalitools@gmail.com>
 website=https://github.com/digitalpalitools
 description=The next generation comprehensive digital Pāli dictionary.

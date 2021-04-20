@@ -25,12 +25,8 @@ struct IdxEntry {
     word: String,
     data_offset: i32,
     data_size: i32,
+    synonym_words: Vec<String>,
 }
-
-// struct SynEntry {
-//     synonym_word: String,
-//     original_word_index: i32,
-// }
 
 #[derive(Serialize)]
 struct WordGroupViewModel<'a> {
@@ -42,25 +38,43 @@ struct WordGroupViewModel<'a> {
 
 #[derive(Serialize)]
 struct IfoViewModel<'a> {
-    version: &'a str,
     name: &'a str,
     word_count: usize,
+    syn_word_count: usize,
     idx_file_size: usize,
     author: &'a str,
     description: &'a str,
     time_stamp: &'a str,
 }
 
-fn create_html_for_word_group(
+fn log_return_error(
+    w: &dyn PaliWord,
+    short_msg: &str,
+    e: String,
+    logger: &dyn EdpdLogger,
+) -> String {
+    logger.warning(&format!(
+        "Failed to generate {} for '{}'. Error: {}.",
+        short_msg,
+        w.id(),
+        e
+    ));
+    e
+}
+
+fn get_ids_and_html_for_word_group(
     dict_info: &StartDictInfo,
     words: impl Iterator<Item = impl PaliWord>,
     igen: &dyn InflectionGenerator,
-) -> Result<String, String> {
-    let mut word_info: Vec<(String, String, String)> = words
+    logger: &dyn EdpdLogger,
+) -> Result<(Vec<String>, String), String> {
+    let mut word_info: Vec<(String, String, String, String)> = words
         .map(|w| {
             (
                 w.sort_key(),
-                w.toc_entry(dict_info.short_name).unwrap_or_else(|e| e),
+                w.id().to_string(),
+                w.toc_entry(dict_info.short_name)
+                    .unwrap_or_else(|e| log_return_error(&w, "table of contents", e, logger)),
                 w.word_data_entry(
                     dict_info.short_name,
                     dict_info.feedback_form_url,
@@ -68,14 +82,21 @@ fn create_html_for_word_group(
                     dict_info.host_version,
                     igen,
                 )
-                .unwrap_or_else(|e| e),
+                .unwrap_or_else(|e| log_return_error(&w, "word data", e, logger)),
             )
         })
         .collect();
     word_info.sort_by(|a, b| a.0.cmp(&b.0));
 
-    let toc_entries: Vec<String> = word_info.iter().map(|w| w.1.to_owned()).collect();
-    let descriptions: Vec<String> = word_info.iter().map(|w| w.2.to_owned()).collect();
+    let (ids, toc_entries, descriptions) =
+        word_info
+            .into_iter()
+            .fold((Vec::new(), Vec::new(), Vec::new()), |mut acc, e| {
+                acc.0.push(e.1);
+                acc.1.push(e.2);
+                acc.2.push(e.3);
+                acc
+            });
 
     let vm = WordGroupViewModel {
         ods_type: dict_info.short_name,
@@ -85,29 +106,34 @@ fn create_html_for_word_group(
     };
 
     let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
-    TEMPLATES
+    let html = TEMPLATES
         .render("word_group", &context)
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+
+    Ok((ids, html))
 }
+
+type DictData = (Vec<u8>, Vec<IdxEntry>);
 
 fn create_dict(
     dict_info: &StartDictInfo,
     words: impl Iterator<Item = impl PaliWord>,
     igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
-) -> Result<(Vec<u8>, Vec<IdxEntry>), String> {
+) -> Result<DictData, String> {
     logger.info(&"Creating dict entries.".to_string());
     let word_groups = words.group_by(|pw| pw.group_id());
 
     let mut dict_buffer: Vec<u8> = Vec::new();
     let mut idx_words: Vec<IdxEntry> = Vec::new();
-    // let mut syn_entries: Vec<SynEntry> = Vec::new();
     for (n, (key, word_group)) in (&word_groups).into_iter().enumerate() {
-        let html_str = create_html_for_word_group(dict_info, word_group, igen)?;
+        let (ids, html_str) = get_ids_and_html_for_word_group(dict_info, word_group, igen, logger)?;
+
+        let synonym_words: Vec<String> = ids
+            .into_iter()
+            .flat_map(|id| igen.generate_all_inflections(&id))
+            .collect();
         let mut html_bytes = html_str.into_bytes();
-
-        // let syn_entries = igen.generate_all_inflections();
-
         idx_words.push(IdxEntry {
             word: key,
             data_offset: if n == 0 {
@@ -116,14 +142,14 @@ fn create_dict(
                 idx_words[n - 1].data_offset + idx_words[n - 1].data_size
             },
             data_size: html_bytes.len() as i32,
+            synonym_words,
         });
         dict_buffer.append(&mut html_bytes);
 
         if n % 1_000 == 0 && n != 0 {
             logger.info(&format!(
                 "... created {:05} dict entries, ending with '{}'.",
-                n,
-                idx_words[idx_words.len() - 1].word
+                n, idx_words[n].word
             ));
         }
     }
@@ -135,9 +161,8 @@ fn create_dict(
     Ok((dict_buffer, idx_words))
 }
 
-fn create_idx(idx_entries: &mut Vec<IdxEntry>, logger: &dyn EdpdLogger) -> Vec<u8> {
+fn create_idx(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> Vec<u8> {
     logger.info(&format!("Creating {} idx entries.", &idx_entries.len()));
-    idx_entries.sort_by(|w1, w2| glib::stardict_strcmp(&w1.word, &w2.word));
 
     let idx: Vec<u8> = idx_entries.iter().fold(Vec::new(), |mut acc, e| {
         acc.append(&mut e.word.to_owned().into_bytes());
@@ -154,6 +179,47 @@ fn create_idx(idx_entries: &mut Vec<IdxEntry>, logger: &dyn EdpdLogger) -> Vec<u
     idx
 }
 
+struct SynEntry {
+    synonym_word: String,
+    original_word_index: i32,
+}
+
+fn create_syn(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> Vec<u8> {
+    let mut syn_entries = idx_entries
+        .iter()
+        .enumerate()
+        .fold(Vec::new(), |mut acc, (n, e)| {
+            let mut ses: Vec<SynEntry> = e
+                .synonym_words
+                .iter()
+                .map(|sw| SynEntry {
+                    synonym_word: sw.to_owned(),
+                    original_word_index: n as i32,
+                })
+                .collect();
+
+            acc.append(&mut ses);
+
+            acc
+        });
+
+    logger.info(&format!("Creating {} syn entries.", &syn_entries.len()));
+
+    syn_entries.sort_by(|w1, w2| glib::stardict_strcmp(&w1.synonym_word, &w2.synonym_word));
+    let syn: Vec<u8> = syn_entries.iter().fold(Vec::new(), |mut acc, e| {
+        acc.append(&mut e.synonym_word.to_owned().into_bytes());
+        acc.push(0u8);
+        acc.extend_from_slice(&e.original_word_index.to_be_bytes());
+        acc
+    });
+
+    logger.info(&format!(
+        "... done creating {} syn entries.",
+        &syn_entries.len()
+    ));
+    syn
+}
+
 ///
 /// See https://github.com/huzheng001/stardict-3/blob/master/dict/doc/StarDictFileFormat
 ///
@@ -164,8 +230,15 @@ pub fn create_dictionary(
     logger: &dyn EdpdLogger,
 ) -> Result<Vec<StarDictFile>, String> {
     let (dict, mut idx_entries) = create_dict(dict_info, words, igen, logger)?;
-    let idx = create_idx(&mut idx_entries, logger);
-    let ifo = create_ifo(dict_info, idx_entries.len(), idx.len())?;
+    idx_entries.sort_by(|w1, w2| glib::stardict_strcmp(&w1.word, &w2.word));
+    let idx = create_idx(&idx_entries, logger);
+    let syn = create_syn(&idx_entries, logger);
+    let ifo = create_ifo(
+        dict_info,
+        idx_entries.len(),
+        /*syn_entries.len()*/ 100,
+        idx.len(),
+    )?;
     let png = create_png(dict_info);
 
     Ok(vec![
@@ -176,6 +249,10 @@ pub fn create_dictionary(
         StarDictFile {
             extension: "dict".to_string(),
             data: dict,
+        },
+        StarDictFile {
+            extension: "syn".to_string(),
+            data: syn,
         },
         StarDictFile {
             extension: "ifo".to_string(),
@@ -191,12 +268,13 @@ pub fn create_dictionary(
 fn create_ifo(
     dict_info: &StartDictInfo,
     word_count: usize,
+    syn_word_count: usize,
     idx_file_size: usize,
 ) -> Result<Vec<u8>, String> {
     let vm = IfoViewModel {
-        version: env!("CARGO_PKG_VERSION"),
         name: dict_info.name,
         word_count,
+        syn_word_count,
         idx_file_size,
         author: dict_info.author,
         description: dict_info.description,
@@ -325,20 +403,22 @@ mod tests {
 
     #[test]
     fn create_idx_test() {
-        let mut idx_entries = vec![
+        let idx_entries = vec![
             IdxEntry {
                 word: "a".to_string(),
                 data_offset: 1,
                 data_size: 2,
+                synonym_words: vec!["a1".to_string(), "a2".to_string()],
             },
             IdxEntry {
                 word: "bc".to_string(),
                 data_offset: 0x01000100,
                 data_size: 0x00020002,
+                synonym_words: vec!["b1".to_string(), "b2".to_string()],
             },
         ];
 
-        let idx = create_idx(&mut idx_entries, &TestLogger::new());
+        let idx = create_idx(&idx_entries, &TestLogger::new());
 
         assert_eq!(
             idx,
@@ -347,8 +427,33 @@ mod tests {
     }
 
     #[test]
+    fn create_syn_test() {
+        let idx_entries = vec![
+            IdxEntry {
+                word: "a".to_string(),
+                data_offset: 1,
+                data_size: 2,
+                synonym_words: vec!["a1".to_string()],
+            },
+            IdxEntry {
+                word: "bc".to_string(),
+                data_offset: 0x01000100,
+                data_size: 0x00020002,
+                synonym_words: vec!["b1".to_string(), "b2".to_string()],
+            },
+        ];
+
+        let syn = create_syn(&idx_entries, &TestLogger::new());
+
+        assert_eq!(
+            syn,
+            vec![0x61, 0x31, 0, 0, 0, 0, 0, 0x62, 0x31, 0, 0, 0, 0, 1, 0x62, 0x32, 0, 0, 0, 0, 1]
+        )
+    }
+
+    #[test]
     fn create_ifo_test() {
-        let ifo = create_ifo(&create_dict_info(), 100, 1000).expect("Unexpected");
+        let ifo = create_ifo(&create_dict_info(), 100, 500, 1000).expect("Unexpected");
 
         insta::assert_snapshot!(&String::from_utf8(ifo).expect("Unexpected"));
     }

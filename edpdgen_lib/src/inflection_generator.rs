@@ -81,7 +81,7 @@ fn exec_sql_core(
 
 pub trait InflectionGenerator {
     fn generate_inflection_table_html(&self, pali1: &str) -> String;
-    fn generate_all_inflections(&self, pali1: &str, stem: &str, pattern: &str) -> Vec<String>;
+    fn generate_all_inflections(&self, pali1: &str) -> Vec<String>;
 }
 
 pub(crate) struct NullInflectionGenerator {}
@@ -97,7 +97,7 @@ impl InflectionGenerator for NullInflectionGenerator {
         "".to_string()
     }
 
-    fn generate_all_inflections(&self, _pali1: &str, _stem: &str, _pattern: &str) -> Vec<String> {
+    fn generate_all_inflections(&self, _pali1: &str) -> Vec<String> {
         Vec::new()
     }
 }
@@ -120,18 +120,22 @@ impl<'a> PlsInflectionGenerator<'a> {
     }
 }
 
+fn is_black_listed_word(pali1: &str) -> bool {
+    let prefix: &str = &PLS_INFLECTION_GENERATOR_PREFIX;
+    pali1.starts_with('!') || (!prefix.is_empty() && !pali1.starts_with(prefix))
+}
+
 impl<'a> InflectionGenerator for PlsInflectionGenerator<'a> {
     fn generate_inflection_table_html(&self, pali1: &str) -> String {
-        let prefix: &str = &PLS_INFLECTION_GENERATOR_PREFIX;
-        if !prefix.is_empty() && !pali1.starts_with(prefix) {
+        if is_black_listed_word(pali1) {
             return "".to_string();
         }
 
         match generate_inflection_table(pali1, &self.inflection_host) {
             Ok(t) => t,
             Err(e) => {
-                self.inflection_host.logger.error(&format!(
-                    "Unable to generate inflection tables '{}'. Error: {}.",
+                self.inflection_host.logger.warning(&format!(
+                    "Unable to generate inflection table '{}'. Error: {}.",
                     pali1, e
                 ));
                 "".to_string()
@@ -139,13 +143,17 @@ impl<'a> InflectionGenerator for PlsInflectionGenerator<'a> {
         }
     }
 
-    fn generate_all_inflections(&self, pali1: &str, stem: &str, pattern: &str) -> Vec<String> {
-        match generate_all_inflections(pali1, stem, pattern, &self.inflection_host) {
+    fn generate_all_inflections(&self, pali1: &str) -> Vec<String> {
+        if is_black_listed_word(pali1) {
+            return vec![];
+        }
+
+        match generate_all_inflections(pali1, &self.inflection_host) {
             Ok(inflections) => inflections,
             Err(e) => {
-                self.inflection_host.logger.error(&format!(
-                    "Unable to generate inflections for '{}', '{}', '{}'. Error: {}.",
-                    pali1, stem, pattern, e
+                self.inflection_host.logger.warning(&format!(
+                    "Unable to generate inflections for '{}'. Error: {}.",
+                    pali1, e
                 ));
                 Vec::new()
             }

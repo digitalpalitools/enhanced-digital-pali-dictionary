@@ -1,8 +1,10 @@
 StarDict's dict ifo file
-version={{ version }}
+version=3.0.0
 bookname={{ name }}
 wordcount={{ word_count }}
+synwordcount={{ syn_word_count }}
 idxfilesize={{ idx_file_size }}
+idxoffsetbits=32
 author={{ author }}
 website=https://github.com/digitalpalitools
 description={{ description }}

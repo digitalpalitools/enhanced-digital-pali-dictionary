@@ -154,13 +154,8 @@ mod tests {
             format!("[ITABLE: {}]", pali1)
         }
 
-        fn generate_all_inflections(
-            &self,
-            pali1: &str,
-            _stem: &str,
-            _pattern: &str,
-        ) -> Vec<String> {
-            vec![format!("[???{}???]", pali1)]
+        fn generate_all_inflections(&self, pali1: &str) -> Vec<String> {
+            vec![format!("{}_1", pali1), format!("{}_2", pali1)]
         }
     }
 }
