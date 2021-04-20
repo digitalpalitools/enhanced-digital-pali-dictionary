@@ -184,7 +184,7 @@ struct SynEntry {
     original_word_index: i32,
 }
 
-fn create_syn(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> Vec<u8> {
+fn create_syn(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> (Vec<u8>, usize) {
     let mut syn_entries = idx_entries
         .iter()
         .enumerate()
@@ -203,7 +203,8 @@ fn create_syn(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> Vec<u8> {
             acc
         });
 
-    logger.info(&format!("Creating {} syn entries.", &syn_entries.len()));
+    let syn_count = syn_entries.len();
+    logger.info(&format!("Creating {} syn entries.", syn_count));
 
     syn_entries.sort_by(|w1, w2| glib::stardict_strcmp(&w1.synonym_word, &w2.synonym_word));
     let syn: Vec<u8> = syn_entries.iter().fold(Vec::new(), |mut acc, e| {
@@ -215,9 +216,10 @@ fn create_syn(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> Vec<u8> {
 
     logger.info(&format!(
         "... done creating {} syn entries.",
-        &syn_entries.len()
+        syn_count
     ));
-    syn
+
+    (syn, syn_count)
 }
 
 ///
@@ -232,11 +234,11 @@ pub fn create_dictionary(
     let (dict, mut idx_entries) = create_dict(dict_info, words, igen, logger)?;
     idx_entries.sort_by(|w1, w2| glib::stardict_strcmp(&w1.word, &w2.word));
     let idx = create_idx(&idx_entries, logger);
-    let syn = create_syn(&idx_entries, logger);
+    let (syn, syn_count) = create_syn(&idx_entries, logger);
     let ifo = create_ifo(
         dict_info,
         idx_entries.len(),
-        /*syn_entries.len()*/ 100,
+        syn_count,
         idx.len(),
     )?;
     let png = create_png(dict_info);
@@ -443,12 +445,13 @@ mod tests {
             },
         ];
 
-        let syn = create_syn(&idx_entries, &TestLogger::new());
+        let (syn, syn_count) = create_syn(&idx_entries, &TestLogger::new());
 
         assert_eq!(
             syn,
             vec![0x61, 0x31, 0, 0, 0, 0, 0, 0x62, 0x31, 0, 0, 0, 0, 1, 0x62, 0x32, 0, 0, 0, 0, 1]
-        )
+        );
+        assert_eq!(syn_count, 3);
     }
 
     #[test]
