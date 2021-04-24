@@ -9,7 +9,6 @@ use crate::inflection_generator::{
 use crate::stardict::input_parsers::dpd::DpdPaliWord;
 use crate::stardict::input_parsers::dps::DpsPaliWord;
 use crate::stardict::StarDictFile;
-use crate::OutputFormat::{AnandaJyoti, GoldenDict};
 use std::fs;
 use std::fs::File;
 use std::io::Write;
@@ -27,9 +26,36 @@ pub trait EdpdLogger {
 }
 
 #[derive(Debug)]
+pub enum InputFormat {
+    DigitalPaliDictionary,
+    DevamittaPaliStudy,
+}
+
+impl ToString for InputFormat {
+    fn to_string(&self) -> String {
+        match self {
+            InputFormat::DigitalPaliDictionary => "dpd".to_string(),
+            InputFormat::DevamittaPaliStudy => "dps".to_string(),
+        }
+    }
+}
+
+impl FromStr for InputFormat {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "dpd" => Ok(InputFormat::DigitalPaliDictionary),
+            "dps" => Ok(InputFormat::DevamittaPaliStudy),
+            _ => Err("Unknown input format".to_string()),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub enum OutputFormat {
-    GoldenDict,
-    AnandaJyoti,
+    StarDict,
+    AnandaJyotiDictionary,
 }
 
 impl FromStr for OutputFormat {
@@ -37,17 +63,17 @@ impl FromStr for OutputFormat {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            "goldendict" => Ok(GoldenDict),
-            "anandajyoti" => Ok(AnandaJyoti),
-            _ => Err("Unknown format".to_string()),
+            "stardict" => Ok(OutputFormat::StarDict),
+            "ajdict" => Ok(OutputFormat::AnandaJyotiDictionary),
+            _ => Err("Unknown output format".to_string()),
         }
     }
 }
 
 pub struct DictionaryInfo<'a> {
     pub name: &'a str,
-    pub ods_type: &'a str,
-    pub output_format: OutputFormat,
+    pub input_format: &'a InputFormat,
+    pub output_format: &'a OutputFormat,
     pub author: &'a str,
     pub description: &'a str,
     pub accent_color: &'a str,
@@ -73,23 +99,22 @@ pub fn run(
 
     igen.check_inflection_db(logger)?;
 
-    match dict_info.ods_type {
-        "dpd" => {
+    match dict_info.input_format {
+        InputFormat::DigitalPaliDictionary => {
             stardict::run_for_ods_type::<DpdPaliWord>(dict_info, csv_path, igen.as_ref(), logger)
         }
-        "dps" => {
+        InputFormat::DevamittaPaliStudy => {
             stardict::run_for_ods_type::<DpsPaliWord>(dict_info, csv_path, igen.as_ref(), logger)
         }
-        _ => unreachable!(),
     }
 }
 
-fn create_base_path(csv_path: &Path, ods_type: &str) -> Result<PathBuf, String> {
+fn create_base_path(csv_path: &Path, input_format: &InputFormat) -> Result<PathBuf, String> {
     let base_path = csv_path
         .parent()
         .ok_or_else(|| format!("Unable to get parent folder for {:?}.", &csv_path))?
         .join("dicts")
-        .join(ods_type);
+        .join(input_format.to_string());
 
     let parent_dir = base_path
         .parent()

@@ -1,5 +1,5 @@
 use crate::inflection_generator::InflectionGenerator;
-use crate::EdpdLogger;
+use crate::{EdpdLogger, InputFormat};
 use regex::{Captures, Regex};
 use std::path::Path;
 
@@ -14,11 +14,11 @@ pub trait PaliWord {
     fn id(&self) -> &str;
     fn sort_key(&self) -> String;
     fn group_id(&self) -> String;
-    fn toc_id(&self, short_name: &str) -> String;
-    fn toc_entry(&self, short_name: &str) -> Result<String, String>;
+    fn toc_id(&self, input_format: &InputFormat) -> String;
+    fn toc_entry(&self, input_format: &InputFormat) -> Result<String, String>;
     fn word_data_entry(
         &self,
-        short_name: &str,
+        input_format: &InputFormat,
         feedback_form_url: &str,
         host_url: &str,
         host_version: &str,
@@ -72,8 +72,8 @@ fn make_group_id(id: &str) -> String {
     gid.into_owned()
 }
 
-fn make_toc_id(id: &str, short_name: &str) -> String {
-    format!("{}_{}", id.replace(" ", "_"), short_name)
+fn make_toc_id(id: &str, input_format: &InputFormat) -> String {
+    format!("{}_{}", id.replace(" ", "_"), input_format.to_string())
 }
 
 #[cfg(test)]
@@ -120,16 +120,16 @@ mod tests {
         assert_eq!(gid, expected_gid);
     }
 
-    #[test_case(4, "abahulīkata_dpx"; "0 digits")]
-    #[test_case(5, "abala_1_dpx"; "1 digit")]
-    #[test_case(11, "adhikāra_10_dpx"; "2 digits")]
+    #[test_case(4, "abahulīkata_dps"; "0 digits")]
+    #[test_case(5, "abala_1_dps"; "1 digit")]
+    #[test_case(11, "adhikāra_10_dps"; "2 digits")]
     fn test_toc_id(rec_number: usize, expected_toc_id: &str) {
         let l = TestLogger::new();
         let mut recs = load_words::<DpdPaliWord>(&get_csv_path(), &l).expect("unexpected");
 
         let toc_id = recs
             .nth(rec_number)
-            .map(|r| make_toc_id(r.id(), "dpx"))
+            .map(|r| make_toc_id(r.id(), &InputFormat::DevamittaPaliStudy))
             .expect("unexpected");
 
         assert_eq!(toc_id, expected_toc_id);

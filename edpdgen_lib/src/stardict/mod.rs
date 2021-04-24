@@ -21,6 +21,6 @@ pub fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + PaliWord>(
     let words = input_parsers::load_words::<T>(csv_path, logger)?;
     let sd_files = output_generators::create_dictionary(&dict_info, words, igen, logger)?;
 
-    let base_path = create_base_path(csv_path, dict_info.ods_type)?;
+    let base_path = create_base_path(csv_path, &dict_info.input_format)?;
     write_dictionary(&base_path, sd_files, logger)
 }

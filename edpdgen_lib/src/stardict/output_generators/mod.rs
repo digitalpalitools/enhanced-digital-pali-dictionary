@@ -73,10 +73,10 @@ fn get_ids_and_html_for_word_group(
             (
                 w.sort_key(),
                 w.id().to_string(),
-                w.toc_entry(dict_info.ods_type)
+                w.toc_entry(&dict_info.input_format)
                     .unwrap_or_else(|e| log_return_error(&w, "table of contents", e, logger)),
                 w.word_data_entry(
-                    dict_info.ods_type,
+                    &dict_info.input_format,
                     dict_info.feedback_form_url,
                     dict_info.host_url,
                     dict_info.host_version,
@@ -99,7 +99,7 @@ fn get_ids_and_html_for_word_group(
             });
 
     let vm = WordGroupViewModel {
-        ods_type: dict_info.ods_type,
+        ods_type: &dict_info.input_format.to_string(),
         accent_color: dict_info.accent_color,
         toc_entries: &toc_entries,
         descriptions: &descriptions,
@@ -293,9 +293,8 @@ fn create_png(dict_info: &DictionaryInfo) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::resolve_file_in_manifest_dir;
     use crate::tests::{TestInflectionGenerator, TestLogger};
-    use crate::OutputFormat::GoldenDict;
+    use crate::{resolve_file_in_manifest_dir, InputFormat, OutputFormat};
 
     #[derive(Debug, Deserialize)]
     struct TestPaliWord {
@@ -320,17 +319,17 @@ mod tests {
             self.group_id.clone()
         }
 
-        fn toc_id(&self, _short_name: &str) -> String {
+        fn toc_id(&self, _input_format: &InputFormat) -> String {
             self.toc_id.clone()
         }
 
-        fn toc_entry(&self, _short_name: &str) -> Result<String, String> {
+        fn toc_entry(&self, _input_format: &InputFormat) -> Result<String, String> {
             Ok(self.toc_entry.clone())
         }
 
         fn word_data_entry(
             &self,
-            short_name: &str,
+            input_format: &InputFormat,
             feedback_form_url: &str,
             host_url: &str,
             host_version: &str,
@@ -339,7 +338,7 @@ mod tests {
             Ok(format!(
                 "{}-{}-{}-{}-{}-{}",
                 self.word_data_entry,
-                short_name,
+                input_format.to_string(),
                 feedback_form_url,
                 host_url,
                 host_version,
@@ -363,8 +362,8 @@ mod tests {
     fn create_dict_info<'a>() -> DictionaryInfo<'a> {
         DictionaryInfo {
             name: "Digital Pāli Tools Dictionary (DPD)",
-            ods_type: "dpz",
-            output_format: GoldenDict,
+            input_format: &InputFormat::DevamittaPaliStudy,
+            output_format: &OutputFormat::StarDict,
             author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
             description: "The next generation comprehensive digital Pāli dictionary.",
             accent_color: "orange",

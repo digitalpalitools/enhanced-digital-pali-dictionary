@@ -1,5 +1,6 @@
 use crate::inflection_generator::InflectionGenerator;
 use crate::stardict::input_parsers::{make_group_id, make_sort_key, make_toc_id, PaliWord};
+use crate::InputFormat;
 use tera::{Context, Tera};
 
 lazy_static! {
@@ -103,13 +104,13 @@ impl PaliWord for DpsPaliWord {
         make_group_id(&self.id())
     }
 
-    fn toc_id(&self, short_name: &str) -> String {
-        make_toc_id(&self.id(), short_name)
+    fn toc_id(&self, input_format: &InputFormat) -> String {
+        make_toc_id(&self.id(), input_format)
     }
 
-    fn toc_entry(&self, short_name: &str) -> Result<String, String> {
+    fn toc_entry(&self, input_format: &InputFormat) -> Result<String, String> {
         let mut context = Context::new();
-        context.insert("toc_id", &self.toc_id(short_name));
+        context.insert("toc_id", &self.toc_id(input_format));
         context.insert("pali", &self.pali);
         context.insert("pos", &self.pos);
         context.insert("in_english", &self.in_english);
@@ -121,7 +122,7 @@ impl PaliWord for DpsPaliWord {
 
     fn word_data_entry(
         &self,
-        short_name: &str,
+        input_format: &InputFormat,
         feedback_form_url: &str,
         host_url: &str,
         host_version: &str,
@@ -129,8 +130,8 @@ impl PaliWord for DpsPaliWord {
     ) -> Result<String, String> {
         let vm = WordDataViewModel {
             word: &self,
-            toc_id: &self.toc_id(short_name),
-            short_name,
+            toc_id: &self.toc_id(input_format),
+            short_name: &input_format.to_string(),
             feedback_form_url,
             host_url,
             host_version,
@@ -168,7 +169,10 @@ mod tests {
 
         let toc_summary = recs
             .nth(rec_number)
-            .map(|r| r.toc_entry("dpy").expect("unexpected"))
+            .map(|r| {
+                r.toc_entry(&InputFormat::DevamittaPaliStudy)
+                    .expect("unexpected")
+            })
             .expect("unexpected");
 
         insta::assert_snapshot!(toc_summary);
@@ -187,8 +191,14 @@ mod tests {
         let word_data = recs
             .nth(rec_number)
             .map(|r| {
-                r.word_data_entry("dpy", "fb_url", "host url", "host version", &igen)
-                    .expect("unexpected")
+                r.word_data_entry(
+                    &InputFormat::DevamittaPaliStudy,
+                    "fb_url",
+                    "host url",
+                    "host version",
+                    &igen,
+                )
+                .expect("unexpected")
             })
             .expect("unexpected");
 

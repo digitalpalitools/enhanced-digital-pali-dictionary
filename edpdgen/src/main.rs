@@ -1,7 +1,7 @@
 use chrono::{Local, SecondsFormat, Utc};
 use clap::{App, Arg, ArgMatches};
 use colored::*;
-use edpdgen_lib::{DictionaryInfo, EdpdLogger, OutputFormat};
+use edpdgen_lib::{DictionaryInfo, EdpdLogger, InputFormat, OutputFormat};
 use std::path::Path;
 use std::str::FromStr;
 
@@ -12,9 +12,12 @@ fn main() -> Result<(), String> {
     let csv_path = matches
         .value_of("CSV_FILE")
         .expect("This is a required argument");
-    let ods_type = matches
-        .value_of("ODS_TYPE")
-        .expect("This is a required argument");
+    let input_format = InputFormat::from_str(
+        matches
+            .value_of("INPUT_FORMAT")
+            .expect("This is a required argument"),
+    )
+    .expect("Invalid cases should have been reject by clapp");
     let output_format = OutputFormat::from_str(
         matches
             .value_of("OUTPUT_FORMAT")
@@ -24,9 +27,9 @@ fn main() -> Result<(), String> {
     let inflections_db_path = matches.value_of("INFLECTION_DB_PATH");
 
     l.info(&format!(
-        "Using csv file: {} for ods type {}. Target dictionary format: {:?}. {}.",
+        "Using csv file: {} for ods type {:?}. Target dictionary format: {:?}. {}.",
         csv_path,
-        ods_type,
+        input_format,
         output_format,
         if let Some(idb) = inflections_db_path {
             format!("Will generated inflections. Using db: {}", idb)
@@ -37,9 +40,9 @@ fn main() -> Result<(), String> {
     let time_stamp = &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true);
 
     edpdgen_lib::run(
-        &get_dictionary_info_from_ods_type(
-            ods_type,
-            output_format,
+        &get_dictionary_info_for_input_format(
+            &input_format,
+            &output_format,
             time_stamp,
             inflections_db_path,
         ),
@@ -102,11 +105,11 @@ fn get_args<'a>() -> ArgMatches<'a> {
                 .takes_value(true),
         )
         .arg(
-            Arg::with_name("ODS_TYPE")
+            Arg::with_name("INPUT_FORMAT")
                 .short("t")
                 .long("type")
-                .value_name("ODS_TYPE")
-                .help("Type of ODS.")
+                .value_name("INPUT_FORMAT")
+                .help("Input data format.")
                 .required(true)
                 .possible_values(&["dpd", "dps"])
                 .takes_value(true),
@@ -118,7 +121,7 @@ fn get_args<'a>() -> ArgMatches<'a> {
                 .value_name("OUTPUT_FORMAT")
                 .help("Target dictionary format.")
                 .required(true)
-                .possible_values(&["goldendict", "anandajyoti"])
+                .possible_values(&["stardict", "ajdict"])
                 .takes_value(true),
         )
         .arg(
@@ -140,20 +143,20 @@ fn get_args<'a>() -> ArgMatches<'a> {
         .get_matches()
 }
 
-fn get_dictionary_info_from_ods_type<'a>(
-    ods_type: &'a str,
-    output_format: OutputFormat,
+fn get_dictionary_info_for_input_format<'a>(
+    input_format: &'a InputFormat,
+    output_format: &'a OutputFormat,
     time_stamp: &'a str,
     inflections_db_path: Option<&'a str>,
 ) -> DictionaryInfo<'a> {
     let host_url = env!("CARGO_PKG_NAME");
     let host_version = env!("CARGO_PKG_VERSION");
 
-    match ods_type {
-        "dpd" => {
+    match input_format {
+        InputFormat::DigitalPaliDictionary => {
             DictionaryInfo {
                 name: "Digital Pāli Tools Dictionary (DPD)",
-                ods_type,
+                input_format,
                 output_format,
                 author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
                 description: "The next generation comprehensive digital Pāli dictionary.",
@@ -167,10 +170,10 @@ fn get_dictionary_info_from_ods_type<'a>(
                 inflections_db_path,
             }
         }
-        "dps" => {
+        InputFormat::DevamittaPaliStudy => {
             DictionaryInfo {
                 name: "Devamitta Pāli Study (DPS)",
-                ods_type,
+                input_format,
                 output_format,
                 author: "Devamitta Bhikkhu",
                 description: "A detailed Pāli language word lookup.",
@@ -184,6 +187,5 @@ fn get_dictionary_info_from_ods_type<'a>(
                 inflections_db_path,
             }
         }
-        _ => unreachable!()
     }
 }

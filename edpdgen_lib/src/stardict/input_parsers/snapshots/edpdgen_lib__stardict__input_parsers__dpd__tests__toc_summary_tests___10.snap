@@ -3,4 +3,4 @@ source: edpdgen_lib/src/stardict/input_parsers/dpd.rs
 expression: toc_summary
 
 ---
-<li><a class="dictionary-toc-link-dpy" href="#adhikāra_2_dpy">adhikāra 2</a>&nbsp;(m)&nbsp;this is a test</li>
+<li><a class="dictionary-toc-link-dpd" href="#adhikāra_2_dpd">adhikāra 2</a>&nbsp;(m)&nbsp;this is a test</li>
