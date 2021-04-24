@@ -1,0 +1,17 @@
+---
+source: edpdgen_lib/src/stardict/input_parsers/dps.rs
+expression: word_data
+
+---
+<hr />
+<div>
+  <h4 id="samañchati_dpy">samañchati</h4>
+  <table class="word-info-table-dpy">
+    <tbody><tr><td>Grammar</td><td><span>pr, trans (+acc)</span></td></tr><tr><td>English</td><td><span><strong>stretches out, pulls out, drags out</strong></span></td></tr><tr><td>Russian</td><td><span><strong>тянет, растягивает, вытягивает</strong></span></td></tr><tr><td>Root</td><td><span>√añch 1.1 a (to extend, draw along)</span></td></tr><tr><td>Base</td><td><span>√añch + a > añcha</span></td></tr><tr><td>Construction</td><td><span>saṃ + añcha + ti</span></td></tr><tr><td>Sanskrit</td><td><span>saṃ + āñchati</span></td></tr><tr><td>Sanskrit Root</td><td><span>√āñch</span></td></tr></tbody>
+  </table>
+  <br /><span>kissa tvaṃ, udāyi, nisīdanaṃ samantato <b>samañchasi</b>, seyyathā'pi purāṇ’āsikoṭṭho'ti?</span><br /><span class="sutta-source-dpy"><i>VIN 2.5.9.7 nisīdana sikkhāpadaṃ</i></span><br /><br /></div>
+<div>
+[ITABLE: samañchati]
+</div>
+<br/>
+<a class="dictionary-feedback-link-dpy" href="fb_url?entry.267696921=host url&entry.1433863141=host version" target="_blank">spot a mistake in the dictionary? fix it here!</a>

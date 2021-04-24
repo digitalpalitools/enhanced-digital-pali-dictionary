@@ -1,0 +1,17 @@
+---
+source: edpdgen_lib/src/stardict/input_parsers/dps.rs
+expression: word_data
+
+---
+<hr />
+<div>
+  <h4 id="jetavana_dpy">jetavana</h4>
+  <table class="word-info-table-dpy">
+    <tbody><tr><td>Grammar</td><td><span>masc, comp</span></td></tr><tr><td>English</td><td><span><strong>Jeta’s Grove</strong></span></td></tr><tr><td>Russian</td><td><span><strong>роща Джеты</strong></span></td></tr><tr><td>Construction</td><td><span>jetassa + vana</span></td></tr><tr><td>Sanskrit</td><td><span>jetavana</span></td></tr></tbody>
+  </table>
+  <br /><span>seyyathā’pi, bhikkhave, yaṃ imasmiṃ <b>jetavane</b> tiṇakaṭṭhasākhāpalāsaṃ taṃ jano hareyya vā ḍaheyya vā yathāpaccayaṃ vā kareyya.</span><br /><span class="sutta-source-dpy"><i>SN 22.33 natumhākaṃ sutta</i></span><br /><br /><span>evaṃ me sutaṃ — ekaṃ samayaṃ bhagavā sāvatthiyaṃ viharati <b>jetavane</b> anāthapiṇḍikassa ārāme.</span><br /><span class="sutta-source-dpy"><i>SNP 16 mahāvaggo 5 maṅgala-sutta</i></span><br /><br /><span class="sutta-source-dpy"><i>Paritta</i></span><br /><br /></div>
+<div>
+[ITABLE: jetavana]
+</div>
+<br/>
+<a class="dictionary-feedback-link-dpy" href="fb_url?entry.267696921=host url&entry.1433863141=host version" target="_blank">spot a mistake in the dictionary? fix it here!</a>

@@ -1,0 +1,17 @@
+---
+source: edpdgen_lib/src/stardict/input_parsers/dps.rs
+expression: word_data
+
+---
+<hr />
+<div>
+  <h4 id="paṭipucchā_dpy">paṭipucchā</h4>
+  <table class="word-info-table-dpy">
+    <tbody><tr><td>Grammar</td><td><span>fem, from pucchā</span></td></tr><tr><td>English</td><td><span><strong>a question in return</strong></span></td></tr><tr><td>Russian</td><td><span><strong>ответный вопрос, вопрос в ответ</strong></span></td></tr><tr><td>Root</td><td><span>√pucch 1.1 a (to ask, question)</span></td></tr><tr><td>Construction</td><td><span>pati + √pucch + ā</span></td></tr><tr><td>Sanskrit Root</td><td><span>√prach </span></td></tr></tbody>
+  </table>
+  <br /><span>atthi bhikkhave pañho ek’aṃsa-byākaraṇīyo, atthi pañho vibhajja-byākaraṇīyo, atthi pañho <b>paṭipucchā</b>-byākaraṇīyo; atthi pañho ṭhapanīyo.</span><br /><span class="sutta-source-dpy"><i>AN 4.42 pañhabyākaraṇa sutta</i></span><br /><br /></div>
+<div>
+[ITABLE: paṭipucchā]
+</div>
+<br/>
+<a class="dictionary-feedback-link-dpy" href="fb_url?entry.267696921=host url&entry.1433863141=host version" target="_blank">spot a mistake in the dictionary? fix it here!</a>

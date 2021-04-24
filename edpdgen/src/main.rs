@@ -1,7 +1,7 @@
 use chrono::{Local, SecondsFormat, Utc};
 use clap::{App, Arg, ArgMatches};
 use colored::*;
-use edpdgen_lib::{EdpdLogger, DictionaryInfo, OutputFormat};
+use edpdgen_lib::{DictionaryInfo, EdpdLogger, OutputFormat};
 use std::path::Path;
 use std::str::FromStr;
 
@@ -15,10 +15,12 @@ fn main() -> Result<(), String> {
     let ods_type = matches
         .value_of("ODS_TYPE")
         .expect("This is a required argument");
-    let output_format = OutputFormat::from_str(matches
-        .value_of("OUTPUT_FORMAT")
-        .expect("This is a required argument"))
-        .expect("Invalid cases should have been reject by clapp");
+    let output_format = OutputFormat::from_str(
+        matches
+            .value_of("OUTPUT_FORMAT")
+            .expect("This is a required argument"),
+    )
+    .expect("Invalid cases should have been reject by clapp");
     let inflections_db_path = matches.value_of("INFLECTION_DB_PATH");
 
     l.info(&format!(
@@ -35,7 +37,12 @@ fn main() -> Result<(), String> {
     let time_stamp = &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true);
 
     edpdgen_lib::run(
-        &get_dictionary_info_from_ods_type(ods_type, output_format, time_stamp, inflections_db_path),
+        &get_dictionary_info_from_ods_type(
+            ods_type,
+            output_format,
+            time_stamp,
+            inflections_db_path,
+        ),
         Path::new(csv_path),
         &l,
     )

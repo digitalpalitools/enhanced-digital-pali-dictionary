@@ -6,30 +6,24 @@ extern crate serde_derive;
 use crate::inflection_generator::{
     InflectionGenerator, NullInflectionGenerator, PlsInflectionGenerator,
 };
-use crate::input_parsers::dpd::DpdPaliWord;
-use crate::input_parsers::dps::DpsPaliWord;
-use crate::input_parsers::PaliWord;
+use crate::stardict::input_parsers::dpd::DpdPaliWord;
+use crate::stardict::input_parsers::dps::DpsPaliWord;
+use crate::stardict::StarDictFile;
+use crate::OutputFormat::{AnandaJyoti, GoldenDict};
 use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
-use crate::OutputFormat::{GoldenDict, AnandaJyoti};
 
-mod glib;
+mod ajdict;
 mod inflection_generator;
-mod input_parsers;
-mod output_generators;
+mod stardict;
 
 pub trait EdpdLogger {
     fn info(&self, msg: &str);
     fn error(&self, msg: &str);
     fn warning(&self, msg: &str);
-}
-
-pub struct StarDictFile {
-    extension: String,
-    data: Vec<u8>,
 }
 
 #[derive(Debug)]
@@ -45,7 +39,7 @@ impl FromStr for OutputFormat {
         match s.to_lowercase().as_str() {
             "goldendict" => Ok(GoldenDict),
             "anandajyoti" => Ok(AnandaJyoti),
-            _ => Err("Unknown format".to_string())
+            _ => Err("Unknown format".to_string()),
         }
     }
 }
@@ -80,23 +74,14 @@ pub fn run(
     igen.check_inflection_db(logger)?;
 
     match dict_info.ods_type {
-        "dpd" => run_for_ods_type::<DpdPaliWord>(dict_info, csv_path, igen.as_ref(), logger),
-        "dps" => run_for_ods_type::<DpsPaliWord>(dict_info, csv_path, igen.as_ref(), logger),
+        "dpd" => {
+            stardict::run_for_ods_type::<DpdPaliWord>(dict_info, csv_path, igen.as_ref(), logger)
+        }
+        "dps" => {
+            stardict::run_for_ods_type::<DpsPaliWord>(dict_info, csv_path, igen.as_ref(), logger)
+        }
         _ => unreachable!(),
     }
-}
-
-fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + PaliWord>(
-    dict_info: &DictionaryInfo,
-    csv_path: &Path,
-    igen: &dyn InflectionGenerator,
-    logger: &dyn EdpdLogger,
-) -> Result<(), String> {
-    let words = input_parsers::load_words::<T>(csv_path, logger)?;
-    let sd_files = output_generators::create_dictionary(&dict_info, words, igen, logger)?;
-
-    let base_path = create_base_path(csv_path, dict_info.ods_type)?;
-    write_dictionary(&base_path, sd_files, logger)
 }
 
 fn create_base_path(csv_path: &Path, ods_type: &str) -> Result<PathBuf, String> {
