@@ -6,68 +6,25 @@ extern crate serde_derive;
 use crate::inflection_generator::{
     InflectionGenerator, NullInflectionGenerator, PlsInflectionGenerator,
 };
-use crate::stardict::input_parsers::dpd::DpdPaliWord;
-use crate::stardict::input_parsers::dps::DpsPaliWord;
-use crate::stardict::StarDictFile;
+use crate::input::dpd::DpdPaliWord;
+use crate::input::dps::DpsPaliWord;
+use crate::input::input_format::InputFormat;
+use crate::output::output_format::OutputFormat;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::str::FromStr;
 
 mod ajdict;
 mod inflection_generator;
+pub mod input;
+pub mod output;
 mod stardict;
 
 pub trait EdpdLogger {
     fn info(&self, msg: &str);
     fn error(&self, msg: &str);
     fn warning(&self, msg: &str);
-}
-
-#[derive(Debug)]
-pub enum InputFormat {
-    DigitalPaliDictionary,
-    DevamittaPaliStudy,
-}
-
-impl ToString for InputFormat {
-    fn to_string(&self) -> String {
-        match self {
-            InputFormat::DigitalPaliDictionary => "dpd".to_string(),
-            InputFormat::DevamittaPaliStudy => "dps".to_string(),
-        }
-    }
-}
-
-impl FromStr for InputFormat {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "dpd" => Ok(InputFormat::DigitalPaliDictionary),
-            "dps" => Ok(InputFormat::DevamittaPaliStudy),
-            _ => Err("Unknown input format".to_string()),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub enum OutputFormat {
-    StarDict,
-    AnandaJyotiDictionary,
-}
-
-impl FromStr for OutputFormat {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "stardict" => Ok(OutputFormat::StarDict),
-            "ajdict" => Ok(OutputFormat::AnandaJyotiDictionary),
-            _ => Err("Unknown output format".to_string()),
-        }
-    }
 }
 
 pub struct DictionaryInfo<'a> {
@@ -83,6 +40,11 @@ pub struct DictionaryInfo<'a> {
     pub host_url: &'a str,
     pub host_version: &'a str,
     pub inflections_db_path: Option<&'a str>,
+}
+
+pub struct DictionaryFile {
+    pub extension: String,
+    pub data: Vec<u8>,
 }
 
 pub fn run(
@@ -139,7 +101,7 @@ pub fn resolve_file_in_manifest_dir(file_name: &str) -> Result<PathBuf, String> 
 
 fn write_dictionary(
     base_path: &Path,
-    sd_files: Vec<StarDictFile>,
+    sd_files: Vec<DictionaryFile>,
     logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
     for sd_file in sd_files {

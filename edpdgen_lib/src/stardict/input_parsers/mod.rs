@@ -1,5 +1,6 @@
 use crate::inflection_generator::InflectionGenerator;
-use crate::{EdpdLogger, InputFormat};
+use crate::input::input_format::InputFormat;
+use crate::EdpdLogger;
 use regex::{Captures, Regex};
 use std::path::Path;
 
@@ -10,7 +11,7 @@ lazy_static! {
     static ref PALI1_CRACKER: Regex = Regex::new(r"(.*)( )(\d+)$").expect("Malformed regex string");
 }
 
-pub trait PaliWord {
+pub trait StarDictPaliWord {
     fn id(&self) -> &str;
     fn sort_key(&self) -> String;
     fn group_id(&self) -> String;
@@ -26,10 +27,10 @@ pub trait PaliWord {
     ) -> Result<String, String>;
 }
 
-pub fn load_words<'a, T: 'a + serde::de::DeserializeOwned + PaliWord>(
+pub fn load_words<'a, T: 'a + serde::de::DeserializeOwned + StarDictPaliWord>(
     path: &Path,
     logger: &'a dyn EdpdLogger,
-) -> Result<impl Iterator<Item = impl PaliWord> + 'a, String> {
+) -> Result<impl Iterator<Item = impl StarDictPaliWord> + 'a, String> {
     logger.info(&format!("Loading words from {:?}.", path));
 
     let file = std::fs::File::open(path).map_err(|e| e.to_string())?;
@@ -79,8 +80,8 @@ fn make_toc_id(id: &str, input_format: &InputFormat) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::input::dpd::DpdPaliWord;
     use crate::resolve_file_in_manifest_dir;
-    use crate::stardict::input_parsers::dpd::DpdPaliWord;
     use crate::tests::TestLogger;
     use std::path::PathBuf;
     use test_case::test_case;

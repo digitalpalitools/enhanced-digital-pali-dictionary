@@ -1,18 +1,13 @@
 use crate::inflection_generator::InflectionGenerator;
-use crate::stardict::input_parsers::PaliWord;
+use crate::stardict::input_parsers::StarDictPaliWord;
 use crate::{create_base_path, write_dictionary, DictionaryInfo, EdpdLogger};
 use std::path::Path;
 
 mod glib;
-pub(crate) mod input_parsers;
+mod input_parsers;
 mod output_generators;
 
-pub struct StarDictFile {
-    pub extension: String,
-    pub data: Vec<u8>,
-}
-
-pub fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + PaliWord>(
+pub fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + StarDictPaliWord>(
     dict_info: &DictionaryInfo,
     csv_path: &Path,
     igen: &dyn InflectionGenerator,

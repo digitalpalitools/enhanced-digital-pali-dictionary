@@ -1,7 +1,9 @@
 use chrono::{Local, SecondsFormat, Utc};
 use clap::{App, Arg, ArgMatches};
 use colored::*;
-use edpdgen_lib::{DictionaryInfo, EdpdLogger, InputFormat, OutputFormat};
+use edpdgen_lib::input::input_format::InputFormat;
+use edpdgen_lib::output::output_format::OutputFormat;
+use edpdgen_lib::{DictionaryInfo, EdpdLogger};
 use std::path::Path;
 use std::str::FromStr;
 

@@ -1,6 +1,7 @@
 use crate::inflection_generator::InflectionGenerator;
-use crate::stardict::input_parsers::{make_group_id, make_sort_key, make_toc_id, PaliWord};
-use crate::InputFormat;
+use crate::input::dpd::DpdPaliWord;
+use crate::input::input_format::InputFormat;
+use crate::stardict::input_parsers::{make_group_id, make_sort_key, make_toc_id, StarDictPaliWord};
 use tera::{Context, Tera};
 
 lazy_static! {
@@ -21,95 +22,6 @@ lazy_static! {
     };
 }
 
-// NOTE: Keep the order deliberately randomized as we support column reordering.
-#[derive(Debug, Serialize, Deserialize)]
-pub struct DpdPaliWord {
-    #[serde(rename = "Pāli1")]
-    pali1: String,
-    #[serde(rename = "Pāli2")]
-    pali2: String,
-    #[serde(rename = "Fin")]
-    fin: String,
-    #[serde(rename = "POS")]
-    pos: String,
-    #[serde(rename = "Grammar")]
-    grammar: String,
-    #[serde(rename = "Derived from")]
-    derived_from: String,
-    #[serde(rename = "Neg")]
-    neg: String,
-    #[serde(rename = "Verb")]
-    verb: String,
-    #[serde(rename = "Trans")]
-    trans: String,
-    #[serde(rename = "Case")]
-    case: String,
-    #[serde(rename = "Meaning IN CONTEXT")]
-    in_english: String,
-    #[serde(rename = "Sanskrit")]
-    sanskrit: String,
-    #[serde(rename = "Sk Root")]
-    sanskrit_root: String,
-    #[serde(rename = "Family")]
-    family: String,
-    #[serde(rename = "Pāli Root")]
-    pali_root: String,
-    #[serde(rename = "V")]
-    v: String,
-    #[serde(rename = "Grp")]
-    grp: String,
-    #[serde(rename = "Sgn")]
-    sgn: String,
-    #[serde(rename = "Root Meaning")]
-    root_meaning: String,
-    #[serde(rename = "Base")]
-    base: String,
-    #[serde(rename = "Construction")]
-    construction: String,
-    #[serde(rename = "Derivative")]
-    derivative: String,
-    #[serde(rename = "Suffix")]
-    suffix: String,
-    #[serde(rename = "Compound")]
-    compound: String,
-    #[serde(rename = "Compound Construction")]
-    compound_construction: String,
-    #[serde(rename = "Source1")]
-    source1: String,
-    #[serde(rename = "Sutta1")]
-    sutta1: String,
-    #[serde(rename = "Example1")]
-    example1: String,
-    #[serde(rename = "Source 2")]
-    source2: String,
-    #[serde(rename = "Sutta2")]
-    sutta2: String,
-    #[serde(rename = "Example 2")]
-    example2: String,
-    #[serde(rename = "Antonyms")]
-    antonyms: String,
-    #[serde(rename = "Synonyms – different word")]
-    synonyms: String,
-    #[serde(rename = "Variant – same constr or diff reading")]
-    variant: String,
-    #[serde(rename = "Commentary")]
-    commentary: String,
-    #[serde(rename = "Literal Meaning")]
-    literal_meaning: String,
-    #[serde(rename = "Root In Comps")]
-    root_in_compound: String,
-    #[serde(rename = "Notes")]
-    notes: String,
-    #[serde(rename = "Stem")]
-    stem: String,
-    #[serde(rename = "Pattern")]
-    pattern: String,
-    #[serde(rename = "Buddhadatta")]
-    buddhadatta: String,
-    #[serde(rename = "Cl")]
-    cl: String,
-}
-
 #[derive(Serialize)]
 struct WordDataViewModel<'a> {
     word: &'a DpdPaliWord,
@@ -121,7 +33,7 @@ struct WordDataViewModel<'a> {
     inflection_table: &'a str,
 }
 
-impl PaliWord for DpdPaliWord {
+impl StarDictPaliWord for DpdPaliWord {
     fn id(&self) -> &str {
         &self.pali1
     }

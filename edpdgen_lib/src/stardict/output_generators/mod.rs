@@ -1,7 +1,7 @@
 use crate::inflection_generator::InflectionGenerator;
-use crate::stardict::input_parsers::PaliWord;
-use crate::stardict::{glib, StarDictFile};
-use crate::{DictionaryInfo, EdpdLogger};
+use crate::stardict::glib;
+use crate::stardict::input_parsers::StarDictPaliWord;
+use crate::{DictionaryFile, DictionaryInfo, EdpdLogger};
 use itertools::Itertools;
 use tera::{Context, Tera};
 
@@ -48,7 +48,7 @@ struct IfoViewModel<'a> {
 }
 
 fn log_return_error(
-    w: &dyn PaliWord,
+    w: &dyn StarDictPaliWord,
     short_msg: &str,
     e: String,
     logger: &dyn EdpdLogger,
@@ -64,7 +64,7 @@ fn log_return_error(
 
 fn get_ids_and_html_for_word_group(
     dict_info: &DictionaryInfo,
-    words: impl Iterator<Item = impl PaliWord>,
+    words: impl Iterator<Item = impl StarDictPaliWord>,
     igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
 ) -> Result<(Vec<String>, String), String> {
@@ -117,7 +117,7 @@ type DictData = (Vec<u8>, Vec<IdxEntry>);
 
 fn create_dict(
     dict_info: &DictionaryInfo,
-    words: impl Iterator<Item = impl PaliWord>,
+    words: impl Iterator<Item = impl StarDictPaliWord>,
     igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
 ) -> Result<DictData, String> {
@@ -224,10 +224,10 @@ fn create_syn(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> (Vec<u8>, us
 ///
 pub fn create_dictionary(
     dict_info: &DictionaryInfo,
-    words: impl Iterator<Item = impl PaliWord>,
+    words: impl Iterator<Item = impl StarDictPaliWord>,
     igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
-) -> Result<Vec<StarDictFile>, String> {
+) -> Result<Vec<DictionaryFile>, String> {
     let (dict, mut idx_entries) = create_dict(dict_info, words, igen, logger)?;
     idx_entries.sort_by(|w1, w2| glib::stardict_strcmp(&w1.word, &w2.word));
     let idx = create_idx(&idx_entries, logger);
@@ -236,23 +236,23 @@ pub fn create_dictionary(
     let png = create_png(dict_info);
 
     Ok(vec![
-        StarDictFile {
+        DictionaryFile {
             extension: "idx".to_string(),
             data: idx,
         },
-        StarDictFile {
+        DictionaryFile {
             extension: "dict".to_string(),
             data: dict,
         },
-        StarDictFile {
+        DictionaryFile {
             extension: "syn".to_string(),
             data: syn,
         },
-        StarDictFile {
+        DictionaryFile {
             extension: "ifo".to_string(),
             data: ifo,
         },
-        StarDictFile {
+        DictionaryFile {
             extension: "png".to_string(),
             data: png,
         },
@@ -306,7 +306,7 @@ mod tests {
         word_data_entry: String,
     }
 
-    impl PaliWord for TestPaliWord {
+    impl StarDictPaliWord for TestPaliWord {
         fn id(&self) -> &str {
             &self.id
         }
@@ -347,7 +347,7 @@ mod tests {
         }
     }
 
-    fn read_pali_words<'a>() -> impl Iterator<Item = impl PaliWord> + 'a {
+    fn read_pali_words<'a>() -> impl Iterator<Item = impl StarDictPaliWord> + 'a {
         let path = resolve_file_in_manifest_dir(
             "src/stardict/output_generators/test_data/pali_words1.csv",
         )
