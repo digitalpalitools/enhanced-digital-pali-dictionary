@@ -1,7 +1,7 @@
 use crate::inflection_generator::InflectionGenerator;
 use crate::input_parsers::PaliWord;
 use crate::EdpdLogger;
-use crate::{glib, StarDictFile, StartDictInfo};
+use crate::{glib, StarDictFile, DictionaryInfo};
 use itertools::Itertools;
 use tera::{Context, Tera};
 
@@ -63,7 +63,7 @@ fn log_return_error(
 }
 
 fn get_ids_and_html_for_word_group(
-    dict_info: &StartDictInfo,
+    dict_info: &DictionaryInfo,
     words: impl Iterator<Item = impl PaliWord>,
     igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
@@ -73,10 +73,10 @@ fn get_ids_and_html_for_word_group(
             (
                 w.sort_key(),
                 w.id().to_string(),
-                w.toc_entry(dict_info.short_name)
+                w.toc_entry(dict_info.ods_type)
                     .unwrap_or_else(|e| log_return_error(&w, "table of contents", e, logger)),
                 w.word_data_entry(
-                    dict_info.short_name,
+                    dict_info.ods_type,
                     dict_info.feedback_form_url,
                     dict_info.host_url,
                     dict_info.host_version,
@@ -99,7 +99,7 @@ fn get_ids_and_html_for_word_group(
             });
 
     let vm = WordGroupViewModel {
-        ods_type: dict_info.short_name,
+        ods_type: dict_info.ods_type,
         accent_color: dict_info.accent_color,
         toc_entries: &toc_entries,
         descriptions: &descriptions,
@@ -116,7 +116,7 @@ fn get_ids_and_html_for_word_group(
 type DictData = (Vec<u8>, Vec<IdxEntry>);
 
 fn create_dict(
-    dict_info: &StartDictInfo,
+    dict_info: &DictionaryInfo,
     words: impl Iterator<Item = impl PaliWord>,
     igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
@@ -223,7 +223,7 @@ fn create_syn(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> (Vec<u8>, us
 /// See https://github.com/huzheng001/stardict-3/blob/master/dict/doc/StarDictFileFormat
 ///
 pub fn create_dictionary(
-    dict_info: &StartDictInfo,
+    dict_info: &DictionaryInfo,
     words: impl Iterator<Item = impl PaliWord>,
     igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
@@ -260,7 +260,7 @@ pub fn create_dictionary(
 }
 
 fn create_ifo(
-    dict_info: &StartDictInfo,
+    dict_info: &DictionaryInfo,
     word_count: usize,
     syn_word_count: usize,
     idx_file_size: usize,
@@ -283,7 +283,7 @@ fn create_ifo(
     Ok(ifo_str.into_bytes())
 }
 
-fn create_png(dict_info: &StartDictInfo) -> Vec<u8> {
+fn create_png(dict_info: &DictionaryInfo) -> Vec<u8> {
     let mut png = Vec::new();
     png.extend_from_slice(&dict_info.ico);
 
@@ -295,6 +295,7 @@ mod tests {
     use super::*;
     use crate::resolve_file_in_manifest_dir;
     use crate::tests::{TestInflectionGenerator, TestLogger};
+    use crate::OutputFormat::GoldenDict;
 
     #[derive(Debug, Deserialize)]
     struct TestPaliWord {
@@ -357,10 +358,11 @@ mod tests {
         rdr.into_deserialize::<TestPaliWord>().map(|w| w.expect(""))
     }
 
-    fn create_dict_info<'a>() -> StartDictInfo<'a> {
-        StartDictInfo {
+    fn create_dict_info<'a>() -> DictionaryInfo<'a> {
+        DictionaryInfo {
             name: "Digital Pāli Tools Dictionary (DPD)",
-            short_name: "dpz",
+            ods_type: "dpz",
+            output_format: GoldenDict,
             author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
             description: "The next generation comprehensive digital Pāli dictionary.",
             accent_color: "orange",

@@ -1,8 +1,9 @@
 use chrono::{Local, SecondsFormat, Utc};
 use clap::{App, Arg, ArgMatches};
 use colored::*;
-use edpdgen_lib::{EdpdLogger, StartDictInfo};
+use edpdgen_lib::{EdpdLogger, DictionaryInfo, OutputFormat};
 use std::path::Path;
+use std::str::FromStr;
 
 fn main() -> Result<(), String> {
     let l = ColoredConsoleLogger {};
@@ -14,12 +15,17 @@ fn main() -> Result<(), String> {
     let ods_type = matches
         .value_of("ODS_TYPE")
         .expect("This is a required argument");
+    let output_format = OutputFormat::from_str(matches
+        .value_of("OUTPUT_FORMAT")
+        .expect("This is a required argument"))
+        .expect("Invalid cases should have been reject by clapp");
     let inflections_db_path = matches.value_of("INFLECTION_DB_PATH");
 
     l.info(&format!(
-        "Using csv file: {} for ods type {}. {}.",
+        "Using csv file: {} for ods type {}. Target dictionary format: {:?}. {}.",
         csv_path,
         ods_type,
+        output_format,
         if let Some(idb) = inflections_db_path {
             format!("Will generated inflections. Using db: {}", idb)
         } else {
@@ -29,7 +35,7 @@ fn main() -> Result<(), String> {
     let time_stamp = &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true);
 
     edpdgen_lib::run(
-        &get_stardict_info_from_ods_type(ods_type, time_stamp, inflections_db_path),
+        &get_dictionary_info_from_ods_type(ods_type, output_format, time_stamp, inflections_db_path),
         Path::new(csv_path),
         &l,
     )
@@ -99,6 +105,16 @@ fn get_args<'a>() -> ArgMatches<'a> {
                 .takes_value(true),
         )
         .arg(
+            Arg::with_name("OUTPUT_FORMAT")
+                .short("f")
+                .long("format")
+                .value_name("OUTPUT_FORMAT")
+                .help("Target dictionary format.")
+                .required(true)
+                .possible_values(&["goldendict", "anandajyoti"])
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("INFLECTION_DB_PATH")
                 .short("i")
                 .long("inflection-db")
@@ -117,20 +133,21 @@ fn get_args<'a>() -> ArgMatches<'a> {
         .get_matches()
 }
 
-fn get_stardict_info_from_ods_type<'a>(
+fn get_dictionary_info_from_ods_type<'a>(
     ods_type: &'a str,
+    output_format: OutputFormat,
     time_stamp: &'a str,
     inflections_db_path: Option<&'a str>,
-) -> StartDictInfo<'a> {
+) -> DictionaryInfo<'a> {
     let host_url = env!("CARGO_PKG_NAME");
     let host_version = env!("CARGO_PKG_VERSION");
-    let short_name = ods_type;
 
-    match short_name {
+    match ods_type {
         "dpd" => {
-            StartDictInfo {
+            DictionaryInfo {
                 name: "Digital Pāli Tools Dictionary (DPD)",
-                short_name,
+                ods_type,
+                output_format,
                 author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
                 description: "The next generation comprehensive digital Pāli dictionary.",
                 accent_color: "#7986CB",
@@ -144,9 +161,10 @@ fn get_stardict_info_from_ods_type<'a>(
             }
         }
         "dps" => {
-            StartDictInfo {
+            DictionaryInfo {
                 name: "Devamitta Pāli Study (DPS)",
-                short_name,
+                ods_type,
+                output_format,
                 author: "Devamitta Bhikkhu",
                 description: "A detailed Pāli language word lookup.",
                 accent_color: "green",

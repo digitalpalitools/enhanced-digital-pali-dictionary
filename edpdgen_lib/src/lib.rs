@@ -13,6 +13,8 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
+use crate::OutputFormat::{GoldenDict, AnandaJyoti};
 
 mod glib;
 mod inflection_generator;
@@ -30,9 +32,28 @@ pub struct StarDictFile {
     data: Vec<u8>,
 }
 
-pub struct StartDictInfo<'a> {
+#[derive(Debug)]
+pub enum OutputFormat {
+    GoldenDict,
+    AnandaJyoti,
+}
+
+impl FromStr for OutputFormat {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "goldendict" => Ok(GoldenDict),
+            "anandajyoti" => Ok(AnandaJyoti),
+            _ => Err("Unknown format".to_string())
+        }
+    }
+}
+
+pub struct DictionaryInfo<'a> {
     pub name: &'a str,
-    pub short_name: &'a str,
+    pub ods_type: &'a str,
+    pub output_format: OutputFormat,
     pub author: &'a str,
     pub description: &'a str,
     pub accent_color: &'a str,
@@ -45,7 +66,7 @@ pub struct StartDictInfo<'a> {
 }
 
 pub fn run(
-    dict_info: &StartDictInfo,
+    dict_info: &DictionaryInfo,
     csv_path: &Path,
     logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
@@ -58,7 +79,7 @@ pub fn run(
 
     igen.check_inflection_db(logger)?;
 
-    match dict_info.short_name {
+    match dict_info.ods_type {
         "dpd" => run_for_ods_type::<DpdPaliWord>(dict_info, csv_path, igen.as_ref(), logger),
         "dps" => run_for_ods_type::<DpsPaliWord>(dict_info, csv_path, igen.as_ref(), logger),
         _ => unreachable!(),
@@ -66,7 +87,7 @@ pub fn run(
 }
 
 fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + PaliWord>(
-    dict_info: &StartDictInfo,
+    dict_info: &DictionaryInfo,
     csv_path: &Path,
     igen: &dyn InflectionGenerator,
     logger: &dyn EdpdLogger,
@@ -74,7 +95,7 @@ fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + PaliWord>(
     let words = input_parsers::load_words::<T>(csv_path, logger)?;
     let sd_files = output_generators::create_dictionary(&dict_info, words, igen, logger)?;
 
-    let base_path = create_base_path(csv_path, dict_info.short_name)?;
+    let base_path = create_base_path(csv_path, dict_info.ods_type)?;
     write_dictionary(&base_path, sd_files, logger)
 }
 
