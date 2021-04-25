@@ -30,7 +30,14 @@ impl<'a> DictionaryBuilder<'a> for AjDict<'a> {
     fn build_files(&self) -> Result<Vec<DictionaryFile>, String> {
         match self.dict_info.input_format {
             InputFormat::Dpd => run_for_ods_type::<DpdPaliWord>(self.input_data_path, self.logger),
-            InputFormat::Dps => todo!(),
+            InputFormat::Dps => {
+                let msg = format!(
+                    "Dictionary format '{}' has not yet been implemented for '{}'.",
+                    self.dict_info.output_format, self.dict_info.input_format
+                );
+                self.logger.error(&msg);
+                Err(msg)
+            }
         }
     }
 }

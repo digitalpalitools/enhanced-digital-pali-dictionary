@@ -64,81 +64,18 @@ pub fn create_dictionary(
 
 #[cfg(test)]
 mod tests {
-    // use crate::{resolve_file_in_manifest_dir, InputFormat, OutputFormat, DictionaryInfo};
-    // use crate::ajdict::AjDictPaliWord;
-    //
-    // #[derive(Debug, Deserialize)]
-    // struct TestPaliWord {
-    //     id: String,
-    //     sort_key: String,
-    //     group_id: String,
-    //     toc_id: String,
-    //     toc_entry: String,
-    //     word_data_entry: String,
-    // }
-    //
-    // impl AjDictPaliWord for TestPaliWord {
-    //     fn id(&self) -> &str {
-    //         &self.id
-    //     }
-    //
-    //     fn sort_key(&self) -> String {
-    //         self.sort_key.clone()
-    //     }
-    //
-    //     fn word_data_entry(&self) -> Result<String, String> {
-    //         Ok(format!("{}",self.word_data_entry))
-    //     }
-    // }
-    //
-    // fn read_pali_words<'a>() -> impl Iterator<Item = impl AjDictPaliWord> + 'a {
-    //     let path = resolve_file_in_manifest_dir(
-    //         "src/stardict/output_generators/test_data/pali_words1.csv",
-    //     )
-    //     .expect("must exist!");
-    //
-    //     let file = std::fs::File::open(path).expect("must exist");
-    //     let rdr = csv::ReaderBuilder::new().from_reader(file);
-    //
-    //     rdr.into_deserialize::<TestPaliWord>().map(|w| w.expect(""))
-    // }
-    //
-    // fn create_dict_info<'a>() -> DictionaryInfo<'a> {
-    //     DictionaryInfo {
-    //         name: "Digital Pāli Tools Dictionary (DPD)",
-    //         input_format: &InputFormat::Dps,
-    //         output_format: &OutputFormat::StarDict,
-    //         author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
-    //         description: "The next generation comprehensive digital Pāli dictionary.",
-    //         accent_color: "orange",
-    //         time_stamp: "xxxx",
-    //         ico: &[],
-    //         feedback_form_url: "http://feedback.form/???",
-    //         host_url: "this is the host",
-    //         host_version: "host version",
-    //         inflections_db_path: None,
-    //     }
-    // }
+    use crate::ajdict::output_generators::create_txt_data;
+    use crate::tests::TestLogger;
 
-    // #[test]
-    // fn create_dict_test() {
-    //     let words = read_pali_words();
-    //     let igen = TestInflectionGenerator::new();
-    //
-    //     let (dict_data, idx_entries) =
-    //         create_dict(&create_dict_info(), words, &igen, &TestLogger::new()).expect("Unexpected");
-    //     let dict_entries: Vec<String> = idx_entries
-    //         .iter()
-    //         .map(|ie| {
-    //             let word_bytes =
-    //                 &dict_data[ie.data_offset as usize..(ie.data_offset + ie.data_size) as usize];
-    //             std::str::from_utf8(word_bytes)
-    //                 .expect("unexpected")
-    //                 .to_owned()
-    //         })
-    //         .collect();
-    //
-    //     insta::assert_debug_snapshot!(dict_entries);
-    //     insta::assert_yaml_snapshot!(idx_entries);
-    // }
+    #[test]
+    fn create_dict_test() {
+        let dict_entries = vec!["a;1;2".to_string(), "b;3;4".to_string()];
+
+        let txt_data = create_txt_data(dict_entries, &TestLogger::new());
+
+        assert_eq!(
+            txt_data,
+            vec![97, 59, 49, 59, 50, 13, 10, 98, 59, 51, 59, 52, 13, 10]
+        );
+    }
 }

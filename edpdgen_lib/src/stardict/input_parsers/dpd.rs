@@ -1,7 +1,8 @@
 use crate::inflection_generator::InflectionGenerator;
 use crate::input::dpd::DpdPaliWord;
 use crate::input::input_format::InputFormat;
-use crate::stardict::input_parsers::{make_group_id, make_sort_key, make_toc_id};
+use crate::input::make_sort_key;
+use crate::stardict::input_parsers::{make_group_id, make_toc_id};
 use crate::stardict::StarDictPaliWord;
 use tera::{Context, Tera};
 

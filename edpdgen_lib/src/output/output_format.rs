@@ -1,3 +1,4 @@
+use std::fmt;
 use std::str::FromStr;
 
 #[derive(Debug)]
@@ -6,6 +7,15 @@ pub enum OutputFormat {
     StarDict,
     /// Ven. Anandajyoti Dictionary format.
     AjDict,
+}
+
+impl fmt::Display for OutputFormat {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            OutputFormat::StarDict => write!(f, "stardict"),
+            OutputFormat::AjDict => write!(f, "ajdict"),
+        }
+    }
 }
 
 impl FromStr for OutputFormat {

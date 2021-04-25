@@ -1,6 +1,6 @@
-use crate::ajdict::input_parsers::make_sort_key;
 use crate::ajdict::AjDictPaliWord;
 use crate::input::dpd::DpdPaliWord;
+use crate::input::make_sort_key;
 use tera::{Context, Tera};
 
 lazy_static! {
@@ -44,9 +44,15 @@ impl AjDictPaliWord for DpdPaliWord {
 mod tests {
     use super::*;
     use crate::ajdict::input_parsers::load_words;
-    use crate::ajdict::input_parsers::tests::get_csv_path;
+    use crate::resolve_file_in_manifest_dir;
     use crate::tests::TestLogger;
+    use std::path::PathBuf;
     use test_case::test_case;
+
+    pub fn get_csv_path() -> PathBuf {
+        resolve_file_in_manifest_dir("Pali_English_Dictionary_10_rows-full.csv")
+            .expect("must exist!")
+    }
 
     #[test_case(0)]
     #[test_case(1)]

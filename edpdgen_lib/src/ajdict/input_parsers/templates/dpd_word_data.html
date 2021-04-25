@@ -4,7 +4,7 @@
 {%- if word['Verb'] -%}; {{ word['Verb'] }}{%- endif -%}
 {%- if word['Trans'] -%}; {{ word['Trans'] }}{%- endif -%}
 {%- if word['Case'] -%}; {{ word['Case'] }}{%- endif -%}:
-{%- if word['Meaning IN CONTEXT'] %} {{ word['Meaning IN CONTEXT'] }}{%- endif -%}
+{%- if word['Meaning IN CONTEXT'] %} {{ word['Meaning IN CONTEXT'] }}{%- else %} {{ word['Buddhadatta'] }}{%- endif -%}
 {%- if word['Literal Meaning'] -%}; lit. {{ word['Literal Meaning'] }}{%- endif -%}
 {%- if word['Pāli Root'] -%}; {{ word['Pāli Root'] }}{%- endif -%}
 {%- if word['V'] -%}{{ word['V'] }}{%- endif -%}
