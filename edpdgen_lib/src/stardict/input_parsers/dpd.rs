@@ -1,7 +1,8 @@
 use crate::inflection_generator::InflectionGenerator;
 use crate::input::dpd::DpdPaliWord;
 use crate::input::input_format::InputFormat;
-use crate::stardict::input_parsers::{make_group_id, make_sort_key, make_toc_id, StarDictPaliWord};
+use crate::stardict::input_parsers::{make_group_id, make_sort_key, make_toc_id};
+use crate::stardict::StarDictPaliWord;
 use tera::{Context, Tera};
 
 lazy_static! {
@@ -116,10 +117,7 @@ mod tests {
 
         let toc_summary = recs
             .nth(rec_number)
-            .map(|r| {
-                r.toc_entry(&InputFormat::DigitalPaliDictionary)
-                    .expect("unexpected")
-            })
+            .map(|r| r.toc_entry(&InputFormat::Dpd).expect("unexpected"))
             .expect("unexpected");
 
         insta::assert_snapshot!(toc_summary);
@@ -147,7 +145,7 @@ mod tests {
             .nth(rec_number)
             .map(|r| {
                 r.word_data_entry(
-                    &InputFormat::DigitalPaliDictionary,
+                    &InputFormat::Dpd,
                     "fb_url",
                     "host url",
                     "host version",

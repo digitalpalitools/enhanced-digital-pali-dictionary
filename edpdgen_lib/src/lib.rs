@@ -6,8 +6,6 @@ extern crate serde_derive;
 use crate::inflection_generator::{
     InflectionGenerator, NullInflectionGenerator, PlsInflectionGenerator,
 };
-use crate::input::dpd::DpdPaliWord;
-use crate::input::dps::DpsPaliWord;
 use crate::input::input_format::InputFormat;
 use crate::output::output_format::OutputFormat;
 use std::fs;
@@ -16,6 +14,7 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 
 mod ajdict;
+mod glib;
 mod inflection_generator;
 pub mod input;
 pub mod output;
@@ -47,9 +46,19 @@ pub struct DictionaryFile {
     pub data: Vec<u8>,
 }
 
+pub trait DictionaryBuilder<'a> {
+    fn new(
+        dict_info: &'a DictionaryInfo,
+        input_data_path: &'a Path,
+        igen: &'a dyn InflectionGenerator,
+        logger: &'a dyn EdpdLogger,
+    ) -> Self;
+    fn build_files(&self) -> Result<Vec<DictionaryFile>, String>;
+}
+
 pub fn run(
     dict_info: &DictionaryInfo,
-    csv_path: &Path,
+    input_data_path: &Path,
     logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
     let igen: Box<dyn InflectionGenerator> =
@@ -61,20 +70,24 @@ pub fn run(
 
     igen.check_inflection_db(logger)?;
 
-    match dict_info.input_format {
-        InputFormat::DigitalPaliDictionary => {
-            stardict::run_for_ods_type::<DpdPaliWord>(dict_info, csv_path, igen.as_ref(), logger)
+    let dict_files = match dict_info.output_format {
+        OutputFormat::StarDict => {
+            stardict::StarDict::new(dict_info, input_data_path, igen.as_ref(), logger)
+                .build_files()?
         }
-        InputFormat::DevamittaPaliStudy => {
-            stardict::run_for_ods_type::<DpsPaliWord>(dict_info, csv_path, igen.as_ref(), logger)
+        OutputFormat::AjDict => {
+            ajdict::AjDict::new(dict_info, input_data_path, igen.as_ref(), logger).build_files()?
         }
-    }
+    };
+
+    let base_path = create_base_path(input_data_path, &dict_info.input_format)?;
+    write_dictionary(&base_path, dict_files, logger)
 }
 
-fn create_base_path(csv_path: &Path, input_format: &InputFormat) -> Result<PathBuf, String> {
-    let base_path = csv_path
+fn create_base_path(input_data_path: &Path, input_format: &InputFormat) -> Result<PathBuf, String> {
+    let base_path = input_data_path
         .parent()
-        .ok_or_else(|| format!("Unable to get parent folder for {:?}.", &csv_path))?
+        .ok_or_else(|| format!("Unable to get parent folder for {:?}.", &input_data_path))?
         .join("dicts")
         .join(input_format.to_string());
 
@@ -101,10 +114,10 @@ pub fn resolve_file_in_manifest_dir(file_name: &str) -> Result<PathBuf, String> 
 
 fn write_dictionary(
     base_path: &Path,
-    sd_files: Vec<DictionaryFile>,
+    dict_files: Vec<DictionaryFile>,
     logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
-    for sd_file in sd_files {
+    for sd_file in dict_files {
         let f_name = base_path.with_extension(&sd_file.extension);
         logger.info(&format!("Writing {:?}.", &f_name));
         let mut f = File::create(&f_name).map_err(|e| e.to_string())?;

@@ -1,7 +1,6 @@
 use crate::inflection_generator::InflectionGenerator;
-use crate::stardict::glib;
-use crate::stardict::input_parsers::StarDictPaliWord;
-use crate::{DictionaryFile, DictionaryInfo, EdpdLogger};
+use crate::stardict::StarDictPaliWord;
+use crate::{glib, DictionaryFile, DictionaryInfo, EdpdLogger};
 use itertools::Itertools;
 use tera::{Context, Tera};
 
@@ -176,6 +175,7 @@ fn create_idx(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> Vec<u8> {
         "... done creating {} idx entries.",
         &idx_entries.len()
     ));
+
     idx
 }
 
@@ -362,7 +362,7 @@ mod tests {
     fn create_dict_info<'a>() -> DictionaryInfo<'a> {
         DictionaryInfo {
             name: "Digital Pāli Tools Dictionary (DPD)",
-            input_format: &InputFormat::DevamittaPaliStudy,
+            input_format: &InputFormat::Dps,
             output_format: &OutputFormat::StarDict,
             author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
             description: "The next generation comprehensive digital Pāli dictionary.",

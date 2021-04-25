@@ -155,7 +155,7 @@ fn get_dictionary_info_for_input_format<'a>(
     let host_version = env!("CARGO_PKG_VERSION");
 
     match input_format {
-        InputFormat::DigitalPaliDictionary => {
+        InputFormat::Dpd => {
             DictionaryInfo {
                 name: "Digital Pāli Tools Dictionary (DPD)",
                 input_format,
@@ -172,7 +172,7 @@ fn get_dictionary_info_for_input_format<'a>(
                 inflections_db_path,
             }
         }
-        InputFormat::DevamittaPaliStudy => {
+        InputFormat::Dps => {
             DictionaryInfo {
                 name: "Devamitta Pāli Study (DPS)",
                 input_format,

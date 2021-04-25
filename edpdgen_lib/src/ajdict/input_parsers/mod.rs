@@ -1,20 +1,29 @@
-use crate::input::input_format::InputFormat;
-use crate::stardict::StarDictPaliWord;
+use crate::ajdict::AjDictPaliWord;
 use crate::EdpdLogger;
 use regex::{Captures, Regex};
 use std::path::Path;
 
 pub mod dpd;
-pub mod dps;
 
 lazy_static! {
     static ref PALI1_CRACKER: Regex = Regex::new(r"(.*)( )(\d+)$").expect("Malformed regex string");
 }
 
-pub fn load_words<'a, T: 'a + serde::de::DeserializeOwned + StarDictPaliWord>(
+//
+//
+//
+//
+//  DUP code
+//
+//
+//
+//
+//
+//
+pub fn load_words<'a, T: 'a + serde::de::DeserializeOwned + AjDictPaliWord>(
     path: &Path,
     logger: &'a dyn EdpdLogger,
-) -> Result<impl Iterator<Item = impl StarDictPaliWord> + 'a, String> {
+) -> Result<impl Iterator<Item = impl AjDictPaliWord> + 'a, String> {
     logger.info(&format!("Loading words from {:?}.", path));
 
     let file = std::fs::File::open(path).map_err(|e| e.to_string())?;
@@ -41,6 +50,17 @@ pub fn load_words<'a, T: 'a + serde::de::DeserializeOwned + StarDictPaliWord>(
     Ok(words)
 }
 
+//
+//
+//
+//
+//  DUP code
+//
+//
+//
+//
+//
+//
 fn make_sort_key(id: &str) -> String {
     let sk = PALI1_CRACKER.replace(id, |caps: &Captures| {
         // NOTE: Best case effort. Not sweating it.
@@ -49,16 +69,6 @@ fn make_sort_key(id: &str) -> String {
     });
 
     sk.into_owned()
-}
-
-fn make_group_id(id: &str) -> String {
-    let gid = PALI1_CRACKER.replace(id, |caps: &Captures| caps[1].to_string());
-
-    gid.into_owned()
-}
-
-fn make_toc_id(id: &str, input_format: &InputFormat) -> String {
-    format!("{}_{}", id.replace(" ", "_"), input_format.to_string())
 }
 
 #[cfg(test)]
@@ -88,35 +98,5 @@ mod tests {
             .expect("unexpected");
 
         assert_eq!(sk, expected_sk)
-    }
-
-    #[test_case(4, "abahulīkata"; "0 digits")]
-    #[test_case(5, "abala"; "1 digit")]
-    #[test_case(11, "adhikāra"; "2 digits")]
-    fn test_group_id(rec_number: usize, expected_gid: &str) {
-        let l = TestLogger::new();
-        let mut recs = load_words::<DpdPaliWord>(&get_csv_path(), &l).expect("failed to load");
-
-        let gid = recs
-            .nth(rec_number)
-            .map(|r| make_group_id(r.id()))
-            .expect("unexpected");
-
-        assert_eq!(gid, expected_gid);
-    }
-
-    #[test_case(4, "abahulīkata_dps"; "0 digits")]
-    #[test_case(5, "abala_1_dps"; "1 digit")]
-    #[test_case(11, "adhikāra_10_dps"; "2 digits")]
-    fn test_toc_id(rec_number: usize, expected_toc_id: &str) {
-        let l = TestLogger::new();
-        let mut recs = load_words::<DpdPaliWord>(&get_csv_path(), &l).expect("unexpected");
-
-        let toc_id = recs
-            .nth(rec_number)
-            .map(|r| make_toc_id(r.id(), &InputFormat::Dps))
-            .expect("unexpected");
-
-        assert_eq!(toc_id, expected_toc_id);
     }
 }
