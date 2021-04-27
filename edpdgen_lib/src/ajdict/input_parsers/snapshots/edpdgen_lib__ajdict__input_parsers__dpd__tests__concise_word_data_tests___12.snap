@@ -1,0 +1,6 @@
+---
+source: edpdgen_lib/src/ajdict/input_parsers/dpd.rs
+expression: word_data
+
+---
+adhikāra 4; m; oh we love tests

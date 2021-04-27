@@ -238,22 +238,27 @@ pub fn create_dictionary(
     Ok(vec![
         DictionaryFile {
             extension: "idx".to_string(),
+            bom: vec![],
             data: idx,
         },
         DictionaryFile {
             extension: "dict".to_string(),
+            bom: vec![],
             data: dict,
         },
         DictionaryFile {
             extension: "syn".to_string(),
+            bom: vec![],
             data: syn,
         },
         DictionaryFile {
             extension: "ifo".to_string(),
+            bom: vec![],
             data: ifo,
         },
         DictionaryFile {
             extension: "png".to_string(),
+            bom: vec![],
             data: png,
         },
     ])

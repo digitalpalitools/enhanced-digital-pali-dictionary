@@ -43,6 +43,7 @@ pub struct DictionaryInfo<'a> {
 
 pub struct DictionaryFile {
     pub extension: String,
+    pub bom: Vec<u8>,
     pub data: Vec<u8>,
 }
 
@@ -117,14 +118,17 @@ fn write_dictionary(
     dict_files: Vec<DictionaryFile>,
     logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
-    for sd_file in dict_files {
-        let f_name = base_path.with_extension(&sd_file.extension);
+    for dict_file in dict_files {
+        let f_name = base_path.with_extension(&dict_file.extension);
         logger.info(&format!("Writing {:?}.", &f_name));
         let mut f = File::create(&f_name).map_err(|e| e.to_string())?;
-        f.write_all(&sd_file.data).map_err(|e| e.to_string())?;
+        if !&dict_file.bom.is_empty() {
+            f.write_all(&dict_file.bom).map_err(|e| e.to_string())?;
+        }
+        f.write_all(&dict_file.data).map_err(|e| e.to_string())?;
         logger.info(&format!(
             "... done ({:.2} MB)...",
-            sd_file.data.len() as f32 / 1024.0 / 1024.0
+            dict_file.data.len() as f32 / 1024.0 / 1024.0
         ));
     }
 

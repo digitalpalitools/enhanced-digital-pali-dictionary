@@ -1,6 +1,6 @@
 use crate::EdpdLogger;
 use pls_core::inflections::{
-    generate_all_inflections, generate_inflection_table, PlsInflectionsHost,
+    generate_all_inflections, generate_inflection_table, host::PlsInflectionsHost,
 };
 use rusqlite::{Connection, Row, NO_PARAMS};
 use std::env;
@@ -183,7 +183,7 @@ impl<'a> InflectionGenerator for PlsInflectionGenerator<'a> {
             return "".to_string();
         }
 
-        match generate_inflection_table(pali1, &self.inflection_host) {
+        match generate_inflection_table(pali1, false, &self.inflection_host) {
             Ok(t) => t,
             Err(e) => {
                 self.inflection_host.logger.warning(&format!(
@@ -215,5 +215,5 @@ impl<'a> InflectionGenerator for PlsInflectionGenerator<'a> {
 
 fn is_black_listed_word(pali1: &str) -> bool {
     let prefix: &str = &PLS_INFLECTION_GENERATOR_PREFIX;
-    pali1.starts_with('!') || (!prefix.is_empty() && !pali1.starts_with(prefix))
+    !prefix.is_empty() && !pali1.starts_with(prefix)
 }

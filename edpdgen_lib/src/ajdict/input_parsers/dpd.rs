@@ -7,6 +7,11 @@ lazy_static! {
     static ref TEMPLATES: Tera = {
         let mut tera = Tera::default();
         tera.add_raw_templates(vec![(
+            "dpd_concise_word_data",
+            include_str!("templates/dpd_concise_word_data.html"),
+        )])
+        .expect("Unexpected failure adding template");
+        tera.add_raw_templates(vec![(
             "dpd_word_data",
             include_str!("templates/dpd_word_data.html"),
         )])
@@ -29,15 +34,35 @@ impl AjDictPaliWord for DpdPaliWord {
         make_sort_key(&self.id())
     }
 
+    fn concise_word_data_entry(&self) -> Result<String, String> {
+        let vm = WordDataViewModel { word: &self };
+
+        let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
+        TEMPLATES
+            .render("dpd_concise_word_data", &context)
+            .map(remove_unnecessary_parts)
+            .map_err(|e| e.to_string())
+    }
+
     fn word_data_entry(&self) -> Result<String, String> {
         let vm = WordDataViewModel { word: &self };
 
         let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
         TEMPLATES
             .render("dpd_word_data", &context)
-            .map(|x| x.replace("\r", "").replace("\n", ""))
+            .map(remove_unnecessary_parts)
             .map_err(|e| e.to_string())
     }
+}
+
+fn remove_unnecessary_parts(s: String) -> String {
+    s.replace("\r", "")
+        .replace("\n", "")
+        .replace("<br/>", " | ")
+        .replace("<b>", "")
+        .replace("</b>", "")
+        .replace("<i>", "")
+        .replace("</i>", "")
 }
 
 #[cfg(test)]
@@ -74,6 +99,31 @@ mod tests {
         let word_data = recs
             .nth(rec_number)
             .map(|r| r.word_data_entry().expect("unexpected"))
+            .expect("unexpected");
+
+        insta::assert_snapshot!(word_data);
+    }
+
+    #[test_case(0)]
+    #[test_case(1)]
+    #[test_case(2)]
+    #[test_case(3)]
+    #[test_case(4)]
+    #[test_case(5)]
+    #[test_case(6)]
+    #[test_case(7)]
+    #[test_case(8)]
+    #[test_case(9)]
+    #[test_case(10)]
+    #[test_case(11)]
+    #[test_case(12)]
+    fn concise_word_data_tests(rec_number: usize) {
+        let l = TestLogger::new();
+        let mut recs = load_words::<DpdPaliWord>(&get_csv_path(), &l).expect("unexpected");
+
+        let word_data = recs
+            .nth(rec_number)
+            .map(|r| r.concise_word_data_entry().expect("unexpected"))
             .expect("unexpected");
 
         insta::assert_snapshot!(word_data);

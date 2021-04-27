@@ -1,0 +1,4 @@
+{{ word['Pāli1'] }};
+{%- if word['Grammar'] %} {{ word['Grammar'] }}{%- endif -%}
+{%- if word['Case'] %}, {{ word['Case'] }}{%- endif -%};
+{%- if word['Meaning IN CONTEXT'] %} {{ word['Meaning IN CONTEXT'] }}{%- else %} {{ word['Buddhadatta'] }}{%- endif -%}

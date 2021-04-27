@@ -4,12 +4,14 @@ use crate::{DictionaryFile, EdpdLogger};
 fn create_dict_entries(
     words: impl Iterator<Item = impl AjDictPaliWord>,
     logger: &dyn EdpdLogger,
-) -> Result<Vec<String>, String> {
+) -> Result<(Vec<String>, Vec<String>), String> {
     logger.info(&"Creating dict entries.".to_string());
 
-    let mut dict_entries: Vec<String> = Vec::new();
+    let mut dpd_entries: Vec<String> = Vec::new();
+    let mut cdpd_entries: Vec<String> = Vec::new();
     for (n, word) in words.into_iter().enumerate() {
-        dict_entries.push(word.word_data_entry()?);
+        dpd_entries.push(word.word_data_entry()?);
+        cdpd_entries.push(word.concise_word_data_entry()?);
 
         if n % 1_000 == 0 && n != 0 {
             logger.info(&format!(
@@ -22,10 +24,10 @@ fn create_dict_entries(
 
     logger.info(&format!(
         "... done creating {} dict entries.",
-        dict_entries.len()
+        dpd_entries.len()
     ));
 
-    Ok(dict_entries)
+    Ok((dpd_entries, cdpd_entries))
 }
 
 fn create_txt_data(dict_entries: Vec<String>, logger: &dyn EdpdLogger) -> Vec<u8> {
@@ -53,13 +55,22 @@ pub fn create_dictionary(
     words: impl Iterator<Item = impl AjDictPaliWord>,
     logger: &dyn EdpdLogger,
 ) -> Result<Vec<DictionaryFile>, String> {
-    let dict_entries = create_dict_entries(words, logger)?;
-    let txt = create_txt_data(dict_entries, logger);
+    let (dpd_entries, cdpd_entries) = create_dict_entries(words, logger)?;
+    let dpd_txt = create_txt_data(dpd_entries, logger);
+    let cdpd_txt = create_txt_data(cdpd_entries, logger);
 
-    Ok(vec![DictionaryFile {
-        extension: "ajd.txt".to_string(),
-        data: txt,
-    }])
+    Ok(vec![
+        DictionaryFile {
+            extension: "dpd.ajd.txt".to_string(),
+            bom: vec![0xEF, 0xBB, 0xBF],
+            data: dpd_txt,
+        },
+        DictionaryFile {
+            extension: "cdpd.ajd.txt".to_string(),
+            bom: vec![0xEF, 0xBB, 0xBF],
+            data: cdpd_txt,
+        },
+    ])
 }
 
 #[cfg(test)]

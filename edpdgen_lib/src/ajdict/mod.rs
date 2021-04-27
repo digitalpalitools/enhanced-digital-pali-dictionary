@@ -45,6 +45,7 @@ impl<'a> DictionaryBuilder<'a> for AjDict<'a> {
 pub trait AjDictPaliWord {
     fn id(&self) -> &str;
     fn sort_key(&self) -> String;
+    fn concise_word_data_entry(&self) -> Result<String, String>;
     fn word_data_entry(&self) -> Result<String, String>;
 }
 

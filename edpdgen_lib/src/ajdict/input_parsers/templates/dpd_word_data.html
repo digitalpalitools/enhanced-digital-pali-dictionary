@@ -1,26 +1,26 @@
-{{ word['Pāli1'] }}
-{%- if word['Grammar'] -%}; {{ word['Grammar'] }}{%- endif -%}
-{%- if word['Neg'] -%}; {{ word['Neg'] }}{%- endif -%}
-{%- if word['Verb'] -%}; {{ word['Verb'] }}{%- endif -%}
-{%- if word['Trans'] -%}; {{ word['Trans'] }}{%- endif -%}
-{%- if word['Case'] -%}; {{ word['Case'] }}{%- endif -%}:
+{{ word['Pāli1'] }};
+{%- if word['Grammar'] %} {{ word['Grammar'] }}{%- endif -%}
+{%- if word['Neg'] %}, {{ word['Neg'] }}{%- endif -%}
+{%- if word['Verb'] %}, {{ word['Verb'] }}{%- endif -%}
+{%- if word['Trans'] %}, {{ word['Trans'] }}{%- endif -%}
+{%- if word['Case'] %}, {{ word['Case'] }}{%- endif -%};
 {%- if word['Meaning IN CONTEXT'] %} {{ word['Meaning IN CONTEXT'] }}{%- else %} {{ word['Buddhadatta'] }}{%- endif -%}
-{%- if word['Literal Meaning'] -%}; lit. {{ word['Literal Meaning'] }}{%- endif -%}
-{%- if word['Pāli Root'] -%}; {{ word['Pāli Root'] }}{%- endif -%}
-{%- if word['V'] -%}{{ word['V'] }}{%- endif -%}
-{%- if word['Grp'] -%}{{ word['Grp'] }}{%- endif -%}
-{%- if word['Sgn'] -%} {{ word['Sgn']}}{%- endif -%}
-{%- if word['Root Meaning'] -%} ({{ word['Root Meaning'] }}){%- endif -%}
-{%- if word['Root In Comps'] -%}; {{ word['Root In Comps'] }} in comps{%- endif -%}
-{%- if word['Base'] -%}; base {{ word['Base'] }}{%- endif -%}
-{%- if word['Construction'] -%}; constr. {{ word['Construction'] }}{%- endif -%}
-{%- if word['Compound'] -%}; {{ word['Compound'] }}{%- endif -%}
-{%- if word['Compound Construction'] -%} ({{ word['Compound Construction'] }}){%- endif -%}
-{%- if word['Antonyms'] -%}; ant. {{ word['Antonyms'] }}{%- endif -%}
-{%- if word['Synonyms – different word'] -%}; syn. {{ word['Synonyms – different word'] }}{%- endif -%}
-{%- if word['Variant – same constr or diff reading'] -%}; var. {{ word['Variant – same constr or diff reading'] }}{%- endif -%}
-{%- if word['Commentary'] -%}; cmty. {{ word['Commentary'] }}{%- endif -%}
-{%- if word['Notes'] -%}; note. {{ word['Notes'] }}{%- endif -%}
-{%- if word['Sanskrit'] -%}; {{ word['Sanskrit'] }}{%- endif -%}
-{%- if word['Sk Root'] -%}; {{ word['Sk Root'] }}{%- endif -%}
-{%- if word['Cl'] -%} cl. {{ word['Cl'] }}{%- endif -%}
+{%- if word['Literal Meaning'] %}, lit. {{ word['Literal Meaning'] }}{%- endif -%}
+{%- if word['Pāli Root'] %}; root: {{ word['Pāli Root'] }}{%- endif -%}
+{%- if word['V'] %}{{ word['V'] }}{%- endif -%}
+{%- if word['Grp'] %}{{ word['Grp'] }}{%- endif -%}
+{%- if word['Sgn'] %} {{ word['Sgn']}}{%- endif -%}
+{%- if word['Root Meaning'] %} ({{ word['Root Meaning'] }}){%- endif -%}
+{%- if word['Root In Comps'] and word['Root In Comps'] != '0' %}, {{ word['Root In Comps'] }} in comps{%- endif -%}
+{%- if word['Base'] %}; base: {{ word['Base'] }}{%- endif -%}
+{%- if word['Construction'] %}; constr: {{ word['Construction'] }}{%- endif -%}
+{%- if word['Compound'] %}; {{ word['Compound'] }}{%- endif -%}
+{%- if word['Compound Construction'] %} ({{ word['Compound Construction'] }}){%- endif -%}
+{%- if word['Antonyms'] %}, ant. {{ word['Antonyms'] }}{%- endif -%}
+{%- if word['Synonyms – different word'] %}; syn. {{ word['Synonyms – different word'] }}{%- endif -%}
+{%- if word['Variant – same constr or diff reading'] %}; var: {{ word['Variant – same constr or diff reading'] }}{%- endif -%}
+{%- if word['Commentary'] %}; ct: {{ word['Commentary'] }}{%- endif -%}
+{%- if word['Notes'] %}; note: {{ word['Notes'] }}{%- endif -%}
+{%- if word['Sanskrit'] %}; sk: {{ word['Sanskrit'] }}{%- endif -%}
+{%- if word['Sk Root'] %}, {{ word['Sk Root'] }}{%- endif -%}
+{%- if word['Cl'] %} cl. {{ word['Cl'] }}{%- endif -%}
