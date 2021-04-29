@@ -2,7 +2,7 @@
   <div>
     <h4 id="{{ toc_id }}">{{ word['Pāli1'] }}</h4>
 {% if word['Meaning IN CONTEXT'] %}
-    <table class="word-info-table-{{ short_name }}">
+    <table class="word-info-table-{{ dict_short_name }}">
       <tbody><tr><td>Pāli</td><td><span>{{ word['Pāli2'] }}</span></td></tr>
 {%- if word['Grammar'] -%}
 <tr><td>Grammar</td><td><span>{{ word['Grammar'] }}
@@ -71,16 +71,16 @@
 <span>{{ word['Example1'] }}</span><br />
 {%- endif -%}
 {%- if word['Source1'] -%}
-<span class="sutta-source-{{ short_name }}"><i>{{ word['Source1'] }} {{ word['Sutta1'] }}</i></span><br /><br />
+<span class="sutta-source-{{ dict_short_name }}"><i>{{ word['Source1'] }} {{ word['Sutta1'] }}</i></span><br /><br />
 {%- endif -%}
 {%- if word['Example 2'] -%}
 <span>{{ word['Example 2'] }}</span><br />
 {%- endif -%}
 {%- if word['Source 2'] -%}
-<span class="sutta-source-{{ short_name }}"><i>{{ word['Source 2'] }} {{ word['Sutta2'] }}</i></span><br /><br />
+<span class="sutta-source-{{ dict_short_name }}"><i>{{ word['Source 2'] }} {{ word['Sutta2'] }}</i></span><br /><br />
 {%- endif -%}
 <div>
-  <a class="dictionary-feedback-link-{{ short_name }}" href="{{ feedback_form_url }}?entry.267696921={{ host_url }}&entry.1433863141={{ host_version }}" target="_blank">spot a mistake in the dictionary? fix it here!</a>
+  <a class="dictionary-feedback-link-{{ dict_short_name }}" href="{{ feedback_form_url }}?entry.267696921={{ host_url }}&entry.1433863141={{ host_version }}" target="_blank">spot a mistake in the dictionary? fix it here!</a>
 </div>
 <br />
 {% else %}
@@ -96,5 +96,5 @@
 <br />
 {% endif %}
 <div>
-<a class="dictionary-word-back-to-top-link-{{ short_name }}" href="#" onclick="document.getElementById('top-{{ short_name }}').parentElement.previousElementSibling.scrollIntoView();return false;">&#x25B2; back to top</a>
+<a class="dictionary-word-back-to-top-link-{{ dict_short_name }}" href="#" onclick="document.getElementById('top-{{ dict_short_name }}').parentElement.previousElementSibling.scrollIntoView();return false;">&#x25B2; back to top</a>
 </div>

@@ -1,7 +1,7 @@
 <hr />
 <div>
   <h4 id="{{ toc_id }}">{{ word['Pāli1'] }}</h4>
-  <table class="word-info-table-{{ short_name }}">
+  <table class="word-info-table-{{ dict_short_name }}">
     <tbody>
     {%- if word['POS'] -%}
     <tr><td>Grammar</td><td><span>{{ word['POS'] }}
@@ -61,20 +61,20 @@
   <span>{{ word['Example1'] }}</span><br />
   {%- endif -%}
   {%- if word['Source1'] -%}
-  <span class="sutta-source-{{ short_name }}"><i>{{ word['Source1'] }} {{ word['Sutta1'] }}</i></span><br /><br />
+  <span class="sutta-source-{{ dict_short_name }}"><i>{{ word['Source1'] }} {{ word['Sutta1'] }}</i></span><br /><br />
   {%- endif -%}
   {%- if word['Example 2'] -%}
   <span>{{ word['Example 2'] }}</span><br />
   {%- endif -%}
   {%- if word['Source 2'] -%}
-  <span class="sutta-source-{{ short_name }}"><i>{{ word['Source 2'] }} {{ word['Sutta2'] }}</i></span><br /><br />
+  <span class="sutta-source-{{ dict_short_name }}"><i>{{ word['Source 2'] }} {{ word['Sutta2'] }}</i></span><br /><br />
   {%- endif -%}
   {%- if word['Chapter'] -%}
-  <span class="sutta-source-{{ short_name }}"><i>{{ word['Chapter'] }}</i></span><br /><br />
+  <span class="sutta-source-{{ dict_short_name }}"><i>{{ word['Chapter'] }}</i></span><br /><br />
   {%- endif -%}
 </div>
 <div>
 {{ inflection_table }}
 </div>
 <br/>
-<a class="dictionary-feedback-link-{{ short_name }}" href="{{ feedback_form_url }}?entry.267696921={{ host_url }}&entry.1433863141={{ host_version }}" target="_blank">spot a mistake in the dictionary? fix it here!</a>
+<a class="dictionary-feedback-link-{{ dict_short_name }}" href="{{ feedback_form_url }}?entry.267696921={{ host_url }}&entry.1433863141={{ host_version }}" target="_blank">spot a mistake in the dictionary? fix it here!</a>

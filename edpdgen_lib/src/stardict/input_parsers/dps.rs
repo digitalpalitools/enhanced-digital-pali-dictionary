@@ -1,6 +1,5 @@
 use crate::inflection_generator::InflectionGenerator;
 use crate::input::dps::DpsPaliWord;
-use crate::input::input_format::InputFormat;
 use crate::input::make_sort_key;
 use crate::stardict::input_parsers::{make_group_id, make_toc_id};
 use crate::stardict::StarDictPaliWord;
@@ -28,7 +27,7 @@ lazy_static! {
 struct WordDataViewModel<'a> {
     word: &'a DpsPaliWord,
     toc_id: &'a str,
-    short_name: &'a str,
+    dict_short_name: &'a str,
     feedback_form_url: &'a str,
     host_url: &'a str,
     host_version: &'a str,
@@ -48,13 +47,13 @@ impl StarDictPaliWord for DpsPaliWord {
         make_group_id(&self.id())
     }
 
-    fn toc_id(&self, input_format: &InputFormat) -> String {
-        make_toc_id(&self.id(), input_format)
+    fn toc_id(&self, dict_short_name: &str) -> String {
+        make_toc_id(&self.id(), dict_short_name)
     }
 
-    fn toc_entry(&self, input_format: &InputFormat) -> Result<String, String> {
+    fn toc_entry(&self, dict_short_name: &str) -> Result<String, String> {
         let mut context = Context::new();
-        context.insert("toc_id", &self.toc_id(input_format));
+        context.insert("toc_id", &self.toc_id(dict_short_name));
         context.insert("pali", &self.pali);
         context.insert("pos", &self.pos);
         context.insert("in_english", &self.in_english);
@@ -66,7 +65,7 @@ impl StarDictPaliWord for DpsPaliWord {
 
     fn word_data_entry(
         &self,
-        input_format: &InputFormat,
+        dict_short_name: &str,
         feedback_form_url: &str,
         host_url: &str,
         host_version: &str,
@@ -74,8 +73,8 @@ impl StarDictPaliWord for DpsPaliWord {
     ) -> Result<String, String> {
         let vm = WordDataViewModel {
             word: &self,
-            toc_id: &self.toc_id(input_format),
-            short_name: &input_format.to_string(),
+            toc_id: &self.toc_id(dict_short_name),
+            dict_short_name,
             feedback_form_url,
             host_url,
             host_version,
@@ -113,7 +112,7 @@ mod tests {
 
         let toc_summary = recs
             .nth(rec_number)
-            .map(|r| r.toc_entry(&InputFormat::Dps).expect("unexpected"))
+            .map(|r| r.toc_entry("dps").expect("unexpected"))
             .expect("unexpected");
 
         insta::assert_snapshot!(toc_summary);
@@ -132,14 +131,8 @@ mod tests {
         let word_data = recs
             .nth(rec_number)
             .map(|r| {
-                r.word_data_entry(
-                    &InputFormat::Dps,
-                    "fb_url",
-                    "host url",
-                    "host version",
-                    &igen,
-                )
-                .expect("unexpected")
+                r.word_data_entry("dps", "fb_url", "host url", "host version", &igen)
+                    .expect("unexpected")
             })
             .expect("unexpected");
 

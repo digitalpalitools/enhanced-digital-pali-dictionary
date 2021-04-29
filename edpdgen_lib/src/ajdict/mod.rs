@@ -33,7 +33,7 @@ impl<'a> DictionaryBuilder<'a> for AjDict<'a> {
             InputFormat::Dps => {
                 let msg = format!(
                     "Dictionary format '{}' has not yet been implemented for '{}'.",
-                    self.dict_info.output_format, self.dict_info.input_format
+                    self.dict_info.output_format, self.dict_info.short_name
                 );
                 self.logger.error(&msg);
                 Err(msg)

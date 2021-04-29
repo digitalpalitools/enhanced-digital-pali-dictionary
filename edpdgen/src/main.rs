@@ -1,193 +1,145 @@
-use chrono::{Local, SecondsFormat, Utc};
-use clap::{App, Arg, ArgMatches};
-use colored::*;
+use chrono::{Datelike, SecondsFormat, Utc};
 use edpdgen_lib::input::input_format::InputFormat;
-use edpdgen_lib::output::output_format::OutputFormat;
-use edpdgen_lib::{DictionaryInfo, EdpdLogger};
-use std::path::Path;
-use std::str::FromStr;
+use edpdgen_lib::DictionaryInfo;
+use std::fs::File;
+use std::io::Read;
+
+mod args;
+mod logger;
 
 fn main() -> Result<(), String> {
-    let l = ColoredConsoleLogger {};
-    let matches = get_args();
+    let l = logger::ColoredConsoleLogger {};
 
-    let csv_path = matches
-        .value_of("CSV_FILE")
-        .expect("This is a required argument");
-    let input_format = InputFormat::from_str(
-        matches
-            .value_of("INPUT_FORMAT")
-            .expect("This is a required argument"),
-    )
-    .expect("Invalid cases should have been reject by clapp");
-    let output_format = OutputFormat::from_str(
-        matches
-            .value_of("OUTPUT_FORMAT")
-            .expect("This is a required argument"),
-    )
-    .expect("Invalid cases should have been reject by clapp");
-    let inflections_db_path = matches.value_of("INFLECTION_DB_PATH");
+    let arg_matches = args::parse_args();
+    let args = args::get_args(&arg_matches);
+    let ts = Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true);
+    let di = create_dictionary_info(&args, &ts);
 
-    l.info(&format!(
-        "Using csv file: {} for ods type {:?}. Target dictionary format: {:?}. {}.",
-        csv_path,
-        input_format,
-        output_format,
-        if let Some(idb) = inflections_db_path {
-            format!("Will generated inflections. Using db: {}", idb)
-        } else {
-            "Will NOT generate inflections".to_string()
-        }
-    ));
-    let time_stamp = &Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true);
+    print_banner();
+    print_dictionary_info(&di);
 
-    edpdgen_lib::run(
-        &get_dictionary_info_for_input_format(
-            &input_format,
-            &output_format,
-            time_stamp,
-            inflections_db_path,
-        ),
-        Path::new(csv_path),
-        &l,
-    )
-}
-
-fn get_time_stamp() -> String {
-    Local::now().format("%y-%m-%d %H:%M:%S").to_string()
-}
-
-struct ColoredConsoleLogger;
-
-impl EdpdLogger for ColoredConsoleLogger {
-    fn info(&self, msg: &str) {
-        println!(
-            "{} {}",
-            get_time_stamp().white(),
-            format!("info: {}", msg).green(),
-        );
+    if args.what_if {
+        println!("Not generating dictionary due to --what-if argument.");
+        return Ok(());
     }
 
-    fn error(&self, msg: &str) {
-        println!(
-            "{} {}",
-            get_time_stamp().white(),
-            format!("error: {}", msg).red(),
-        );
-    }
-
-    fn warning(&self, msg: &str) {
-        println!(
-            "{} {}",
-            get_time_stamp().white(),
-            format!("warning: {}", msg).yellow(),
-        );
-    }
+    edpdgen_lib::run(&di, &l)
 }
 
-fn get_args<'a>() -> ArgMatches<'a> {
-    App::new(env!("CARGO_PKG_NAME"))
-        .version(env!("CARGO_PKG_VERSION"))
-        .author(env!("CARGO_PKG_AUTHORS"))
-        .about(env!("CARGO_PKG_DESCRIPTION"))
-        .arg(
-            Arg::with_name("CSV_FILE")
-                .short("c")
-                .long("csv")
-                .value_name("CSV_FILE")
-                .help("CSV with all words.")
-                .required(true)
-                .validator(|x| {
-                    if Path::new(&x).is_file() {
-                        Ok(())
-                    } else {
-                        Err(format!("{} does not exist.", x))
-                    }
-                })
-                .takes_value(true),
-        )
-        .arg(
-            Arg::with_name("INPUT_FORMAT")
-                .short("t")
-                .long("type")
-                .value_name("INPUT_FORMAT")
-                .help("Input data format.")
-                .required(true)
-                .possible_values(&["dpd", "dps"])
-                .takes_value(true),
-        )
-        .arg(
-            Arg::with_name("OUTPUT_FORMAT")
-                .short("f")
-                .long("format")
-                .value_name("OUTPUT_FORMAT")
-                .help("Target dictionary format.")
-                .required(true)
-                .possible_values(&["stardict", "ajdict"])
-                .takes_value(true),
-        )
-        .arg(
-            Arg::with_name("INFLECTION_DB_PATH")
-                .short("i")
-                .long("inflection-db")
-                .value_name("INFLECTION_DB_PATH")
-                .help("The path to inflections.db.")
-                .required(false)
-                .validator(|x| {
-                    if Path::new(&x).is_file() {
-                        Ok(())
-                    } else {
-                        Err(format!("{} does not exist.", x))
-                    }
-                })
-                .takes_value(true),
-        )
-        .get_matches()
-}
-
-fn get_dictionary_info_for_input_format<'a>(
-    input_format: &'a InputFormat,
-    output_format: &'a OutputFormat,
-    time_stamp: &'a str,
-    inflections_db_path: Option<&'a str>,
-) -> DictionaryInfo<'a> {
+fn create_dictionary_info<'a>(args: &'a args::EdpdArgs, time_stamp: &'a str) -> DictionaryInfo<'a> {
     let host_url = env!("CARGO_PKG_NAME");
     let host_version = env!("CARGO_PKG_VERSION");
 
-    match input_format {
+    match &args.input_format {
         InputFormat::Dpd => {
             DictionaryInfo {
-                name: "Digital Pāli Tools Dictionary (DPD)",
-                input_format,
-                output_format,
                 author: "Digital Pāli Tools <digitalpalitools@gmail.com>",
-                description: "The next generation comprehensive digital Pāli dictionary.",
-                accent_color: "#7986CB",
+                input_data_path: args.csv_path,
+                input_format: &args.input_format,
+                output_format: &args.output_format,
+                output_folder: args.output_folder.unwrap_or("dicts"),
                 time_stamp,
-                ico: include_bytes!("dpd.png"),
-                feedback_form_url:
-                    "https://docs.google.com/forms/d/1hMra0aMz65sYnRlPjGlTYQIHz-3_tKlywu3enqXlpSc/viewform",
                 host_url,
                 host_version,
-                inflections_db_path,
+                feedback_form_url:
+                    "https://docs.google.com/forms/d/1hMra0aMz65sYnRlPjGlTYQIHz-3_tKlywu3enqXlpSc/viewform",
+                name: args.name.unwrap_or("Digital Pāli Tools Dictionary (DPD)"),
+                short_name: args.short_name.unwrap_or("dpd"),
+                description: args.description.unwrap_or("The next generation comprehensive Digital Pāli Dictionary."),
+                links_color: args.links_color.unwrap_or("#0006c8"),
+                headings_color: args.headings_color.unwrap_or("#747592"),
+                icon_path: args.icon_path,
+                icon: read_icon_bytes(args.icon_path, &args.input_format),
+                inflections_db_path: args.inflections_db_path,
             }
         }
         InputFormat::Dps => {
             DictionaryInfo {
-                name: "Devamitta Pāli Study (DPS)",
-                input_format,
-                output_format,
                 author: "Devamitta Bhikkhu",
-                description: "A detailed Pāli language word lookup.",
-                accent_color: "green",
+                input_data_path: args.csv_path,
+                input_format: &args.input_format,
+                output_format: &args.output_format,
+                output_folder: args.output_folder.unwrap_or("dicts"),
                 time_stamp,
-                ico: include_bytes!("dps.png"),
-                feedback_form_url:
-                    "https://docs.google.com/forms/d/e/1FAIpQLSc87oKqninpyg01YWdsjdYK6wSeIMoAZpy2jNM7Wu0KYygnHw/viewform",
                 host_url,
                 host_version,
-                inflections_db_path,
+                feedback_form_url:
+                    "https://docs.google.com/forms/d/e/1FAIpQLSc87oKqninpyg01YWdsjdYK6wSeIMoAZpy2jNM7Wu0KYygnHw/viewform",
+                name: args.name.unwrap_or( "Devamitta Pāli Study (DPS)"),
+                short_name: args.short_name.unwrap_or("dps"),
+                description: args.description.unwrap_or("A detailed Pāli language word lookup."),
+                links_color: args.links_color.unwrap_or( "orange"),
+                headings_color: args.headings_color.unwrap_or("green"),
+                icon_path: args.icon_path,
+                icon: read_icon_bytes(args.icon_path, &args.input_format),
+                inflections_db_path: args.inflections_db_path,
             }
         }
     }
+}
+
+fn print_banner() {
+    println!(
+        "{} - {}",
+        env!("CARGO_PKG_NAME"),
+        env!("CARGO_PKG_DESCRIPTION")
+    );
+    println!(
+        "(c) 2020 - {}, {}",
+        Utc::now().year(),
+        env!("CARGO_PKG_AUTHORS")
+    );
+    println!("Version: {}", env!("CARGO_PKG_VERSION"));
+    println!("This work is licensed under the {} license (https://creativecommons.org/licenses/by-nc-sa/4.0/)", env!("CARGO_PKG_LICENSE"));
+    println!();
+}
+
+fn print_dictionary_info(di: &DictionaryInfo) {
+    println!("Generating dictionary with following parameters:");
+    println!("... Name: {}", di.name);
+    println!("... Short name: {}", di.short_name);
+    println!("... Description: {}", di.description);
+    println!("... Author: {}", di.author);
+    println!("... Input data path: {}", di.input_data_path);
+    println!("... Input format: {}", di.input_format);
+    println!("... Output format: {}", di.output_format);
+    println!("... Output folder: {}", di.output_folder);
+    println!("... Links color: {}", di.links_color);
+    println!("... Headings color: {}", di.headings_color);
+    println!(
+        "... Icon: {}",
+        if let Some(ipath) = di.icon_path {
+            ipath.to_string()
+        } else {
+            format!("<default icon for {}>", di.short_name)
+        }
+    );
+    println!("... Feedback URL: {}", di.feedback_form_url);
+    println!(
+        "... Inflections: {}",
+        if let Some(idb) = di.inflections_db_path {
+            idb
+        } else {
+            "<will not generate>"
+        }
+    );
+    println!();
+}
+
+fn read_icon_bytes(ico_path: Option<&str>, input_format: &InputFormat) -> Vec<u8> {
+    let res = ico_path
+        .ok_or(())
+        .and_then(|path| File::open(path).map_err(|_| ()))
+        .as_mut()
+        .map(|f: &mut File| {
+            let mut buffer: Vec<u8> = vec![];
+            let _ = f.read_to_end(&mut buffer);
+            buffer
+        })
+        .unwrap_or_else(|_| match input_format {
+            InputFormat::Dpd => include_bytes!("dpd.png").to_vec(),
+            InputFormat::Dps => include_bytes!("dps.png").to_vec(),
+        });
+
+    res
 }

@@ -28,13 +28,18 @@ pub trait EdpdLogger {
 
 pub struct DictionaryInfo<'a> {
     pub name: &'a str,
+    pub input_data_path: &'a str,
     pub input_format: &'a InputFormat,
     pub output_format: &'a OutputFormat,
+    pub output_folder: &'a str,
+    pub short_name: &'a str,
     pub author: &'a str,
     pub description: &'a str,
-    pub accent_color: &'a str,
+    pub links_color: &'a str,
+    pub headings_color: &'a str,
     pub time_stamp: &'a str,
-    pub ico: &'a [u8],
+    pub icon_path: Option<&'a str>,
+    pub icon: Vec<u8>,
     pub feedback_form_url: &'a str,
     pub host_url: &'a str,
     pub host_version: &'a str,
@@ -57,11 +62,7 @@ pub trait DictionaryBuilder<'a> {
     fn build_files(&self) -> Result<Vec<DictionaryFile>, String>;
 }
 
-pub fn run(
-    dict_info: &DictionaryInfo,
-    input_data_path: &Path,
-    logger: &dyn EdpdLogger,
-) -> Result<(), String> {
+pub fn run(dict_info: &DictionaryInfo, logger: &dyn EdpdLogger) -> Result<(), String> {
     let igen: Box<dyn InflectionGenerator> =
         if let Some(inflections_db_path) = dict_info.inflections_db_path {
             Box::new(PlsInflectionGenerator::new(inflections_db_path, logger)?)
@@ -71,6 +72,7 @@ pub fn run(
 
     igen.check_inflection_db(logger)?;
 
+    let input_data_path = Path::new(dict_info.input_data_path);
     let dict_files = match dict_info.output_format {
         OutputFormat::StarDict => {
             stardict::StarDict::new(dict_info, input_data_path, igen.as_ref(), logger)
@@ -81,16 +83,24 @@ pub fn run(
         }
     };
 
-    let base_path = create_base_path(input_data_path, &dict_info.input_format)?;
+    let base_path = create_base_path(
+        input_data_path,
+        &dict_info.output_folder,
+        &dict_info.short_name,
+    )?;
     write_dictionary(&base_path, dict_files, logger)
 }
 
-fn create_base_path(input_data_path: &Path, input_format: &InputFormat) -> Result<PathBuf, String> {
+fn create_base_path(
+    input_data_path: &Path,
+    output_folder: &str,
+    dict_short_name: &str,
+) -> Result<PathBuf, String> {
     let base_path = input_data_path
         .parent()
         .ok_or_else(|| format!("Unable to get parent folder for {:?}.", &input_data_path))?
-        .join("dicts")
-        .join(input_format.to_string());
+        .join(output_folder)
+        .join(dict_short_name);
 
     let parent_dir = base_path
         .parent()

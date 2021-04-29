@@ -6,21 +6,23 @@
 * {
   font-family: "Verajja Serif", "DejaVu Sans", sans-serif;
 }
-table.word-info-table-{{ ods_type }} tr {
+table.word-info-table-{{ dict_short_name }} tr {
   vertical-align: top;
 }
-table.word-info-table-{{ ods_type }} tr td:nth-child(1), span.sutta-source-{{ ods_type }} {
-  color: {{ accent_color }};
+table.word-info-table-{{ dict_short_name }} tr td:nth-child(1), span.sutta-source-{{ dict_short_name }} {
+  color: {{ headings_color }};
 }
-a.dictionary-feedback-link-{{ ods_type }}, a.dictionary-word-back-to-top-link-{{ ods_type }}, a.dictionary-toc-link-{{ ods_type }} {
-  color: #ff4081;
+a.dictionary-feedback-link-{{ dict_short_name }}, a.dictionary-word-back-to-top-link-{{ dict_short_name }}, a.dictionary-toc-link-{{ dict_short_name }} {
+  color: {{ links_color }};
+}
+a.dictionary-feedback-link-{{ dict_short_name }}, a.dictionary-word-back-to-top-link-{{ dict_short_name }} {
   font-weight:700;
 }
-.pls-inflection-root .pls-inflection-header{margin-bottom:1rem}.pls-inflection-root .pls-inflection-header .pls-inflection-summary-word-info{font-weight:700}.pls-inflection-root .pls-inflection-table-title{white-space:nowrap;font-weight:700}.pls-inflection-root .pls-inflection-col-header,.pls-inflection-root .pls-inflection-row-header{white-space:nowrap;color:#7986cb}.pls-inflection-root .pls-inflection-inflected-word-suffix{font-weight:700}.pls-inflection-root .pls-inflection-table{width:1rem;margin-bottom:1rem;border:1px solid;border-collapse:collapse}.pls-inflection-root .pls-inflection-feedback-link{color:#ff4081;font-weight:700}.pls-inflection-root table,.pls-inflection-root td,.pls-inflection-root th{border:1px solid;border-collapse:collapse;padding:.25rem}.pls-inflection-root td:first-child{width:10%}
+.pls-inflection-root .pls-inflection-header{margin-bottom:1rem}.pls-inflection-root .pls-inflection-header .pls-inflection-summary-word-info{font-weight:700}.pls-inflection-root .pls-inflection-table-title{white-space:nowrap;font-weight:700}.pls-inflection-root .pls-inflection-col-header,.pls-inflection-root .pls-inflection-row-header{white-space:nowrap;color:{{ headings_color }}}.pls-inflection-root .pls-inflection-inflected-word-suffix{font-weight:700}.pls-inflection-root .pls-inflection-table{width:1rem;margin-bottom:1rem;border:1px solid;border-collapse:collapse}.pls-inflection-root .pls-inflection-feedback-link{color:{{ links_color }};font-weight:700}.pls-inflection-root table,.pls-inflection-root td,.pls-inflection-root th{border:1px solid;border-collapse:collapse;padding:.25rem}.pls-inflection-root td:first-child{width:10%}
 </style>
 </head>
 <body>
-<a id="top-{{ ods_type }}"></a>
+<a id="top-{{ dict_short_name }}"></a>
 {% for toc_entry in toc_entries -%}
 {{ toc_entry }}
 {% endfor %}<br/>

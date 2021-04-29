@@ -52,11 +52,11 @@ pub trait StarDictPaliWord {
     fn id(&self) -> &str;
     fn sort_key(&self) -> String;
     fn group_id(&self) -> String;
-    fn toc_id(&self, input_format: &InputFormat) -> String;
-    fn toc_entry(&self, input_format: &InputFormat) -> Result<String, String>;
+    fn toc_id(&self, dict_short_name: &str) -> String;
+    fn toc_entry(&self, dict_short_name: &str) -> Result<String, String>;
     fn word_data_entry(
         &self,
-        input_format: &InputFormat,
+        dict_short_name: &str,
         feedback_form_url: &str,
         host_url: &str,
         host_version: &str,

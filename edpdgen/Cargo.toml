@@ -1,9 +1,10 @@
 [package]
 name = "edpdgen"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Digital Pāli Tools <digitalpalitools@gmail.com>"]
 edition = "2018"
 description = "Enhanced Digital Pāli Dictionary Generator CLI."
+license = "CC BY-NC-SA 4.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -12,6 +13,7 @@ edpdgen_lib = { path = '../edpdgen_lib' }
 colored = "2"
 chrono = "0.4"
 clap = "2.33.3"
+regex = "1.4.4"
 
 [dev-dependencies]
 proptest = "0.10.1"

@@ -1,5 +1,4 @@
 use crate::input::create_csv_reader;
-use crate::input::input_format::InputFormat;
 use crate::input::PALI1_CRACKER;
 use crate::stardict::StarDictPaliWord;
 use crate::EdpdLogger;
@@ -39,8 +38,8 @@ fn make_group_id(id: &str) -> String {
     gid.into_owned()
 }
 
-fn make_toc_id(id: &str, input_format: &InputFormat) -> String {
-    format!("{}_{}", id.replace(" ", "_"), input_format.to_string())
+fn make_toc_id(id: &str, dict_short_name: &str) -> String {
+    format!("{}_{}", id.replace(" ", "_"), dict_short_name)
 }
 
 #[cfg(test)]
@@ -81,7 +80,7 @@ mod tests {
 
         let toc_id = recs
             .nth(rec_number)
-            .map(|r| make_toc_id(r.id(), &InputFormat::Dps))
+            .map(|r| make_toc_id(r.id(), "dps"))
             .expect("unexpected");
 
         assert_eq!(toc_id, expected_toc_id);
