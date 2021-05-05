@@ -242,26 +242,31 @@ pub fn create_dictionary(
             extension: "idx".to_string(),
             bom: vec![],
             data: idx,
+            can_be_empty: false,
         },
         DictionaryFile {
             extension: "dict".to_string(),
             bom: vec![],
             data: dict,
+            can_be_empty: false,
         },
         DictionaryFile {
             extension: "syn".to_string(),
             bom: vec![],
             data: syn,
+            can_be_empty: true,
         },
         DictionaryFile {
             extension: "ifo".to_string(),
             bom: vec![],
             data: ifo,
+            can_be_empty: false,
         },
         DictionaryFile {
             extension: "png".to_string(),
             bom: vec![],
             data: png,
+            can_be_empty: false,
         },
     ])
 }

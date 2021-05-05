@@ -50,6 +50,7 @@ pub struct DictionaryFile {
     pub extension: String,
     pub bom: Vec<u8>,
     pub data: Vec<u8>,
+    pub can_be_empty: bool,
 }
 
 pub trait DictionaryBuilder<'a> {
@@ -83,12 +84,36 @@ pub fn run(dict_info: &DictionaryInfo, logger: &dyn EdpdLogger) -> Result<(), St
         }
     };
 
+    validate_dictionary_files(&dict_files, logger)?;
+
     let base_path = create_base_path(
         input_data_path,
         &dict_info.output_folder,
         &dict_info.short_name,
     )?;
-    write_dictionary(&base_path, dict_files, logger)
+    write_dictionary(&base_path, &dict_files, logger)
+}
+
+fn validate_dictionary_files(
+    dict_files: &[DictionaryFile],
+    logger: &dyn EdpdLogger,
+) -> Result<(), String> {
+    for dict_file in dict_files {
+        if dict_file.can_be_empty {
+            continue;
+        }
+
+        if dict_file.data.is_empty() {
+            let msg = format!(
+                "'{}' file cannot be empty. Check that input csv has required columns and data.",
+                &dict_file.extension,
+            );
+            logger.info(&msg);
+            return Err(msg);
+        }
+    }
+
+    Ok(())
 }
 
 fn create_base_path(
@@ -125,7 +150,7 @@ pub fn resolve_file_in_manifest_dir(file_name: &str) -> Result<PathBuf, String> 
 
 fn write_dictionary(
     base_path: &Path,
-    dict_files: Vec<DictionaryFile>,
+    dict_files: &[DictionaryFile],
     logger: &dyn EdpdLogger,
 ) -> Result<(), String> {
     for dict_file in dict_files {
