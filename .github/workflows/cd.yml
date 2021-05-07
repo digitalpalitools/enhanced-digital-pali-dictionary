@@ -7,6 +7,9 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
+    branches:
+      - master
 
 jobs:
   build-test-deploy-linux:
@@ -43,19 +46,19 @@ jobs:
           args: --release --target x86_64-unknown-linux-musl
 
       - name: Azure Login
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_KSAPPLICATIONS_STORAGE }}
 
       - name: Deploy edpdgen
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
               az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/edpdgen' --file ./target/x86_64-unknown-linux-musl/release/edpdgen --content-cache-control 'no-store max-age=0' --content-type "application/x-executable"
         shell: pwsh
 
       - name: Azure Logout
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
               az logout
 
@@ -89,19 +92,19 @@ jobs:
           args: --release --target i686-pc-windows-msvc
 
       - name: Azure Login
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_KSAPPLICATIONS_STORAGE }}
 
       - name: Deploy edpdgen
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
               az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/edpdgen.exe' --file ./target/i686-pc-windows-msvc/release/edpdgen.exe --content-cache-control 'no-store max-age=0' --content-type "application/x-executable"
         shell: pwsh
 
       - name: Azure Logout
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
               az logout
 
@@ -168,19 +171,19 @@ jobs:
           args: zip -9 -j ./tools/dpdods2csv/build/dpdods2csv.zip ./tools/dpdods2csv/build/dpdods2csv.js
 
       - name: Azure Login
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_KSAPPLICATIONS_STORAGE }}
 
       - name: Deploy dpdods2csv.zip
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
               az storage blob upload --account-name ksapplications --container-name '$web' --name 'edpd/dpdods2csv.zip' --file ./tools/dpdods2csv/build/dpdods2csv.zip --content-cache-control 'no-store max-age=0' --content-type "application/gzip"
         shell: pwsh
 
       - name: Azure Logout
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
               az logout
 
@@ -190,7 +193,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Notify DPT on Discord
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         env:
           JOB_STATUS: ${{ job.status }}
           WEBHOOK_URL: ${{ secrets.DISCORD_DPT_DEPLOYMENT_NOTIFICATIONS_WEBHOOK_URL }}
