@@ -1,6 +1,6 @@
 use chrono::Local;
 use colored::*;
-use edpdgen_lib::EdpdLogger;
+use pls_core_extras::logger::PlsLogger;
 
 fn get_time_stamp() -> String {
     Local::now().format("%y-%m-%d %H:%M:%S").to_string()
@@ -8,7 +8,7 @@ fn get_time_stamp() -> String {
 
 pub(crate) struct ColoredConsoleLogger;
 
-impl EdpdLogger for ColoredConsoleLogger {
+impl PlsLogger for ColoredConsoleLogger {
     fn info(&self, msg: &str) {
         println!(
             "{} {}",

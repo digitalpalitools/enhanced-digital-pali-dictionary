@@ -1,7 +1,8 @@
-use crate::inflection_generator::InflectionGenerator;
 use crate::input::dpd::DpdPaliWord;
 use crate::input::input_format::InputFormat;
-use crate::{DictionaryBuilder, DictionaryFile, DictionaryInfo, EdpdLogger};
+use crate::{DictionaryBuilder, DictionaryFile, DictionaryInfo};
+use pls_core_extras::inflection_generator::InflectionGenerator;
+use pls_core_extras::logger::PlsLogger;
 use std::path::Path;
 
 mod input_parsers;
@@ -10,7 +11,7 @@ mod output_generators;
 pub struct AjDict<'a> {
     dict_info: &'a DictionaryInfo<'a>,
     input_data_path: &'a Path,
-    logger: &'a dyn EdpdLogger,
+    logger: &'a dyn PlsLogger,
 }
 
 impl<'a> DictionaryBuilder<'a> for AjDict<'a> {
@@ -18,7 +19,7 @@ impl<'a> DictionaryBuilder<'a> for AjDict<'a> {
         dict_info: &'a DictionaryInfo,
         input_data_path: &'a Path,
         _igen: &'a dyn InflectionGenerator,
-        logger: &'a dyn EdpdLogger,
+        logger: &'a dyn PlsLogger,
     ) -> Self {
         AjDict {
             dict_info,
@@ -51,7 +52,7 @@ pub trait AjDictPaliWord {
 
 pub fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + AjDictPaliWord>(
     input_data_path: &Path,
-    logger: &dyn EdpdLogger,
+    logger: &dyn PlsLogger,
 ) -> Result<Vec<DictionaryFile>, String> {
     let words = input_parsers::load_words::<T>(input_data_path, logger)?;
     let sd_files = output_generators::create_dictionary(words, logger)?;

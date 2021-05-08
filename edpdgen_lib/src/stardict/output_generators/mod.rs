@@ -1,7 +1,8 @@
-use crate::inflection_generator::InflectionGenerator;
 use crate::stardict::StarDictPaliWord;
-use crate::{glib, DictionaryFile, DictionaryInfo, EdpdLogger};
+use crate::{glib, DictionaryFile, DictionaryInfo};
 use itertools::Itertools;
+use pls_core_extras::inflection_generator::InflectionGenerator;
+use pls_core_extras::logger::PlsLogger;
 use tera::{Context, Tera};
 
 lazy_static! {
@@ -51,7 +52,7 @@ fn log_return_error(
     w: &dyn StarDictPaliWord,
     short_msg: &str,
     e: String,
-    logger: &dyn EdpdLogger,
+    logger: &dyn PlsLogger,
 ) -> String {
     logger.warning(&format!(
         "Failed to generate {} for '{}'. Error: {}.",
@@ -66,7 +67,7 @@ fn get_ids_and_html_for_word_group(
     dict_info: &DictionaryInfo,
     words: impl Iterator<Item = impl StarDictPaliWord>,
     igen: &dyn InflectionGenerator,
-    logger: &dyn EdpdLogger,
+    logger: &dyn PlsLogger,
 ) -> Result<(Vec<String>, String), String> {
     let mut word_info: Vec<(String, String, String, String)> = words
         .map(|w| {
@@ -120,7 +121,7 @@ fn create_dict(
     dict_info: &DictionaryInfo,
     words: impl Iterator<Item = impl StarDictPaliWord>,
     igen: &dyn InflectionGenerator,
-    logger: &dyn EdpdLogger,
+    logger: &dyn PlsLogger,
 ) -> Result<DictData, String> {
     logger.info(&"Creating dict entries.".to_string());
     let word_groups = words.group_by(|pw| pw.group_id());
@@ -162,7 +163,7 @@ fn create_dict(
     Ok((dict_buffer, idx_words))
 }
 
-fn create_idx(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> Vec<u8> {
+fn create_idx(idx_entries: &[IdxEntry], logger: &dyn PlsLogger) -> Vec<u8> {
     logger.info(&format!("Creating {} idx entries.", &idx_entries.len()));
 
     let idx: Vec<u8> = idx_entries.iter().fold(Vec::new(), |mut acc, e| {
@@ -186,7 +187,7 @@ struct SynEntry {
     original_word_index: i32,
 }
 
-fn create_syn(idx_entries: &[IdxEntry], logger: &dyn EdpdLogger) -> (Vec<u8>, usize) {
+fn create_syn(idx_entries: &[IdxEntry], logger: &dyn PlsLogger) -> (Vec<u8>, usize) {
     let mut syn_entries = idx_entries
         .iter()
         .enumerate()
@@ -228,7 +229,7 @@ pub fn create_dictionary(
     dict_info: &DictionaryInfo,
     words: impl Iterator<Item = impl StarDictPaliWord>,
     igen: &dyn InflectionGenerator,
-    logger: &dyn EdpdLogger,
+    logger: &dyn PlsLogger,
 ) -> Result<Vec<DictionaryFile>, String> {
     let (dict, mut idx_entries) = create_dict(dict_info, words, igen, logger)?;
     idx_entries.sort_by(|w1, w2| glib::stardict_strcmp(&w1.word, &w2.word));

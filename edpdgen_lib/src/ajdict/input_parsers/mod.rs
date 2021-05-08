@@ -1,13 +1,13 @@
 use crate::ajdict::AjDictPaliWord;
 use crate::input::create_csv_reader;
-use crate::EdpdLogger;
+use pls_core_extras::logger::PlsLogger;
 use std::path::Path;
 
 pub mod dpd;
 
 pub fn load_words<'a, T: 'a + serde::de::DeserializeOwned + AjDictPaliWord>(
     path: &Path,
-    logger: &'a dyn EdpdLogger,
+    logger: &'a dyn PlsLogger,
 ) -> Result<impl Iterator<Item = impl AjDictPaliWord> + 'a, String> {
     let rdr = create_csv_reader(path, logger)?;
 

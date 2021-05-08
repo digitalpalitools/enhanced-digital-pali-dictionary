@@ -1,8 +1,8 @@
 pub mod dpd;
 pub mod dps;
 pub mod input_format;
-use crate::EdpdLogger;
 use csv::Reader;
+use pls_core_extras::logger::PlsLogger;
 use regex::{Captures, Regex};
 use std::fs::File;
 use std::path::Path;
@@ -12,7 +12,7 @@ lazy_static! {
         Regex::new(r"(.*)( )(\d+)$").expect("Malformed regex string");
 }
 
-pub fn create_csv_reader(path: &Path, logger: &dyn EdpdLogger) -> Result<Reader<File>, String> {
+pub fn create_csv_reader(path: &Path, logger: &dyn PlsLogger) -> Result<Reader<File>, String> {
     logger.info(&format!("Loading words from {:?}.", path));
 
     let file = std::fs::File::open(path).map_err(|e| e.to_string())?;

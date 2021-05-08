@@ -10,6 +10,7 @@ license = "CC BY-NC-SA 4.0"
 
 [dependencies]
 edpdgen_lib = { path = '../edpdgen_lib' }
+pls_core_extras = { git = "https://github.com/digitalpalitools/pali-language-services" }
 colored = "2"
 chrono = "0.4"
 clap = "2.33.3"

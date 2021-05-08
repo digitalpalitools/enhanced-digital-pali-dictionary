@@ -3,11 +3,12 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 
-use crate::inflection_generator::{
-    InflectionGenerator, NullInflectionGenerator, PlsInflectionGenerator,
-};
 use crate::input::input_format::InputFormat;
 use crate::output::output_format::OutputFormat;
+use pls_core_extras::inflection_generator::{
+    InflectionGenerator, NullInflectionGenerator, PlsInflectionGenerator,
+};
+use pls_core_extras::logger::PlsLogger;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
@@ -15,16 +16,9 @@ use std::path::{Path, PathBuf};
 
 mod ajdict;
 mod glib;
-mod inflection_generator;
 pub mod input;
 pub mod output;
 mod stardict;
-
-pub trait EdpdLogger {
-    fn info(&self, msg: &str);
-    fn error(&self, msg: &str);
-    fn warning(&self, msg: &str);
-}
 
 pub struct DictionaryInfo<'a> {
     pub name: &'a str,
@@ -58,15 +52,21 @@ pub trait DictionaryBuilder<'a> {
         dict_info: &'a DictionaryInfo,
         input_data_path: &'a Path,
         igen: &'a dyn InflectionGenerator,
-        logger: &'a dyn EdpdLogger,
+        logger: &'a dyn PlsLogger,
     ) -> Self;
     fn build_files(&self) -> Result<Vec<DictionaryFile>, String>;
 }
 
-pub fn run(dict_info: &DictionaryInfo, logger: &dyn EdpdLogger) -> Result<(), String> {
+pub fn run(dict_info: &DictionaryInfo, logger: &dyn PlsLogger) -> Result<(), String> {
     let igen: Box<dyn InflectionGenerator> =
         if let Some(inflections_db_path) = dict_info.inflections_db_path {
-            Box::new(PlsInflectionGenerator::new(inflections_db_path, logger)?)
+            Box::new(PlsInflectionGenerator::new(
+                "en",
+                env!("CARGO_PKG_VERSION"),
+                env!("CARGO_PKG_NAME"),
+                inflections_db_path,
+                logger,
+            )?)
         } else {
             Box::new(NullInflectionGenerator::new())
         };
@@ -96,7 +96,7 @@ pub fn run(dict_info: &DictionaryInfo, logger: &dyn EdpdLogger) -> Result<(), St
 
 fn validate_dictionary_files(
     dict_files: &[DictionaryFile],
-    logger: &dyn EdpdLogger,
+    logger: &dyn PlsLogger,
 ) -> Result<(), String> {
     for dict_file in dict_files {
         if dict_file.can_be_empty {
@@ -151,7 +151,7 @@ pub fn resolve_file_in_manifest_dir(file_name: &str) -> Result<PathBuf, String> 
 fn write_dictionary(
     base_path: &Path,
     dict_files: &[DictionaryFile],
-    logger: &dyn EdpdLogger,
+    logger: &dyn PlsLogger,
 ) -> Result<(), String> {
     for dict_file in dict_files {
         let f_name = base_path.with_extension(&dict_file.extension);
@@ -173,6 +173,7 @@ fn write_dictionary(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pls_core_extras::logger::PlsLogger;
 
     pub struct TestLogger {}
 
@@ -182,7 +183,7 @@ mod tests {
         }
     }
 
-    impl EdpdLogger for TestLogger {
+    impl PlsLogger for TestLogger {
         fn info(&self, _msg: &str) {}
         fn error(&self, _msg: &str) {}
         fn warning(&self, _msg: &str) {}
@@ -197,7 +198,7 @@ mod tests {
     }
 
     impl InflectionGenerator for TestInflectionGenerator {
-        fn check_inflection_db(&self, _logger: &dyn EdpdLogger) -> Result<(), String> {
+        fn check_inflection_db(&self, _logger: &dyn PlsLogger) -> Result<(), String> {
             Ok(())
         }
 

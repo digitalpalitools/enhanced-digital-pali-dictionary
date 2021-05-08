@@ -1,9 +1,10 @@
 use crate::ajdict::AjDictPaliWord;
-use crate::{DictionaryFile, EdpdLogger};
+use crate::DictionaryFile;
+use pls_core_extras::logger::PlsLogger;
 
 fn create_dict_entries(
     words: impl Iterator<Item = impl AjDictPaliWord>,
-    logger: &dyn EdpdLogger,
+    logger: &dyn PlsLogger,
 ) -> Result<(Vec<String>, Vec<String>), String> {
     logger.info(&"Creating dict entries.".to_string());
 
@@ -30,7 +31,7 @@ fn create_dict_entries(
     Ok((dpd_entries, cdpd_entries))
 }
 
-fn create_txt_data(dict_entries: Vec<String>, logger: &dyn EdpdLogger) -> Vec<u8> {
+fn create_txt_data(dict_entries: Vec<String>, logger: &dyn PlsLogger) -> Vec<u8> {
     logger.info(&format!(
         "Creating dict data for {} txt entries.",
         &dict_entries.len()
@@ -53,7 +54,7 @@ fn create_txt_data(dict_entries: Vec<String>, logger: &dyn EdpdLogger) -> Vec<u8
 
 pub fn create_dictionary(
     words: impl Iterator<Item = impl AjDictPaliWord>,
-    logger: &dyn EdpdLogger,
+    logger: &dyn PlsLogger,
 ) -> Result<Vec<DictionaryFile>, String> {
     let (dpd_entries, cdpd_entries) = create_dict_entries(words, logger)?;
     let dpd_txt = create_txt_data(dpd_entries, logger);

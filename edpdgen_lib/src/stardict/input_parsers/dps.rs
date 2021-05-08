@@ -1,8 +1,8 @@
-use crate::inflection_generator::InflectionGenerator;
 use crate::input::dps::DpsPaliWord;
 use crate::input::make_sort_key;
 use crate::stardict::input_parsers::{make_group_id, make_toc_id};
 use crate::stardict::StarDictPaliWord;
+use pls_core_extras::inflection_generator::InflectionGenerator;
 use tera::{Context, Tera};
 
 lazy_static! {

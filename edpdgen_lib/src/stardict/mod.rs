@@ -1,8 +1,9 @@
-use crate::inflection_generator::InflectionGenerator;
 use crate::input::dpd::DpdPaliWord;
 use crate::input::dps::DpsPaliWord;
 use crate::input::input_format::InputFormat;
-use crate::{DictionaryBuilder, DictionaryFile, DictionaryInfo, EdpdLogger};
+use crate::{DictionaryBuilder, DictionaryFile, DictionaryInfo};
+use pls_core_extras::inflection_generator::InflectionGenerator;
+use pls_core_extras::logger::PlsLogger;
 use std::path::Path;
 
 mod input_parsers;
@@ -12,7 +13,7 @@ pub struct StarDict<'a> {
     dict_info: &'a DictionaryInfo<'a>,
     input_data_path: &'a Path,
     igen: &'a dyn InflectionGenerator,
-    logger: &'a dyn EdpdLogger,
+    logger: &'a dyn PlsLogger,
 }
 
 impl<'a> DictionaryBuilder<'a> for StarDict<'a> {
@@ -20,7 +21,7 @@ impl<'a> DictionaryBuilder<'a> for StarDict<'a> {
         dict_info: &'a DictionaryInfo,
         input_data_path: &'a Path,
         igen: &'a dyn InflectionGenerator,
-        logger: &'a dyn EdpdLogger,
+        logger: &'a dyn PlsLogger,
     ) -> Self {
         StarDict {
             dict_info,
@@ -68,7 +69,7 @@ pub fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + StarDictPaliWo
     dict_info: &DictionaryInfo,
     input_data_path: &Path,
     igen: &dyn InflectionGenerator,
-    logger: &dyn EdpdLogger,
+    logger: &dyn PlsLogger,
 ) -> Result<Vec<DictionaryFile>, String> {
     let words = input_parsers::load_words::<T>(input_data_path, logger)?;
     let sd_files = output_generators::create_dictionary(&dict_info, words, igen, logger)?;
