@@ -5,57 +5,57 @@ expression: idx_entries
 ---
 - word: ābādha
   data_offset: 0
-  data_size: 1499
+  data_size: 1582
   synonym_words:
     - ābādha_1
     - ābādha_2
 - word: ābādhato
-  data_offset: 1499
-  data_size: 1505
+  data_offset: 1582
+  data_size: 1588
   synonym_words:
     - ābādhato_1
     - ābādhato_2
 - word: ābādhika
-  data_offset: 3004
-  data_size: 1505
+  data_offset: 3170
+  data_size: 1588
   synonym_words:
     - ābādhika_1
     - ābādhika_2
 - word: ābādhikinī
-  data_offset: 4509
-  data_size: 1514
+  data_offset: 4758
+  data_size: 1597
   synonym_words:
     - ābādhikinī_1
     - ābādhikinī_2
 - word: abahulīkata
-  data_offset: 6023
-  data_size: 1511
+  data_offset: 6355
+  data_size: 1594
   synonym_words:
     - abahulīkata_1
     - abahulīkata_2
 - word: abala
-  data_offset: 7534
-  data_size: 1615
+  data_offset: 7949
+  data_size: 1697
   synonym_words:
     - abala 1_1
     - abala 1_2
     - abala 2_1
     - abala 2_2
 - word: abalabala
-  data_offset: 9149
-  data_size: 1502
+  data_offset: 9646
+  data_size: 1585
   synonym_words:
     - abalabala_1
     - abalabala_2
 - word: ābandhaka
-  data_offset: 10651
-  data_size: 1505
+  data_offset: 11231
+  data_size: 1588
   synonym_words:
     - ābandhaka_1
     - ābandhaka_2
 - word: adhikāra
-  data_offset: 12156
-  data_size: 1904
+  data_offset: 12819
+  data_size: 1984
   synonym_words:
     - adhikāra 1_1
     - adhikāra 1_2
