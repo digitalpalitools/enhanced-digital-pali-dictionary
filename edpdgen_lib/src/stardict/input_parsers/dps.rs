@@ -107,29 +107,36 @@ mod tests {
         resolve_file_in_manifest_dir("dps_sample.csv").expect("must exist!")
     }
 
-    #[test_case(0)]
-    #[test_case(1)]
-    #[test_case(2)]
-    #[test_case(3)]
-    #[test_case(4)]
-    fn toc_summary_tests(rec_number: usize) {
+    #[test_case(0, false)]
+    #[test_case(1, false)]
+    #[test_case(2, false)]
+    #[test_case(3, false)]
+    #[test_case(4, false)]
+    #[test_case(0, true)]
+    #[test_case(1, true)]
+    #[test_case(2, true)]
+    #[test_case(3, true)]
+    #[test_case(4, true)]
+
+    fn toc_summary_tests(rec_number: usize, concise:bool) {
         let l = TestLogger::new();
         let mut recs = load_words::<DpsPaliWord>(&get_csv_path(), &l).expect("unexpected");
 
         let toc_summary = recs
             .nth(rec_number)
-            .map(|r| r.toc_entry("dps", false).expect("unexpected"))
+            .map(|r| r.toc_entry("dps", concise).expect("unexpected"))
             .expect("unexpected");
 
         insta::assert_snapshot!(toc_summary);
     }
 
-    #[test_case(0)]
-    #[test_case(1)]
-    #[test_case(2)]
-    #[test_case(3)]
-    #[test_case(4)]
-    fn word_data_tests(rec_number: usize) {
+    #[test_case(0, false)]
+    #[test_case(1, false)]
+    #[test_case(2, false)]
+    #[test_case(3, false)]
+    #[test_case(4, false)]
+    #[test_case(4, true)]
+    fn word_data_tests(rec_number: usize, concise: bool) {
         let l = TestLogger::new();
         let mut recs = load_words::<DpsPaliWord>(&get_csv_path(), &l).expect("unexpected");
         let igen = TestInflectionGenerator::new();
@@ -137,7 +144,7 @@ mod tests {
         let word_data = recs
             .nth(rec_number)
             .map(|r| {
-                r.word_data_entry("dps", "fb_url", "host url", "host version", &igen, false)
+                r.word_data_entry("dps", "fb_url", "host url", "host version", &igen, concise)
                     .expect("unexpected")
             })
             .expect("unexpected");

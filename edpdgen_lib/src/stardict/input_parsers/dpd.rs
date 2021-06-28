@@ -105,45 +105,59 @@ mod tests {
     use crate::tests::{TestInflectionGenerator, TestLogger};
     use test_case::test_case;
 
-    #[test_case(0)]
-    #[test_case(1)]
-    #[test_case(2)]
-    #[test_case(3)]
-    #[test_case(4)]
-    #[test_case(5)]
-    #[test_case(6)]
-    #[test_case(7)]
-    #[test_case(8)]
-    #[test_case(9)]
-    #[test_case(10)]
-    #[test_case(11)]
-    #[test_case(12)]
-    fn toc_summary_tests(rec_number: usize) {
+    #[test_case(0, false)]
+    #[test_case(1, false)]
+    #[test_case(2, false)]
+    #[test_case(3, false)]
+    #[test_case(4, false)]
+    #[test_case(5, false)]
+    #[test_case(6, false)]
+    #[test_case(7, false)]
+    #[test_case(8, false)]
+    #[test_case(9, false)]
+    #[test_case(10, false)]
+    #[test_case(11, false)]
+    #[test_case(12, false)]
+    #[test_case(0, true)]
+    #[test_case(1, true)]
+    #[test_case(2, true)]
+    #[test_case(3, true)]
+    #[test_case(4, true)]
+    #[test_case(5, true)]
+    #[test_case(6, true)]
+    #[test_case(7, true)]
+    #[test_case(8, true)]
+    #[test_case(9, true)]
+    #[test_case(10, true)]
+    #[test_case(11, true)]
+    #[test_case(12, true)]
+    fn toc_summary_tests_false(rec_number: usize, concise: bool) {
         let l = TestLogger::new();
         let mut recs = load_words::<DpdPaliWord>(&get_csv_path(), &l).expect("unexpected");
 
         let toc_summary = recs
             .nth(rec_number)
-            .map(|r| r.toc_entry("dpd", false).expect("unexpected"))
+            .map(|r| r.toc_entry("dpd", concise).expect("unexpected"))
             .expect("unexpected");
 
         insta::assert_snapshot!(toc_summary);
     }
 
-    #[test_case(0)]
-    #[test_case(1)]
-    #[test_case(2)]
-    #[test_case(3)]
-    #[test_case(4)]
-    #[test_case(5)]
-    #[test_case(6)]
-    #[test_case(7)]
-    #[test_case(8)]
-    #[test_case(9)]
-    #[test_case(10)]
-    #[test_case(11)]
-    #[test_case(12)]
-    fn word_data_tests(rec_number: usize) {
+    #[test_case(0, false)]
+    #[test_case(1, false)]
+    #[test_case(2, false)]
+    #[test_case(3, false)]
+    #[test_case(4, false)]
+    #[test_case(5, false)]
+    #[test_case(6, false)]
+    #[test_case(7, false)]
+    #[test_case(8, false)]
+    #[test_case(9, false)]
+    #[test_case(10, false)]
+    #[test_case(11, false)]
+    #[test_case(12, false)]
+    #[test_case(12, true)]
+    fn word_data_tests(rec_number: usize, concise: bool) {
         let l = TestLogger::new();
         let mut recs = load_words::<DpdPaliWord>(&get_csv_path(), &l).expect("unexpected");
         let igen = TestInflectionGenerator::new();
@@ -151,7 +165,7 @@ mod tests {
         let word_data = recs
             .nth(rec_number)
             .map(|r| {
-                r.word_data_entry("dpd", "fb_url", "host url", "host version", &igen, false)
+                r.word_data_entry("dpd", "fb_url", "host url", "host version", &igen, concise)
                     .expect("unexpected")
             })
             .expect("unexpected");
