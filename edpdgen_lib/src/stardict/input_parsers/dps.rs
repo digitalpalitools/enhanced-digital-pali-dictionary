@@ -58,6 +58,7 @@ impl StarDictPaliWord for DpsPaliWord {
         context.insert("pos", &self.pos);
         context.insert("in_english", &self.in_english);
         context.insert("concise", &concise);
+
         TEMPLATES
             .render("dps_toc_summary", &context)
             .map_err(|e| e.to_string())

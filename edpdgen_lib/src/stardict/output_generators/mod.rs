@@ -131,6 +131,7 @@ fn create_dict(
     let mut idx_words: Vec<IdxEntry> = Vec::new();
     for (n, (key, word_group)) in (&word_groups).into_iter().enumerate() {
         let (ids, html_str) = get_ids_and_html_for_word_group(dict_info, word_group, igen, logger)?;
+
         let synonym_words: Vec<String> = ids
             .into_iter()
             .flat_map(|id| igen.generate_all_inflections(&id))

@@ -61,6 +61,7 @@ impl StarDictPaliWord for DpdPaliWord {
         context.insert("in_english", &self.in_english);
         context.insert("buddhadatta", &self.buddhadatta);
         context.insert("concise", &concise);
+
         TEMPLATES
             .render("dpd_toc_summary", &context)
             .map_err(|e| e.to_string())
