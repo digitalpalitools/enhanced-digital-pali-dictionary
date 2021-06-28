@@ -51,15 +51,16 @@ impl StarDictPaliWord for DpdPaliWord {
         make_toc_id(&self.id(), dict_short_name)
     }
 
-    fn toc_entry(&self, dict_short_name: &str) -> Result<String, String> {
+    fn toc_entry(&self, dict_short_name: &str, concise: bool) -> Result<String, String> {
         let mut context = Context::new();
         context.insert("dict_short_name", dict_short_name);
         context.insert("toc_id", &self.toc_id(dict_short_name));
         context.insert("pali1", &self.pali1);
+        context.insert("case", &self.case);
         context.insert("pos", &self.pos);
         context.insert("in_english", &self.in_english);
         context.insert("buddhadatta", &self.buddhadatta);
-
+        context.insert("concise", &concise);
         TEMPLATES
             .render("dpd_toc_summary", &context)
             .map_err(|e| e.to_string())
@@ -72,21 +73,26 @@ impl StarDictPaliWord for DpdPaliWord {
         host_url: &str,
         host_version: &str,
         igen: &dyn InflectionGenerator,
+        concise: bool,
     ) -> Result<String, String> {
-        let vm = WordDataViewModel {
-            word: &self,
-            toc_id: &self.toc_id(dict_short_name),
-            dict_short_name,
-            feedback_form_url,
-            host_url,
-            host_version,
-            inflection_table: &igen.generate_inflection_table_html(&self.pali1),
-        };
+        if concise {
+            Ok("".to_string())
+        } else {
+            let vm = WordDataViewModel {
+                word: &self,
+                toc_id: &self.toc_id(dict_short_name),
+                dict_short_name,
+                feedback_form_url,
+                host_url,
+                host_version,
+                inflection_table: &igen.generate_inflection_table_html(&self.pali1),
+            };
 
-        let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
-        TEMPLATES
-            .render("dpd_word_data", &context)
-            .map_err(|e| e.to_string())
+            let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
+            TEMPLATES
+                .render("dpd_word_data", &context)
+                .map_err(|e| e.to_string())
+        }
     }
 }
 
@@ -117,7 +123,7 @@ mod tests {
 
         let toc_summary = recs
             .nth(rec_number)
-            .map(|r| r.toc_entry("dpd").expect("unexpected"))
+            .map(|r| r.toc_entry("dpd", false).expect("unexpected"))
             .expect("unexpected");
 
         insta::assert_snapshot!(toc_summary);
@@ -144,7 +150,7 @@ mod tests {
         let word_data = recs
             .nth(rec_number)
             .map(|r| {
-                r.word_data_entry("dpd", "fb_url", "host url", "host version", &igen)
+                r.word_data_entry("dpd", "fb_url", "host url", "host version", &igen, false)
                     .expect("unexpected")
             })
             .expect("unexpected");

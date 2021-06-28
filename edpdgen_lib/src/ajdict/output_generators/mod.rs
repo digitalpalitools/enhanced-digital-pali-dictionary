@@ -55,25 +55,27 @@ fn create_txt_data(dict_entries: Vec<String>, logger: &dyn PlsLogger) -> Vec<u8>
 pub fn create_dictionary(
     words: impl Iterator<Item = impl AjDictPaliWord>,
     logger: &dyn PlsLogger,
+    concise: bool,
 ) -> Result<Vec<DictionaryFile>, String> {
     let (dpd_entries, cdpd_entries) = create_dict_entries(words, logger)?;
     let dpd_txt = create_txt_data(dpd_entries, logger);
     let cdpd_txt = create_txt_data(cdpd_entries, logger);
 
-    Ok(vec![
-        DictionaryFile {
-            extension: "dpd.ajd.txt".to_string(),
-            bom: vec![0xEF, 0xBB, 0xBF],
-            data: dpd_txt,
-            can_be_empty: false,
-        },
-        DictionaryFile {
+    if concise {
+        Ok(vec![DictionaryFile {
             extension: "cdpd.ajd.txt".to_string(),
             bom: vec![0xEF, 0xBB, 0xBF],
             data: cdpd_txt,
             can_be_empty: false,
-        },
-    ])
+        }])
+    } else {
+        Ok(vec![DictionaryFile {
+            extension: "dpd.ajd.txt".to_string(),
+            bom: vec![0xEF, 0xBB, 0xBF],
+            data: dpd_txt,
+            can_be_empty: false,
+        }])
+    }
 }
 
 #[cfg(test)]

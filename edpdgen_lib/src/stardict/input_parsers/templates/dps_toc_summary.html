@@ -1,1 +1,1 @@
-<li><a href="#{{ toc_id }}">{{ pali }}</a>&nbsp;({{ pos }})&nbsp;{{ in_english }}</li>
+<li>{% if concise %}{{ pali }}&nbsp;({{pos}}){% if case %}&nbsp;({{ case }}){% endif %}{% else %}<a href="#{{ toc_id }}">{{ pali }}</a>&nbsp;({{ pos }}){% endif %}&nbsp;{{ in_english }}</li>

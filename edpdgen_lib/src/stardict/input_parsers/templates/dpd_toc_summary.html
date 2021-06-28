@@ -1,4 +1,4 @@
-<li><a class="dictionary-toc-link-{{ dict_short_name }}" href="#{{ toc_id }}">{{ pali1 }}</a>&nbsp;({{ pos }})&nbsp;
+<li>{% if concise %}{{ pali1 }}&nbsp;({{ pos }}){% if case %}&nbsp;({{ case }}){% endif %}{% else %}<a class="dictionary-toc-link-{{ dict_short_name }}" href="#{{ toc_id }}">{{ pali1 }}</a>&nbsp;({{ pos }})&nbsp;{% endif %}
 {%- if in_english -%}
 {{ in_english }}
 {%- else -%}

@@ -30,7 +30,11 @@ impl<'a> DictionaryBuilder<'a> for AjDict<'a> {
 
     fn build_files(&self) -> Result<Vec<DictionaryFile>, String> {
         match self.dict_info.input_format {
-            InputFormat::Dpd => run_for_ods_type::<DpdPaliWord>(self.input_data_path, self.logger),
+            InputFormat::Dpd => run_for_ods_type::<DpdPaliWord>(
+                self.input_data_path,
+                self.logger,
+                self.dict_info.concise,
+            ),
             InputFormat::Dps => {
                 let msg = format!(
                     "Dictionary format '{}' has not yet been implemented for '{}'.",
@@ -53,9 +57,10 @@ pub trait AjDictPaliWord {
 pub fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + AjDictPaliWord>(
     input_data_path: &Path,
     logger: &dyn PlsLogger,
+    concise: bool,
 ) -> Result<Vec<DictionaryFile>, String> {
     let words = input_parsers::load_words::<T>(input_data_path, logger)?;
-    let sd_files = output_generators::create_dictionary(words, logger)?;
+    let sd_files = output_generators::create_dictionary(words, logger, concise)?;
 
     Ok(sd_files)
 }
