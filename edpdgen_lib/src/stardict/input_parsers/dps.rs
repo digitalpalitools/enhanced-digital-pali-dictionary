@@ -118,7 +118,7 @@ mod tests {
     #[test_case(3, true)]
     #[test_case(4, true)]
 
-    fn toc_summary_tests(rec_number: usize, concise:bool) {
+    fn toc_summary_tests(rec_number: usize, concise: bool) {
         let l = TestLogger::new();
         let mut recs = load_words::<DpsPaliWord>(&get_csv_path(), &l).expect("unexpected");
 
