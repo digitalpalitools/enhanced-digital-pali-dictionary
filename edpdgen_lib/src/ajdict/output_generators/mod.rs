@@ -63,14 +63,14 @@ pub fn create_dictionary(
 
     if concise {
         Ok(vec![DictionaryFile {
-            extension: "cdpd.ajd.txt".to_string(),
+            extension: "ajd.txt".to_string(),
             bom: vec![0xEF, 0xBB, 0xBF],
             data: cdpd_txt,
             can_be_empty: false,
         }])
     } else {
         Ok(vec![DictionaryFile {
-            extension: "dpd.ajd.txt".to_string(),
+            extension: "ajd.txt".to_string(),
             bom: vec![0xEF, 0xBB, 0xBF],
             data: dpd_txt,
             can_be_empty: false,
