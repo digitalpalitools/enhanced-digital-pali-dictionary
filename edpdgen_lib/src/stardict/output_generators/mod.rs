@@ -74,7 +74,7 @@ fn get_ids_and_html_for_word_group(
             (
                 w.sort_key(),
                 w.id().to_string(),
-                w.toc_entry(&dict_info.short_name)
+                w.toc_entry(&dict_info.short_name, dict_info.concise)
                     .unwrap_or_else(|e| log_return_error(&w, "table of contents", e, logger)),
                 w.word_data_entry(
                     &dict_info.short_name,
@@ -82,6 +82,7 @@ fn get_ids_and_html_for_word_group(
                     dict_info.host_url,
                     dict_info.host_version,
                     igen,
+                    dict_info.concise,
                 )
                 .unwrap_or_else(|e| log_return_error(&w, "word data", e, logger)),
             )
@@ -336,7 +337,7 @@ mod tests {
             self.toc_id.clone()
         }
 
-        fn toc_entry(&self, _dict_short_namet: &str) -> Result<String, String> {
+        fn toc_entry(&self, _dict_short_namet: &str, _concise: bool) -> Result<String, String> {
             Ok(self.toc_entry.clone())
         }
 
@@ -347,6 +348,7 @@ mod tests {
             host_url: &str,
             host_version: &str,
             igen: &dyn InflectionGenerator,
+            _concise: bool,
         ) -> Result<String, String> {
             Ok(format!(
                 "{}-{}-{}-{}-{}-{}",
@@ -391,6 +393,7 @@ mod tests {
             host_url: "this is the host",
             host_version: "host version",
             inflections_db_path: None,
+            concise: false,
         }
     }
 
