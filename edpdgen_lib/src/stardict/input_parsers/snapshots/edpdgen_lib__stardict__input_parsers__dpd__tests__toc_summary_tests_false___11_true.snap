@@ -1,0 +1,6 @@
+---
+source: edpdgen_lib/src/stardict/input_parsers/dpd.rs
+expression: toc_summary
+
+---
+<li>adhikāra 10&nbsp;(m)&nbsp;this is another test</li>
