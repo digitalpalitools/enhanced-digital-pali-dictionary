@@ -54,7 +54,7 @@ pub trait StarDictPaliWord {
     fn sort_key(&self) -> String;
     fn group_id(&self) -> String;
     fn toc_id(&self, dict_short_name: &str) -> String;
-    fn toc_entry(&self, dict_short_name: &str, concise: bool) -> Result<String, String>;
+    fn toc_entry(&self, dict_short_name: &str) -> Result<String, String>;
     fn word_data_entry(
         &self,
         dict_short_name: &str,
@@ -62,7 +62,6 @@ pub trait StarDictPaliWord {
         host_url: &str,
         host_version: &str,
         igen: &dyn InflectionGenerator,
-        concise: bool,
     ) -> Result<String, String>;
 }
 

@@ -20,7 +20,6 @@ pub(crate) struct EdpdArgs<'a> {
     pub icon_path: Option<&'a str>,
     pub inflections_db_path: Option<&'a str>,
     pub what_if: bool,
-    pub concise: bool,
 }
 
 pub(crate) fn get_args<'a>(args: &'a ArgMatches) -> EdpdArgs<'a> {
@@ -47,7 +46,6 @@ pub(crate) fn get_args<'a>(args: &'a ArgMatches) -> EdpdArgs<'a> {
         icon_path: args.value_of("ICON_PATH"),
         inflections_db_path: args.value_of("INFLECTION_DB_PATH"),
         what_if: args.is_present("WHAT_IF"),
-        concise: args.is_present("CONCISE"),
     }
 }
 
@@ -68,7 +66,6 @@ pub(crate) fn parse_args<'a>() -> ArgMatches<'a> {
         .arg(create_icon_path_arg())
         .arg(create_inflection_db_path_arg())
         .arg(create_what_if_arg())
-        .arg(create_concise_arg())
         .get_matches()
 }
 
@@ -155,12 +152,6 @@ fn create_what_if_arg<'a, 'b>() -> Arg<'a, 'b> {
         .short("w")
         .long("what-if")
         .help("Print everything but dont generate.")
-}
-
-fn create_concise_arg<'a, 'b>() -> Arg<'a, 'b> {
-    Arg::with_name("CONCISE")
-        .long("concise")
-        .help("Use to generate Concise Dictionary.")
 }
 
 fn create_inflection_db_path_arg<'a, 'b>() -> Arg<'a, 'b> {

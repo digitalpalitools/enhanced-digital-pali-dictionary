@@ -43,15 +43,14 @@ fn create_dictionary_info<'a>(args: &'a args::EdpdArgs, time_stamp: &'a str) -> 
                 host_version,
                 feedback_form_url:
                     "https://docs.google.com/forms/d/1hMra0aMz65sYnRlPjGlTYQIHz-3_tKlywu3enqXlpSc/viewform",
-                name: args.name.unwrap_or(if args.concise { "Concise Digital Pāli Tools Dictionary (CDPD)" } else { "Digital Pāli Tools Dictionary (DPD)" }),
-                short_name: args.short_name.unwrap_or(if args.concise { "cdpd" } else { "dpd" }),
-                description: args.description.unwrap_or(if args.concise { "The next generation concise Digital Pāli Dictionary." } else { "The next generation comprehensive Digital Pāli Dictionary." }),
+                name: args.name.unwrap_or("Digital Pāli Tools Dictionary (DPD)"),
+                short_name: args.short_name.unwrap_or("dpd"),
+                description: args.description.unwrap_or("The next generation comprehensive Digital Pāli Dictionary."),
                 links_color: args.links_color.unwrap_or("#0006c8"),
                 headings_color: args.headings_color.unwrap_or("#747592"),
                 icon_path: args.icon_path,
                 icon: read_icon_bytes(args.icon_path, &args.input_format),
                 inflections_db_path: args.inflections_db_path,
-                concise: args.concise,
             }
         }
         InputFormat::Dps => {
@@ -66,15 +65,14 @@ fn create_dictionary_info<'a>(args: &'a args::EdpdArgs, time_stamp: &'a str) -> 
                 host_version,
                 feedback_form_url:
                     "https://docs.google.com/forms/d/e/1FAIpQLSc87oKqninpyg01YWdsjdYK6wSeIMoAZpy2jNM7Wu0KYygnHw/viewform",
-                name: args.name.unwrap_or(if args.concise { "Concise Devamitta Pāli Study (CDPS)" } else { "Devamitta Pāli Study (DPS)" }),
-                short_name: args.short_name.unwrap_or(if args.concise { "cdps" } else { "dps" }),
-                description: args.description.unwrap_or(if args.concise { "A concise Pāli language word lookup." } else { "A detailed Pāli language word lookup." }),
-                links_color: args.links_color.unwrap_or("orange"),
+                name: args.name.unwrap_or( "Devamitta Pāli Study (DPS)"),
+                short_name: args.short_name.unwrap_or("dps"),
+                description: args.description.unwrap_or("A detailed Pāli language word lookup."),
+                links_color: args.links_color.unwrap_or( "orange"),
                 headings_color: args.headings_color.unwrap_or("green"),
                 icon_path: args.icon_path,
                 icon: read_icon_bytes(args.icon_path, &args.input_format),
                 inflections_db_path: args.inflections_db_path,
-                concise: args.concise,
             }
         }
     }
