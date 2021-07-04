@@ -51,12 +51,13 @@ impl StarDictPaliWord for DpsPaliWord {
         make_toc_id(&self.id(), dict_short_name)
     }
 
-    fn toc_entry(&self, dict_short_name: &str) -> Result<String, String> {
+    fn toc_entry(&self, dict_short_name: &str, concise: bool) -> Result<String, String> {
         let mut context = Context::new();
         context.insert("toc_id", &self.toc_id(dict_short_name));
         context.insert("pali", &self.pali);
         context.insert("pos", &self.pos);
         context.insert("in_english", &self.in_english);
+        context.insert("concise", &concise);
 
         TEMPLATES
             .render("dps_toc_summary", &context)
@@ -70,21 +71,26 @@ impl StarDictPaliWord for DpsPaliWord {
         host_url: &str,
         host_version: &str,
         igen: &dyn InflectionGenerator,
+        concise: bool,
     ) -> Result<String, String> {
-        let vm = WordDataViewModel {
-            word: &self,
-            toc_id: &self.toc_id(dict_short_name),
-            dict_short_name,
-            feedback_form_url,
-            host_url,
-            host_version,
-            inflection_table: &igen.generate_inflection_table_html(&self.pali),
-        };
+        if concise {
+            Ok("".to_string())
+        } else {
+            let vm = WordDataViewModel {
+                word: &self,
+                toc_id: &self.toc_id(dict_short_name),
+                dict_short_name,
+                feedback_form_url,
+                host_url,
+                host_version,
+                inflection_table: &igen.generate_inflection_table_html(&self.pali),
+            };
 
-        let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
-        TEMPLATES
-            .render("dps_word_data", &context)
-            .map_err(|e| e.to_string())
+            let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
+            TEMPLATES
+                .render("dps_word_data", &context)
+                .map_err(|e| e.to_string())
+        }
     }
 }
 
@@ -101,29 +107,36 @@ mod tests {
         resolve_file_in_manifest_dir("dps_sample.csv").expect("must exist!")
     }
 
-    #[test_case(0)]
-    #[test_case(1)]
-    #[test_case(2)]
-    #[test_case(3)]
-    #[test_case(4)]
-    fn toc_summary_tests(rec_number: usize) {
+    #[test_case(0, false)]
+    #[test_case(1, false)]
+    #[test_case(2, false)]
+    #[test_case(3, false)]
+    #[test_case(4, false)]
+    #[test_case(0, true)]
+    #[test_case(1, true)]
+    #[test_case(2, true)]
+    #[test_case(3, true)]
+    #[test_case(4, true)]
+
+    fn toc_summary_tests(rec_number: usize, concise: bool) {
         let l = TestLogger::new();
         let mut recs = load_words::<DpsPaliWord>(&get_csv_path(), &l).expect("unexpected");
 
         let toc_summary = recs
             .nth(rec_number)
-            .map(|r| r.toc_entry("dps").expect("unexpected"))
+            .map(|r| r.toc_entry("dps", concise).expect("unexpected"))
             .expect("unexpected");
 
         insta::assert_snapshot!(toc_summary);
     }
 
-    #[test_case(0)]
-    #[test_case(1)]
-    #[test_case(2)]
-    #[test_case(3)]
-    #[test_case(4)]
-    fn word_data_tests(rec_number: usize) {
+    #[test_case(0, false)]
+    #[test_case(1, false)]
+    #[test_case(2, false)]
+    #[test_case(3, false)]
+    #[test_case(4, false)]
+    #[test_case(4, true)]
+    fn word_data_tests(rec_number: usize, concise: bool) {
         let l = TestLogger::new();
         let mut recs = load_words::<DpsPaliWord>(&get_csv_path(), &l).expect("unexpected");
         let igen = TestInflectionGenerator::new();
@@ -131,7 +144,7 @@ mod tests {
         let word_data = recs
             .nth(rec_number)
             .map(|r| {
-                r.word_data_entry("dps", "fb_url", "host url", "host version", &igen)
+                r.word_data_entry("dps", "fb_url", "host url", "host version", &igen, concise)
                     .expect("unexpected")
             })
             .expect("unexpected");
