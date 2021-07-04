@@ -38,7 +38,6 @@ pub struct DictionaryInfo<'a> {
     pub host_url: &'a str,
     pub host_version: &'a str,
     pub inflections_db_path: Option<&'a str>,
-    pub concise: bool,
 }
 
 pub struct DictionaryFile {
