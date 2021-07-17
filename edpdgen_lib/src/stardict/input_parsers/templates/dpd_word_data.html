@@ -37,6 +37,9 @@
 {%- if word['Construction'] -%}
 <tr><td>Construction</td><td><span>{{ word['Construction'] }}</span></td></tr>
 {%- endif -%}
+{%- if word['Phonetic Changes'] -%}
+<tr><td>Phonetic Changes</td><td><span>{{ word['Phonetic Changes'] }}</span></td></tr>
+{%- endif -%}
 {%- if word['Derivative'] -%}
 <tr><td>Derivative</td><td><span>{{ word['Derivative'] }} ({{ word['Suffix'] }})</span></td></tr>
 {%- endif -%}
@@ -56,13 +59,16 @@
 <tr><td>Sanskrit</td><td><span><i>{{ word['Sanskrit'] }}</i></span></td></tr>
 {%- endif -%}
 {%- if word['Sk Root'] -%}
-<tr><td>Sanskrit Root</td><td><span><i>{{ word['Sk Root'] }}</i>{%- if word['Cl'] and word['Cl'] != '0' -%}&nbsp;cl. {{ word['Cl'] }}{%- endif -%}</span></td></tr>
+<tr><td>Sanskrit Root</td><td><span><i>{{ word['Sk Root'] }}</i>{%- if word['Cl'] and word['Cl'] != '0' -%}&nbsp;cl. {{ word['Cl'] }}{%- endif -%}{%- if word['Sk Root Mn'] -%}&nbsp;({{ word['Sk Root Mn'] }}){%- endif -%}</span></td></tr>
 {%- endif -%}
 {%- if word['Commentary'] -%}
 <tr><td>Commentary</td><td><span>{{ word['Commentary'] }}</span></td></tr>
 {%- endif -%}
 {%- if word['Notes'] -%}
 <tr><td>Notes</td><td><span>{{ word['Notes'] }}</span></td></tr>
+{%- endif -%}
+{%- if word['Link'] -%}
+<tr><td>Link</td><td><span><a class="dictionary-wiki-link-{{ dict_short_name }}" href="{{ word['Link'] }}">{{ word['Link'] }}</a></span></td></tr>
 {%- endif -%}
 </tbody>
     </table>
