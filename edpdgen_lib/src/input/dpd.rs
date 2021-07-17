@@ -90,5 +90,5 @@ pub struct DpdPaliWord {
     #[serde(rename = "Phonetic Changes")]
     pub phonetic_changes: String,
     #[serde(rename = "Link")]
-    pub link: String
+    pub link: String,
 }
