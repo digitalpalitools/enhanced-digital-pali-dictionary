@@ -3,4 +3,4 @@ source: edpdgen_lib/src/ajdict/input_parsers/dpd.rs
 expression: word_data
 
 ---
-abala 2; adj, from bala; weak, feeble, not strong, not powerful
+abala 2; adj; weak; feeble

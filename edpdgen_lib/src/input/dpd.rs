@@ -85,4 +85,10 @@ pub struct DpdPaliWord {
     pub buddhadatta: String,
     #[serde(rename = "Cl")]
     pub cl: String,
+    #[serde(rename = "Sk Root Mn")]
+    pub sanskrit_root_meaning: String,
+    #[serde(rename = "Phonetic Changes")]
+    pub phonetic_changes: String,
+    #[serde(rename = "Link")]
+    pub link: String,
 }

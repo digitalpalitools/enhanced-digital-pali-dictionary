@@ -3,4 +3,4 @@ source: edpdgen_lib/src/ajdict/input_parsers/dpd.rs
 expression: word_data
 
 ---
-abala 1; adj, from bala, neg; weak, feeble, not strong, not powerful, lit. LM6; root: √bal×1.1 a (to be strong, live), RiC6 in comps; constr: na + √bal + a; kammadhāraya (na + bala), ant: bala; sk: abala, √bal cl. 5
+abala 1; adj, neg; weak; feeble, lit. not strong; root: √bal×1 a (to be strong, live); constr: na > a + √bal + a; kammadhāraya (na + bala), ant: bala; sk: abala, √bal cl. 2 (to be strong)

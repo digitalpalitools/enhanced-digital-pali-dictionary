@@ -5,12 +5,12 @@ expression: word_data
 ---
   <hr />
   <div>
-    <h4 id="adhikāra_2_dpd" class="word-info-heading-dpd">adhikāra 2</h4>
+    <h4 id="nigrodha_dpd" class="word-info-heading-dpd">nigrodha</h4>
 
     <table class="word-info-table-dpd">
-      <tbody><tr><td>Pāli</td><td><span>adhikāro</span></td></tr><tr><td>Grammar</td><td><span>m</span></td></tr><tr><td>English</td><td><span><strong>this is a test</strong></span></td></tr><tr><td></td><td><span>lit. LM11</span></td></tr><tr><td>Root</td><td><span>0<sup>0</sup>0 o (0)</span></td></tr><tr><td></td><td><span>RiC11 in comps</span></td></tr><tr><td>Construction</td><td><span>adhi + √kar > kār + *a</span></td></tr><tr><td>Derivative</td><td><span>kitaka (*a)</span></td></tr><tr><td>Sanskrit</td><td><span><i>adhikāra</i></span></td></tr><tr><td>Sanskrit Root</td><td><span><i>0</i>&nbsp;cl. 10</span></td></tr></tbody>
+      <tbody><tr><td>Pāli</td><td><span>nigrodho</span></td></tr><tr><td>Grammar</td><td><span>masc</span></td></tr><tr><td>English</td><td><span><strong>banyan tree</strong></span></td></tr><tr><td></td><td><span>lit. growing down</span></td></tr><tr><td>Root</td><td><span>√ruh<sup>･</sup>1 a (to ascend, grow)</span></td></tr><tr><td>Construction</td><td><span>ni + [g] + √ruh > rodh + *a</span></td></tr><tr><td>Phonetic Changes</td><td><span>u > o</span></td></tr><tr><td>Derivative</td><td><span>kita (*a)</span></td></tr><tr><td>Sanskrit</td><td><span><i>nyagrodha</i></span></td></tr><tr><td>Sanskrit Root</td><td><span><i>√ruh</i>&nbsp;cl. 1&nbsp;(to ascend)</span></td></tr><tr><td>Link</td><td><span><a class="dictionary-wiki-link-dpd" href="https://en.wikipedia.org/wiki/Banyan">https://en.wikipedia.org/wiki/Banyan</a></span></td></tr></tbody>
     </table>
-    <br /><div>
+    <br /><span>kīdiso, bho purisa, kiṃsuko'ti? so evaṃ vadeyya, bahalapattapalāso sandacchāyo kho, ambho purisa, kiṃsuko, seyyathā'pi <b>nigrodho</b>'ti.</span><br /><span class="sutta-source-dpd"><i>SN 35.245 kiṃsukopamasuttaṃ</i></span><br /><br /><span>khandhabījaṃ nāma, assattho, <b>nigrodho</b>, pilakkho, udumbaro, kacchako, kapitthano, yāni vā pan'aññāni'pi atthi khandhe jāyanti, khandhe sañjāyanti, etaṃ khandhabījaṃ nāma.</span><br /><span class="sutta-source-dpd"><i>VIN 2.5.2.1 bhūtagāmasikkhāpadaṃ</i></span><br /><br /><div>
   <a class="dictionary-feedback-link-dpd" href="fb_url?entry.267696921=host url&entry.1433863141=host version" target="_blank">spot a mistake in the dictionary? fix it here!</a>
 </div>
 <br />
@@ -18,7 +18,10 @@ expression: word_data
 </div>
 
 <div>
-[ITABLE: adhikāra 2]
+<details>
+<summary>Inflection Table</summary>
+[ITABLE: nigrodha]
+</details>
 </div>
 <br />
 

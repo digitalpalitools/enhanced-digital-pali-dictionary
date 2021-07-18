@@ -3,4 +3,4 @@ source: edpdgen_lib/src/ajdict/input_parsers/dpd.rs
 expression: word_data
 
 ---
-ābādhika; m, agent, from ābādha; sick person, ill man
+ābādhika; adj, from ābādha; sick; ill
