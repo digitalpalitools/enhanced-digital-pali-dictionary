@@ -14,6 +14,7 @@
 {%- if word['Root In Comps'] and word['Root In Comps'] != '0' %}, {{ word['Root In Comps'] }} in comps{%- endif -%}
 {%- if word['Base'] %}; base: {{ word['Base'] }}{%- endif -%}
 {%- if word['Construction'] %}; constr: {{ word['Construction'] }}{%- endif -%}
+{%- if word['Phonetic Changes'] %}; ph: {{ word['Phonetic Changes'] }}{%- endif -%}
 {%- if word['Compound'] %}; {{ word['Compound'] }}{%- endif -%}
 {%- if word['Compound Construction'] %} ({{ word['Compound Construction'] }}){%- endif -%}
 {%- if word['Antonyms'] %}, ant: {{ word['Antonyms'] }}{%- endif -%}
@@ -21,6 +22,7 @@
 {%- if word['Variant – same constr or diff reading'] %}; var: {{ word['Variant – same constr or diff reading'] }}{%- endif -%}
 {%- if word['Commentary'] %}; ct: {{ word['Commentary'] }}{%- endif -%}
 {%- if word['Notes'] %}; note: {{ word['Notes'] }}{%- endif -%}
+{%- if word['Link'] %}; wiki: {{ word['Link'] }}{%- endif -%}
 {%- if word['Sanskrit'] %}; sk: {{ word['Sanskrit'] }}{%- endif -%}
 {%- if word['Sk Root'] %}, {{ word['Sk Root'] }}{%- endif -%}
 {%- if word['Cl'] %} cl. {{ word['Cl'] }}{%- endif -%}
