@@ -55,6 +55,7 @@ impl StarDictPaliWord for DpsPaliWord {
         let mut context = Context::new();
         context.insert("toc_id", &self.toc_id(dict_short_name));
         context.insert("pali", &self.pali);
+        context.insert("fin", &self.fin);
         context.insert("pos", &self.pos);
         context.insert("in_english", &self.in_english);
         context.insert("concise", &concise);
