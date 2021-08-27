@@ -74,10 +74,10 @@ fn get_ids_and_html_for_word_group(
             (
                 w.sort_key(),
                 w.id().to_string(),
-                w.toc_entry(&dict_info.short_name, dict_info.concise)
+                w.toc_entry(dict_info.short_name, dict_info.concise)
                     .unwrap_or_else(|e| log_return_error(&w, "table of contents", e, logger)),
                 w.word_data_entry(
-                    &dict_info.short_name,
+                    dict_info.short_name,
                     dict_info.feedback_form_url,
                     dict_info.host_url,
                     dict_info.host_version,
@@ -101,7 +101,7 @@ fn get_ids_and_html_for_word_group(
             });
 
     let vm = WordGroupViewModel {
-        dict_short_name: &dict_info.short_name,
+        dict_short_name: dict_info.short_name,
         headings_color: dict_info.headings_color,
         links_color: dict_info.links_color,
         toc_entries: &toc_entries,

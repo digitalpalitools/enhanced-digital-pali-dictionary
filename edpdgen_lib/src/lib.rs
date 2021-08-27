@@ -89,8 +89,8 @@ pub fn run(dict_info: &DictionaryInfo, logger: &dyn PlsLogger) -> Result<(), Str
 
     let base_path = create_base_path(
         input_data_path,
-        &dict_info.output_folder,
-        &dict_info.short_name,
+        dict_info.output_folder,
+        dict_info.short_name,
     )?;
     write_dictionary(&base_path, &dict_files, logger)
 }

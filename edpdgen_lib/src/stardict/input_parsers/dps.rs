@@ -40,15 +40,15 @@ impl StarDictPaliWord for DpsPaliWord {
     }
 
     fn sort_key(&self) -> String {
-        make_sort_key(&self.id())
+        make_sort_key(self.id())
     }
 
     fn group_id(&self) -> String {
-        make_group_id(&self.id())
+        make_group_id(self.id())
     }
 
     fn toc_id(&self, dict_short_name: &str) -> String {
-        make_toc_id(&self.id(), dict_short_name)
+        make_toc_id(self.id(), dict_short_name)
     }
 
     fn toc_entry(&self, dict_short_name: &str, concise: bool) -> Result<String, String> {
@@ -78,7 +78,7 @@ impl StarDictPaliWord for DpsPaliWord {
             Ok("".to_string())
         } else {
             let vm = WordDataViewModel {
-                word: &self,
+                word: self,
                 toc_id: &self.toc_id(dict_short_name),
                 dict_short_name,
                 feedback_form_url,
