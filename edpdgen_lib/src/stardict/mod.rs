@@ -73,7 +73,7 @@ pub fn run_for_ods_type<'a, T: 'a + serde::de::DeserializeOwned + StarDictPaliWo
     logger: &dyn PlsLogger,
 ) -> Result<Vec<DictionaryFile>, String> {
     let words = input_parsers::load_words::<T>(input_data_path, logger)?;
-    let sd_files = output_generators::create_dictionary(&dict_info, words, igen, logger)?;
+    let sd_files = output_generators::create_dictionary(dict_info, words, igen, logger)?;
 
     Ok(sd_files)
 }
