@@ -31,11 +31,11 @@ impl AjDictPaliWord for DpdPaliWord {
     }
 
     fn sort_key(&self) -> String {
-        make_sort_key(&self.id())
+        make_sort_key(self.id())
     }
 
     fn concise_word_data_entry(&self) -> Result<String, String> {
-        let vm = WordDataViewModel { word: &self };
+        let vm = WordDataViewModel { word: self };
 
         let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
         TEMPLATES
@@ -45,7 +45,7 @@ impl AjDictPaliWord for DpdPaliWord {
     }
 
     fn word_data_entry(&self) -> Result<String, String> {
-        let vm = WordDataViewModel { word: &self };
+        let vm = WordDataViewModel { word: self };
 
         let context = Context::from_serialize(&vm).map_err(|e| e.to_string())?;
         TEMPLATES
